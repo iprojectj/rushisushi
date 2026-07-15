@@ -42,9 +42,6 @@ function Index() {
           <h1 className="text-center text-2xl font-semibold text-foreground sm:text-3xl">
             Você é maior de 18 anos?
           </h1>
-          <p className="mt-3 text-center text-sm text-muted-foreground">
-            Este conteúdo é destinado apenas para adultos.
-          </p>
 
           <div className="mt-8 grid grid-cols-2 gap-3">
             <Button
