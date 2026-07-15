@@ -114,10 +114,10 @@ function Index() {
             <Button
               onClick={handleCtaClick}
               size="lg"
-              className="group relative w-full bg-brand py-7 text-lg font-semibold text-brand-foreground shadow-lg shadow-brand/25 transition-all hover:bg-brand/90 hover:shadow-xl hover:shadow-brand/30 active:scale-[0.98]"
+              className="group relative w-full whitespace-normal bg-brand px-4 py-6 text-base font-semibold leading-tight text-brand-foreground shadow-lg shadow-brand/25 transition-all hover:bg-brand/90 hover:shadow-xl hover:shadow-brand/30 active:scale-[0.98] sm:py-7 sm:text-lg sm:whitespace-nowrap"
             >
               Falar com a Milena no Telegram
-              <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-0.5" />
+              <ArrowRight className="ml-2 h-5 w-5 shrink-0 transition-transform group-hover:translate-x-0.5" />
             </Button>
 
             <p className="mt-4 text-center text-xs text-muted-foreground">
