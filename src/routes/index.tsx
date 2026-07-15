@@ -6,7 +6,7 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const TELEGRAM_URL = "https://naomeclonaporfavor.com/l/c4fae7c1?utm_source=tiktok&utm_campaign=__CAMPAIGN_NAME__|__CAMPAIGN_ID__&utm_medium=__AID_NAME__|__AID__&utm_content=__CID_NAME__|__CID__&utm_term=__PLACEMENT__&utm_id=__CAMPAIGN_ID__&shk=ijcjuqrl";
+const TELEGRAM_URL = "https://paylume.fans/l/6b589ea5?shk=xqung0o4";
 
 function Index() {
   const trackClick = (name: string) => {
