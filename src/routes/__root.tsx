@@ -79,27 +79,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Acesso Exclusivo" },
+      { title: "Telegram: Contact @helenasabrinabot" },
       {
         name: "description",
-        content:
-          "Acesso exclusivo",
+        content: "Join Helena Sabrina ✝️ on Telegram",
       },
-      { name: "author", content: "Milena Online" },
-      { property: "og:title", content: "Acesso Exclusivo" },
+      { name: "author", content: "Telegram" },
+      { property: "og:title", content: "Telegram: Contact @helenasabrinabot" },
       {
         property: "og:description",
-        content:
-          "Acesso exclusivo",
+        content: "Join Helena Sabrina ✝️ on Telegram",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://id-preview--665f500c-4e1b-41c0-9216-163e81268759.lovable.app" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Acesso Exclusivo" },
+      { name: "twitter:title", content: "Telegram: Contact @helenasabrinabot" },
       {
         name: "twitter:description",
-        content:
-          "Acesso exclusivo",
+        content: "Join Helena Sabrina ✝️ on Telegram",
       },
       { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/f6e9abc1-a20a-40c3-b407-7b4cc9bc834b" },
       { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/f6e9abc1-a20a-40c3-b407-7b4cc9bc834b" },
