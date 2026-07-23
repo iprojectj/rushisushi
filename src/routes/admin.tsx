@@ -69,26 +69,27 @@ function Admin() {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      // Salva no Servidor (Persistente entre sessões)
-      await updateConfig({
+      // Salva no Servidor (Persistente entre sessões enquanto o servidor estiver rodando)
+      const result = await updateConfig({
         data: {
           isExternalActive,
           externalUrl
         }
       });
 
-      // Salva no LocalStorage (Redundância/Fallback)
+      if (result.success) {
+        toast.success("Configurações aplicadas globalmente com sucesso!");
+      } else {
+        toast.error("O servidor não confirmou a alteração.");
+      }
+
+      // Salva no LocalStorage (Apenas para debug e referência local)
       localStorage.setItem("redirect_external_active", isExternalActive.toString());
       localStorage.setItem("redirect_external_url", externalUrl);
       
-      toast.success("Configurações aplicadas globalmente!");
     } catch (error) {
       console.error("Save error:", error);
-      toast.error("Erro ao salvar no servidor. Salvo apenas localmente.");
-      
-      // Fallback local se o servidor falhar
-      localStorage.setItem("redirect_external_active", isExternalActive.toString());
-      localStorage.setItem("redirect_external_url", externalUrl);
+      toast.error("Erro crítico ao salvar no servidor.");
     } finally {
       setIsSaving(false);
     }

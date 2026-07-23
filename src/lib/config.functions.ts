@@ -2,8 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 // Armazenamento em memória no servidor (Edge Runtime)
-// Nota: Em serverless, isso reseta quando a instância morre, 
-// mas é melhor que localStorage para persistência entre usuários diferentes.
+// Nota: Em serverless, isso reseta quando a instância morre.
+// Sem Lovable Cloud (supabase), usamos apenas memória volátil.
 let serverConfig = {
   isExternalActive: false,
   externalUrl: ""
@@ -21,5 +21,6 @@ export const updateConfig = createServerFn({ method: "POST" })
   }).parse(data))
   .handler(async ({ data }) => {
     serverConfig = data;
+    console.log("Global config updated to:", serverConfig);
     return { success: true, config: serverConfig };
   });
