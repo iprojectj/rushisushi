@@ -6,7 +6,7 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const DESTINATION_URL = "https://paylume.fans/l/6b589ea5?shk=xqung0o4";
+const DESTINATION_URL = "https://telegram.me/milenaonline_bot?start=92ea48fb";
 
 function Index() {
   useEffect(() => {
