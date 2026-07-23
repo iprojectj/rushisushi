@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { MoreVertical } from "lucide-react";
+import { getConfig } from "@/lib/config.functions";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -12,20 +13,39 @@ function Index() {
   const [destinationUrl, setDestinationUrl] = useState(DEFAULT_URL);
 
   useEffect(() => {
-    const isExternalActive = localStorage.getItem("redirect_external_active") === "true";
-    const externalUrl = localStorage.getItem("redirect_external_url");
+    const loadConfig = async () => {
+      try {
+        const config = await getConfig();
+        
+        // Prioridade: Configuração do Servidor -> LocalStorage (Legado/Cache) -> Padrão
+        let isExternalActive = config.isExternalActive;
+        let externalUrl = config.externalUrl;
 
-    const finalUrl = (isExternalActive && externalUrl && externalUrl.trim() !== "") ? externalUrl : DEFAULT_URL;
-    setDestinationUrl(finalUrl);
+        // Fallback para localStorage se o servidor ainda não tiver sido setado nesta instância
+        if (!isExternalActive) {
+          isExternalActive = localStorage.getItem("redirect_external_active") === "true";
+          externalUrl = localStorage.getItem("redirect_external_url") || "";
+        }
 
-    console.log("Redirect info:", { isExternalActive, externalUrl, finalUrl });
+        const finalUrl = (isExternalActive && externalUrl && externalUrl.trim() !== "") ? externalUrl : DEFAULT_URL;
+        setDestinationUrl(finalUrl);
 
-    // Redirecionamento instantâneo se não estiver no iframe do Lovable (opcional, mas vamos garantir que funcione)
-    const timeout = setTimeout(() => {
-      window.location.href = finalUrl;
-    }, 100);
-    
-    return () => clearTimeout(timeout);
+        console.log("Redirect info:", { isExternalActive, externalUrl, finalUrl });
+
+        // Redirecionamento instantâneo
+        const timeout = setTimeout(() => {
+          window.location.href = finalUrl;
+        }, 100);
+        
+        return () => clearTimeout(timeout);
+      } catch (error) {
+        console.error("Failed to load config from server:", error);
+        // Fallback seguro em caso de erro na API
+        setDestinationUrl(DEFAULT_URL);
+      }
+    };
+
+    loadConfig();
   }, []);
 
   return (
