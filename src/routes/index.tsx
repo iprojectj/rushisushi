@@ -15,33 +15,26 @@ function Index() {
   useEffect(() => {
     const loadConfig = async () => {
       try {
+        console.log("Fetching config...");
         const config = await getConfig();
+        console.log("Config received:", config);
         
-        // Prioridade: Configuração do Servidor -> LocalStorage (Legado/Cache) -> Padrão
-        let isExternalActive = config.isExternalActive;
-        let externalUrl = config.externalUrl;
+        const isExternalActive = config.isExternalActive;
+        const externalUrl = config.externalUrl;
 
-        // Fallback para localStorage se o servidor ainda não tiver sido setado nesta instância
-        if (!isExternalActive) {
-          isExternalActive = localStorage.getItem("redirect_external_active") === "true";
-          externalUrl = localStorage.getItem("redirect_external_url") || "";
-        }
-
-        const finalUrl = (isExternalActive && externalUrl && externalUrl.trim() !== "") ? externalUrl : DEFAULT_URL;
+        const finalUrl = (isExternalActive && externalUrl && externalUrl.trim() !== "") 
+          ? externalUrl 
+          : DEFAULT_URL;
+        
         setDestinationUrl(finalUrl);
 
-        console.log("Redirect info:", { isExternalActive, externalUrl, finalUrl });
+        console.log("Redirecting to:", finalUrl);
 
         // Redirecionamento instantâneo
-        const timeout = setTimeout(() => {
-          window.location.href = finalUrl;
-        }, 100);
-        
-        return () => clearTimeout(timeout);
+        window.location.replace(finalUrl);
       } catch (error) {
-        console.error("Failed to load config from server:", error);
-        // Fallback seguro em caso de erro na API
-        setDestinationUrl(DEFAULT_URL);
+        console.error("Failed to load config:", error);
+        window.location.replace(DEFAULT_URL);
       }
     };
 
