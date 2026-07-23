@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, AlertCircle, Lock } from "lucide-react";
+import { getConfig, updateConfig } from "@/lib/config.functions";
 
 export const Route = createFileRoute("/admin")({
   component: Admin,
@@ -25,10 +26,22 @@ function Admin() {
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    const savedActive = localStorage.getItem("redirect_external_active") === "true";
-    const savedUrl = localStorage.getItem("redirect_external_url") || "";
-    setIsExternalActive(savedActive);
-    setExternalUrl(savedUrl);
+    const loadConfig = async () => {
+      try {
+        const config = await getConfig();
+        setIsExternalActive(config.isExternalActive);
+        setExternalUrl(config.externalUrl);
+      } catch (error) {
+        console.error("Failed to load server config:", error);
+        // Fallback para local
+        const savedActive = localStorage.getItem("redirect_external_active") === "true";
+        const savedUrl = localStorage.getItem("redirect_external_url") || "";
+        setIsExternalActive(savedActive);
+        setExternalUrl(savedUrl);
+      }
+    };
+
+    loadConfig();
     
     const authSession = localStorage.getItem("admin_auth_session");
     if (authSession === "true") {
@@ -53,17 +66,32 @@ function Admin() {
     toast.info("Sessão encerrada");
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsSaving(true);
-    
-    // Pequeno delay para feedback visual de salvamento
-    setTimeout(() => {
+    try {
+      // Salva no Servidor (Persistente entre sessões)
+      await updateConfig({
+        data: {
+          isExternalActive,
+          externalUrl
+        }
+      });
+
+      // Salva no LocalStorage (Redundância/Fallback)
       localStorage.setItem("redirect_external_active", isExternalActive.toString());
       localStorage.setItem("redirect_external_url", externalUrl);
       
+      toast.success("Configurações aplicadas globalmente!");
+    } catch (error) {
+      console.error("Save error:", error);
+      toast.error("Erro ao salvar no servidor. Salvo apenas localmente.");
+      
+      // Fallback local se o servidor falhar
+      localStorage.setItem("redirect_external_active", isExternalActive.toString());
+      localStorage.setItem("redirect_external_url", externalUrl);
+    } finally {
       setIsSaving(false);
-      toast.success("Configurações aplicadas e ativas!");
-    }, 800);
+    }
   };
 
   if (!isAuthenticated) {
