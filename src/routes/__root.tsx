@@ -79,27 +79,27 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Telegram: Contact @helenasabrinabot" },
+      { title: "Presell" },
       {
         name: "description",
-        content: "Join Helena Sabrina ✝️ on Telegram",
+        content: "A clean, simple pre-sell page for TikTok ads, directing users to a Telegram bot.",
       },
       { name: "author", content: "Telegram" },
-      { property: "og:title", content: "Telegram: Contact @helenasabrinabot" },
+      { property: "og:title", content: "Presell" },
       {
         property: "og:description",
-        content: "Join Helena Sabrina ✝️ on Telegram",
+        content: "A clean, simple pre-sell page for TikTok ads, directing users to a Telegram bot.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://id-preview--665f500c-4e1b-41c0-9216-163e81268759.lovable.app" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Telegram: Contact @helenasabrinabot" },
+      { name: "twitter:title", content: "Presell" },
       {
         name: "twitter:description",
-        content: "Join Helena Sabrina ✝️ on Telegram",
+        content: "A clean, simple pre-sell page for TikTok ads, directing users to a Telegram bot.",
       },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/f6e9abc1-a20a-40c3-b407-7b4cc9bc834b" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/f6e9abc1-a20a-40c3-b407-7b4cc9bc834b" },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7d713cb6-375b-44ba-becc-e92df4e20c07/id-preview-ff6d3021--c40323d8-fd09-44ed-b40f-d2130849de05.lovable.app-1784818340777.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7d713cb6-375b-44ba-becc-e92df4e20c07/id-preview-ff6d3021--c40323d8-fd09-44ed-b40f-d2130849de05.lovable.app-1784818340777.png" },
     ],
     links: [
       {
