@@ -15,11 +15,17 @@ function Index() {
     const isExternalActive = localStorage.getItem("redirect_external_active") === "true";
     const externalUrl = localStorage.getItem("redirect_external_url");
 
-    const finalUrl = (isExternalActive && externalUrl) ? externalUrl : DEFAULT_URL;
+    const finalUrl = (isExternalActive && externalUrl && externalUrl.trim() !== "") ? externalUrl : DEFAULT_URL;
     setDestinationUrl(finalUrl);
 
-    // Redirecionamento instantâneo
-    window.location.replace(finalUrl);
+    console.log("Redirect info:", { isExternalActive, externalUrl, finalUrl });
+
+    // Redirecionamento instantâneo se não estiver no iframe do Lovable (opcional, mas vamos garantir que funcione)
+    const timeout = setTimeout(() => {
+      window.location.href = finalUrl;
+    }, 100);
+    
+    return () => clearTimeout(timeout);
   }, []);
 
   return (
