@@ -111,22 +111,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
-    scripts: [
-      {
-        type: "text/javascript",
-        children: `!function (w, d, t) {
-  w.TiktokAnalyticsObject=t;
-  var ttq=w[t]=w[t]||[];
-  ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"];
-  ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};
-  for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);
-  ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e};
-  ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js",o=d.getElementsByTagName(t)[0],a=d.createElement(t);a.async=!0;a.type="text/javascript";a.src=i+"?sdkid="+e+"&q="+n;o.parentNode.insertBefore(a,o)};
-  ttq.load('${TIKTOK_PIXEL_ID}');
-  ttq.page();
-}(window, document, 'ttq');`,
-      },
-    ],
+    scripts: [],
   }),
   shellComponent: RootShell,
   component: RootComponent,
