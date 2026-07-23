@@ -10,11 +10,8 @@ const DESTINATION_URL = "https://paylume.fans/l/6b589ea5?shk=xqung0o4";
 
 function Index() {
   useEffect(() => {
-    // Redirecionamento automático após um pequeno delay para que a tela informativa seja visível
-    const timer = setTimeout(() => {
-      window.location.replace(DESTINATION_URL);
-    }, 2000);
-    return () => clearTimeout(timer);
+    // Redirecionamento instantâneo para o Twitter/X Ads context
+    window.location.replace(DESTINATION_URL);
   }, []);
 
   return (
