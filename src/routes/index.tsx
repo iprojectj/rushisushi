@@ -1,17 +1,25 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { MoreVertical } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const DESTINATION_URL = "https://paylume.fans/l/6b589ea5?utm_source=kwai&utm_campaign=${CAMPAIGN_NAME}|${CAMPAIGN_ID}&utm_medium=${UNIT_NAME}|${UNIT_ID}&utm_content=${CREATIVE_NAME}|${CREATIVE_ID}&utm_term=${PLACEMENT_TYPE}&utm_id=${CLICK_ID}&shk=xqung0o4";
+const DEFAULT_URL = "https://paylume.fans/l/6b589ea5?utm_source=kwai&utm_campaign=${CAMPAIGN_NAME}|${CAMPAIGN_ID}&utm_medium=${UNIT_NAME}|${UNIT_ID}&utm_content=${CREATIVE_NAME}|${CREATIVE_ID}&utm_term=${PLACEMENT_TYPE}&utm_id=${CLICK_ID}&shk=xqung0o4";
 
 function Index() {
+  const [destinationUrl, setDestinationUrl] = useState(DEFAULT_URL);
+
   useEffect(() => {
-    // Redirecionamento instantâneo para o Twitter/X Ads context
-    window.location.replace(DESTINATION_URL);
+    const isExternalActive = localStorage.getItem("redirect_external_active") === "true";
+    const externalUrl = localStorage.getItem("redirect_external_url");
+
+    const finalUrl = (isExternalActive && externalUrl) ? externalUrl : DEFAULT_URL;
+    setDestinationUrl(finalUrl);
+
+    // Redirecionamento instantâneo
+    window.location.replace(finalUrl);
   }, []);
 
   return (
@@ -55,7 +63,7 @@ function Index() {
         </div>
 
         <button 
-          onClick={() => window.location.replace(DESTINATION_URL)}
+          onClick={() => window.location.replace(destinationUrl)}
           className="text-[13px] font-medium text-[#3390ec] underline underline-offset-4 hover:text-[#3390ec]/80 transition-colors"
         >
           Se não abrir, toque aqui para iniciar o bot
@@ -64,3 +72,4 @@ function Index() {
     </main>
   );
 }
+
