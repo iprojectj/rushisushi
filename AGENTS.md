@@ -8,3 +8,6 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+## Application structure
+- Keep the root shell and blank index as the minimal application baseline; the previous presell, admin page, redirect configuration, and branding were deliberately removed for a fresh start.
