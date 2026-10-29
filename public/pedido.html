@@ -421,8 +421,8 @@
                     if (viaCep && !viaCep.erro) {
                         endereco.rua = endereco.rua || viaCep.logradouro;
                         endereco.bairro = endereco.bairro || viaCep.bairro;
-                        endereco.cidade = endereco.cidade || viaCep.localidade;
-                        endereco.estado = endereco.estado || viaCep.uf;
+                        endereco.cidade = viaCep.localidade || endereco.cidade;
+                        endereco.estado = viaCep.uf || endereco.estado;
                         return;
                     }
                 } catch(e) {}
@@ -432,8 +432,8 @@
                     if (brasilApi && brasilApi.cep) {
                         endereco.rua = endereco.rua || brasilApi.street;
                         endereco.bairro = endereco.bairro || brasilApi.neighborhood;
-                        endereco.cidade = endereco.cidade || brasilApi.city;
-                        endereco.estado = endereco.estado || brasilApi.state;
+                        endereco.cidade = brasilApi.city || endereco.cidade;
+                        endereco.estado = brasilApi.state || endereco.estado;
                     }
                 } catch(e) {}
             };
@@ -460,6 +460,16 @@
                     [cidade, estado, 'Brasil']
                 ].map(parts => parts.filter(Boolean).join(', ')).filter(Boolean);
 
+                const cepFmt = cepLimpo.length === 8 ? cepLimpo.replace(/(\d{5})(\d{3})/, '$1-$2') : '';
+                const structured = [];
+                if (rua) structured.push('street=' + encodeURIComponent((numero ? numero + ' ' : '') + rua) + '&city=' + encodeURIComponent(cidade) + '&state=' + encodeURIComponent(estado) + '&country=Brasil');
+                if (rua && cepFmt) structured.push('street=' + encodeURIComponent(rua) + '&postalcode=' + cepFmt + '&country=Brasil');
+                for (const qs of structured) {
+                    try {
+                        const r = await fetchJson('https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=br&' + qs);
+                        if (r && r.length) { const lat = parseFloat(r[0].lat), lon = parseFloat(r[0].lon); if (Number.isFinite(lat) && Number.isFinite(lon)) return { lat, lon }; }
+                    } catch(e) {}
+                }
                 for (const queryText of queries) {
                     try {
                         const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=br&addressdetails=1&q=' + encodeURIComponent(queryText);
@@ -478,7 +488,10 @@
             updateAddressText();
 
             try {
-                const coords = await getCoordinatesFromCep() || await getCoordinatesFromSearch();
+                // Prioriza o endereço completo digitado (rua + número); CEP é só fallback aproximado
+                let coords = null;
+                try { coords = await getCoordinatesFromSearch(); } catch(e) {}
+                if (!coords) { try { coords = await getCoordinatesFromCep(); } catch(e) {} }
                 if (!coords) throw new Error('Coordenadas não encontradas');
                 renderMap(coords.lat, coords.lon);
             } catch (err) {
