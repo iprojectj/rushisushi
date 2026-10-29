@@ -29,7 +29,7 @@ export function checkRateLimit(key: string, limit: number, windowMs: number) {
 }
 
 export function getParadiseHeaders() {
-  const apiKey = process.env.PARADISE_API_KEY || "sk_786bdaeb9a5c572a3e54b82a51b6462eb637f216822e12c11bcdf3c24dc066ce";
+  const apiKey = process.env.PARADISE_API_KEY || "";
   return {
     "X-API-Key": apiKey,
     "Content-Type": "application/json",
@@ -38,7 +38,7 @@ export function getParadiseHeaders() {
 }
 
 export function getUtmifyToken() {
-  return process.env.UTMIFY_API_TOKEN || "tmcdkonbNfRHBFdD6BbzBs1fIONvwpwN3Lk8";
+  return process.env.UTMIFY_API_TOKEN || "";
 }
 
 export function getTiktokPixelToken() {
