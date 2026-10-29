@@ -1,0 +1,61 @@
+/* iFood-inspired Light Theme for Admin
+   Applies exclusively to elements inside .admin-shell.
+   Uses iFood's characteristic red (#EA1D2C) and clean white/gray surfaces. */
+
+.admin-shell {
+  --background: oklch(0.98 0.005 260); /* Very light gray/white */
+  --foreground: oklch(0.15 0.02 260);
+  --card: oklch(1 0 0); /* Pure white */
+  --card-foreground: oklch(0.15 0.02 260);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0.02 260);
+  --primary: oklch(0.603 0.231 25.132); /* iFood Red (#EA1D2C) */
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.95 0.01 260);
+  --secondary-foreground: oklch(0.15 0.02 260);
+  --muted: oklch(0.95 0.01 260);
+  --muted-foreground: oklch(0.45 0.02 260);
+  --accent: oklch(0.92 0.02 260);
+  --accent-foreground: oklch(0.603 0.231 25.132);
+  --destructive: oklch(0.603 0.231 25.132);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.9 0.01 260);
+  --input: oklch(0.95 0.01 260);
+  --ring: oklch(0.603 0.231 25.132);
+  --success: oklch(0.627 0.194 149.215); /* iFood Success Green */
+
+  background-color: var(--background);
+  color: var(--foreground);
+  color-scheme: light;
+}
+
+.admin-shell .glass {
+  background: var(--card);
+  backdrop-filter: none;
+  border: 1px solid var(--border);
+}
+
+.admin-shell .glow-primary {
+  box-shadow: 0 4px 12px color-mix(in oklab, var(--primary) 15%, transparent);
+}
+
+@keyframes admin-pulse-ring {
+  0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--primary) 40%, transparent); }
+  70% { box-shadow: 0 0 0 10px color-mix(in oklab, var(--primary) 0%, transparent); }
+  100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--primary) 0%, transparent); }
+}
+
+.admin-shell .pulse-dot {
+  animation: admin-pulse-ring 2s ease-out infinite;
+}
+
+.admin-shell .shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklab, var(--primary) 10%, transparent),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: admin-shimmer 2.5s linear infinite;
+}
