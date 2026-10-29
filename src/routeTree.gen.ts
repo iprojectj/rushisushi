@@ -10,33 +10,291 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CriarPixRouteImport } from './routes/criar-pix'
+import { Route as ObrigadoRouteImport } from './routes/obrigado'
+import { Route as PedidoRouteImport } from './routes/pedido'
+import { Route as ReembolsoSolicitadoRouteImport } from './routes/reembolso-solicitado'
+import { Route as MxIndexRouteImport } from './routes/mx.index'
+import { Route as MxCrearPagoRouteImport } from './routes/mx.crear-pago'
+import { Route as MxGraciasRouteImport } from './routes/mx.gracias'
+import { Route as MxPedidoRouteImport } from './routes/mx.pedido'
+import { Route as MxReembolsoRouteImport } from './routes/mx.reembolso'
+import { Route as VerificarStatusIdRouteImport } from './routes/verificar-status.$id'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin.dashboard'
+import { Route as AuthenticatedAdminLeadsRouteImport } from './routes/_authenticated/admin.leads'
+import { Route as ApiPublicCooudWebhookRouteImport } from './routes/api/public/cooud-webhook'
+import { Route as ApiPublicLeadSubmitRouteImport } from './routes/api/public/lead-submit'
+import { Route as ApiPublicNexusWebhookRouteImport } from './routes/api/public/nexus-webhook'
+import { Route as ApiPublicParadiseWebhookRouteImport } from './routes/api/public/paradise-webhook'
+import { Route as AuthenticatedAdminLeadsIdRouteImport } from './routes/_authenticated/admin.leads.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CriarPixRoute = CriarPixRouteImport.update({
+  id: '/criar-pix',
+  path: '/criar-pix',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ObrigadoRoute = ObrigadoRouteImport.update({
+  id: '/obrigado',
+  path: '/obrigado',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PedidoRoute = PedidoRouteImport.update({
+  id: '/pedido',
+  path: '/pedido',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReembolsoSolicitadoRoute = ReembolsoSolicitadoRouteImport.update({
+  id: '/reembolso-solicitado',
+  path: '/reembolso-solicitado',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MxIndexRoute = MxIndexRouteImport.update({
+  id: '/mx/',
+  path: '/mx/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MxCrearPagoRoute = MxCrearPagoRouteImport.update({
+  id: '/mx/crear-pago',
+  path: '/mx/crear-pago',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MxGraciasRoute = MxGraciasRouteImport.update({
+  id: '/mx/gracias',
+  path: '/mx/gracias',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MxPedidoRoute = MxPedidoRouteImport.update({
+  id: '/mx/pedido',
+  path: '/mx/pedido',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MxReembolsoRoute = MxReembolsoRouteImport.update({
+  id: '/mx/reembolso',
+  path: '/mx/reembolso',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerificarStatusIdRoute = VerificarStatusIdRouteImport.update({
+  id: '/verificar-status/$id',
+  path: '/verificar-status/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminDashboardRoute =
+  AuthenticatedAdminDashboardRouteImport.update({
+    id: '/admin/dashboard',
+    path: '/admin/dashboard',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminLeadsRoute = AuthenticatedAdminLeadsRouteImport.update({
+  id: '/admin/leads',
+  path: '/admin/leads',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ApiPublicCooudWebhookRoute = ApiPublicCooudWebhookRouteImport.update({
+  id: '/api/public/cooud-webhook',
+  path: '/api/public/cooud-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicLeadSubmitRoute = ApiPublicLeadSubmitRouteImport.update({
+  id: '/api/public/lead-submit',
+  path: '/api/public/lead-submit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicNexusWebhookRoute = ApiPublicNexusWebhookRouteImport.update({
+  id: '/api/public/nexus-webhook',
+  path: '/api/public/nexus-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicParadiseWebhookRoute =
+  ApiPublicParadiseWebhookRouteImport.update({
+    id: '/api/public/paradise-webhook',
+    path: '/api/public/paradise-webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedAdminLeadsIdRoute =
+  AuthenticatedAdminLeadsIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedAdminLeadsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/criar-pix': typeof CriarPixRoute
+  '/obrigado': typeof ObrigadoRoute
+  '/pedido': typeof PedidoRoute
+  '/reembolso-solicitado': typeof ReembolsoSolicitadoRoute
+  '/mx/crear-pago': typeof MxCrearPagoRoute
+  '/mx/gracias': typeof MxGraciasRoute
+  '/mx/pedido': typeof MxPedidoRoute
+  '/mx/reembolso': typeof MxReembolsoRoute
+  '/verificar-status/$id': typeof VerificarStatusIdRoute
+  '/mx/': typeof MxIndexRoute
+  '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
+  '/api/public/cooud-webhook': typeof ApiPublicCooudWebhookRoute
+  '/api/public/lead-submit': typeof ApiPublicLeadSubmitRoute
+  '/api/public/nexus-webhook': typeof ApiPublicNexusWebhookRoute
+  '/api/public/paradise-webhook': typeof ApiPublicParadiseWebhookRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/admin/leads/$id': typeof AuthenticatedAdminLeadsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/criar-pix': typeof CriarPixRoute
+  '/obrigado': typeof ObrigadoRoute
+  '/pedido': typeof PedidoRoute
+  '/reembolso-solicitado': typeof ReembolsoSolicitadoRoute
+  '/mx/crear-pago': typeof MxCrearPagoRoute
+  '/mx/gracias': typeof MxGraciasRoute
+  '/mx/pedido': typeof MxPedidoRoute
+  '/mx/reembolso': typeof MxReembolsoRoute
+  '/verificar-status/$id': typeof VerificarStatusIdRoute
+  '/mx': typeof MxIndexRoute
+  '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
+  '/api/public/cooud-webhook': typeof ApiPublicCooudWebhookRoute
+  '/api/public/lead-submit': typeof ApiPublicLeadSubmitRoute
+  '/api/public/nexus-webhook': typeof ApiPublicNexusWebhookRoute
+  '/api/public/paradise-webhook': typeof ApiPublicParadiseWebhookRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
+  '/admin/leads/$id': typeof AuthenticatedAdminLeadsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/criar-pix': typeof CriarPixRoute
+  '/obrigado': typeof ObrigadoRoute
+  '/pedido': typeof PedidoRoute
+  '/reembolso-solicitado': typeof ReembolsoSolicitadoRoute
+  '/mx/crear-pago': typeof MxCrearPagoRoute
+  '/mx/gracias': typeof MxGraciasRoute
+  '/mx/pedido': typeof MxPedidoRoute
+  '/mx/reembolso': typeof MxReembolsoRoute
+  '/verificar-status/$id': typeof VerificarStatusIdRoute
+  '/mx/': typeof MxIndexRoute
+  '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/_authenticated/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
+  '/api/public/cooud-webhook': typeof ApiPublicCooudWebhookRoute
+  '/api/public/lead-submit': typeof ApiPublicLeadSubmitRoute
+  '/api/public/nexus-webhook': typeof ApiPublicNexusWebhookRoute
+  '/api/public/paradise-webhook': typeof ApiPublicParadiseWebhookRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/admin/leads/$id': typeof AuthenticatedAdminLeadsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/criar-pix'
+    | '/obrigado'
+    | '/pedido'
+    | '/reembolso-solicitado'
+    | '/mx/crear-pago'
+    | '/mx/gracias'
+    | '/mx/pedido'
+    | '/mx/reembolso'
+    | '/verificar-status/$id'
+    | '/mx/'
+    | '/admin/dashboard'
+    | '/admin/leads'
+    | '/api/public/cooud-webhook'
+    | '/api/public/lead-submit'
+    | '/api/public/nexus-webhook'
+    | '/api/public/paradise-webhook'
+    | '/admin/'
+    | '/admin/leads/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/criar-pix'
+    | '/obrigado'
+    | '/pedido'
+    | '/reembolso-solicitado'
+    | '/mx/crear-pago'
+    | '/mx/gracias'
+    | '/mx/pedido'
+    | '/mx/reembolso'
+    | '/verificar-status/$id'
+    | '/mx'
+    | '/admin/dashboard'
+    | '/admin/leads'
+    | '/api/public/cooud-webhook'
+    | '/api/public/lead-submit'
+    | '/api/public/nexus-webhook'
+    | '/api/public/paradise-webhook'
+    | '/admin'
+    | '/admin/leads/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/criar-pix'
+    | '/obrigado'
+    | '/pedido'
+    | '/reembolso-solicitado'
+    | '/mx/crear-pago'
+    | '/mx/gracias'
+    | '/mx/pedido'
+    | '/mx/reembolso'
+    | '/verificar-status/$id'
+    | '/mx/'
+    | '/_authenticated/admin/dashboard'
+    | '/_authenticated/admin/leads'
+    | '/api/public/cooud-webhook'
+    | '/api/public/lead-submit'
+    | '/api/public/nexus-webhook'
+    | '/api/public/paradise-webhook'
+    | '/_authenticated/admin/'
+    | '/_authenticated/admin/leads/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  CriarPixRoute: typeof CriarPixRoute
+  ObrigadoRoute: typeof ObrigadoRoute
+  PedidoRoute: typeof PedidoRoute
+  ReembolsoSolicitadoRoute: typeof ReembolsoSolicitadoRoute
+  MxCrearPagoRoute: typeof MxCrearPagoRoute
+  MxGraciasRoute: typeof MxGraciasRoute
+  MxPedidoRoute: typeof MxPedidoRoute
+  MxReembolsoRoute: typeof MxReembolsoRoute
+  VerificarStatusIdRoute: typeof VerificarStatusIdRoute
+  MxIndexRoute: typeof MxIndexRoute
+  ApiPublicCooudWebhookRoute: typeof ApiPublicCooudWebhookRoute
+  ApiPublicLeadSubmitRoute: typeof ApiPublicLeadSubmitRoute
+  ApiPublicNexusWebhookRoute: typeof ApiPublicNexusWebhookRoute
+  ApiPublicParadiseWebhookRoute: typeof ApiPublicParadiseWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +306,196 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/criar-pix': {
+      id: '/criar-pix'
+      path: '/criar-pix'
+      fullPath: '/criar-pix'
+      preLoaderRoute: typeof CriarPixRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/obrigado': {
+      id: '/obrigado'
+      path: '/obrigado'
+      fullPath: '/obrigado'
+      preLoaderRoute: typeof ObrigadoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pedido': {
+      id: '/pedido'
+      path: '/pedido'
+      fullPath: '/pedido'
+      preLoaderRoute: typeof PedidoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reembolso-solicitado': {
+      id: '/reembolso-solicitado'
+      path: '/reembolso-solicitado'
+      fullPath: '/reembolso-solicitado'
+      preLoaderRoute: typeof ReembolsoSolicitadoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mx/': {
+      id: '/mx/'
+      path: '/mx'
+      fullPath: '/mx/'
+      preLoaderRoute: typeof MxIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mx/crear-pago': {
+      id: '/mx/crear-pago'
+      path: '/mx/crear-pago'
+      fullPath: '/mx/crear-pago'
+      preLoaderRoute: typeof MxCrearPagoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mx/gracias': {
+      id: '/mx/gracias'
+      path: '/mx/gracias'
+      fullPath: '/mx/gracias'
+      preLoaderRoute: typeof MxGraciasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mx/pedido': {
+      id: '/mx/pedido'
+      path: '/mx/pedido'
+      fullPath: '/mx/pedido'
+      preLoaderRoute: typeof MxPedidoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mx/reembolso': {
+      id: '/mx/reembolso'
+      path: '/mx/reembolso'
+      fullPath: '/mx/reembolso'
+      preLoaderRoute: typeof MxReembolsoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verificar-status/$id': {
+      id: '/verificar-status/$id'
+      path: '/verificar-status/$id'
+      fullPath: '/verificar-status/$id'
+      preLoaderRoute: typeof VerificarStatusIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/dashboard': {
+      id: '/_authenticated/admin/dashboard'
+      path: '/admin/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AuthenticatedAdminDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/leads': {
+      id: '/_authenticated/admin/leads'
+      path: '/admin/leads'
+      fullPath: '/admin/leads'
+      preLoaderRoute: typeof AuthenticatedAdminLeadsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/public/cooud-webhook': {
+      id: '/api/public/cooud-webhook'
+      path: '/api/public/cooud-webhook'
+      fullPath: '/api/public/cooud-webhook'
+      preLoaderRoute: typeof ApiPublicCooudWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/lead-submit': {
+      id: '/api/public/lead-submit'
+      path: '/api/public/lead-submit'
+      fullPath: '/api/public/lead-submit'
+      preLoaderRoute: typeof ApiPublicLeadSubmitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/nexus-webhook': {
+      id: '/api/public/nexus-webhook'
+      path: '/api/public/nexus-webhook'
+      fullPath: '/api/public/nexus-webhook'
+      preLoaderRoute: typeof ApiPublicNexusWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/paradise-webhook': {
+      id: '/api/public/paradise-webhook'
+      path: '/api/public/paradise-webhook'
+      fullPath: '/api/public/paradise-webhook'
+      preLoaderRoute: typeof ApiPublicParadiseWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin/leads/$id': {
+      id: '/_authenticated/admin/leads/$id'
+      path: '/$id'
+      fullPath: '/admin/leads/$id'
+      preLoaderRoute: typeof AuthenticatedAdminLeadsIdRouteImport
+      parentRoute: typeof AuthenticatedAdminLeadsRoute
+    }
   }
 }
 
+interface AuthenticatedAdminLeadsRouteChildren {
+  AuthenticatedAdminLeadsIdRoute: typeof AuthenticatedAdminLeadsIdRoute
+}
+
+const AuthenticatedAdminLeadsRouteChildren: AuthenticatedAdminLeadsRouteChildren =
+  {
+    AuthenticatedAdminLeadsIdRoute: AuthenticatedAdminLeadsIdRoute,
+  }
+
+const AuthenticatedAdminLeadsRouteWithChildren =
+  AuthenticatedAdminLeadsRoute._addFileChildren(
+    AuthenticatedAdminLeadsRouteChildren,
+  )
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
+  AuthenticatedAdminLeadsRoute: typeof AuthenticatedAdminLeadsRouteWithChildren
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
+  AuthenticatedAdminLeadsRoute: AuthenticatedAdminLeadsRouteWithChildren,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  CriarPixRoute: CriarPixRoute,
+  ObrigadoRoute: ObrigadoRoute,
+  PedidoRoute: PedidoRoute,
+  ReembolsoSolicitadoRoute: ReembolsoSolicitadoRoute,
+  MxCrearPagoRoute: MxCrearPagoRoute,
+  MxGraciasRoute: MxGraciasRoute,
+  MxPedidoRoute: MxPedidoRoute,
+  MxReembolsoRoute: MxReembolsoRoute,
+  VerificarStatusIdRoute: VerificarStatusIdRoute,
+  MxIndexRoute: MxIndexRoute,
+  ApiPublicCooudWebhookRoute: ApiPublicCooudWebhookRoute,
+  ApiPublicLeadSubmitRoute: ApiPublicLeadSubmitRoute,
+  ApiPublicNexusWebhookRoute: ApiPublicNexusWebhookRoute,
+  ApiPublicParadiseWebhookRoute: ApiPublicParadiseWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,19 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
+import indexHtml from "../../public/index.html?raw";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Novo projeto | Início" },
-      { name: "description", content: "Projeto vazio, pronto para um novo começo." },
-      { property: "og:title", content: "Novo projeto | Início" },
-      { property: "og:description", content: "Projeto vazio, pronto para um novo começo." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
-  component: Index,
+  server: {
+    handlers: {
+      GET: async () =>
+        new Response(indexHtml, {
+          status: 200,
+          headers: { "Content-Type": "text/html; charset=utf-8" },
+        }),
+    },
+  },
 });
-
-function Index() {
-  return <main aria-label="Projeto vazio" className="min-h-screen bg-background" />;
-}
