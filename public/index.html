@@ -1104,10 +1104,10 @@
 
         const __diaSemana = ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"][new Date().getDay()];
         const catalog = [
+            { id: "barca-ostentacao", category: "destaques", name: "Combo Haki (120 peças)", desc: "O maior do cardápio! 40 Sashimis, 20 Joes, Camarão e muito mais.", price: 79.90, oldPrice: 229.90, img: "images/combo-presidencial.webp", badge: "Desconto aplicado Amigo de Patas 🐾", hasAddons: true },
             { id: "combo-rodízio", category: "destaques", name: "Combo Kamusari (74 peças)", desc: `Aquele pedido de ${__diaSemana} que vira tradição. Pra quem entende que sushi bom é sushi de salmão de verdade — e não abre mão. Sashimis fatiados na espessura certa, niguiris cortados na hora, uramaki Filadélfia crocante, joys recheados com cream cheese e hot rolls empanados no ponto. Salmão em todas as texturas, do cru ao empanado.`, price: 49.90, oldPrice: 149.80, img: "images/combo-kamusari.webp", badge: "Desconto aplicado Amigo de Patas 🐾", hasAddons: true, isBait: true },
             { id: "combo-ashura", category: "destaques", name: "Combo Ashura (48 peças)", desc: "Indeciso entre salmão, atum ou peixe branco? Come os três. Combo pensado pra quem gosta de variar a cada peça. Sashimis e niguiris dos três peixes nobres, uramaki California com manga e morango e tartar de salmão fresquinho. Corte no dia, arroz temperado no ponto e um visual colorido que já vende antes da primeira mordida.", price: 39.90, oldPrice: 99.90, img: "images/combo-ashura.webp", badge: "Desconto aplicado Amigo de Patas 🐾", hasAddons: true, isBait: true },
             { id: "combo-rokugan", category: "destaques", name: "Combo Rokugan (24 peças)", desc: "Pra quem prefere sabor intenso a combo gigante. Peças especiais em porção enxuta, feitas pra durar na memória. Niguiris de salmão flambados no maçarico com furikake, tataki de atum selado na hora, joys cremosos e hot rolls crocantes empanados. Porção enxuta, sabor intenso, preço honesto.", price: 19.90, oldPrice: 54.90, img: "images/combo-rokugan.webp", badge: "Desconto aplicado Amigo de Patas 🐾", hasAddons: true, isBait: true },
-            { id: "barca-ostentacao", category: "familia", name: "Combo Haki (120 peças)", desc: "O maior do cardápio! 40 Sashimis, 20 Joes, Camarão e muito mais.", price: 229.90, img: "images/combo-presidencial.webp", hasAddons: true },
             { id: "combo-individual", category: "familia", name: "Combo Tsuki (56 peças)", desc: "Para quem quer comer bem pagando pouco. Variedade incrível.", price: 129.90, img: "images/combo-koi.webp", hasAddons: true },
             { id: "temaki-isca", category: "familia", name: "Combo Fujin (24 peças)", desc: "Oferta limitada. O melhor custo benefício para sua fome.", price: 64.90, img: "images/combo1.webp", hasAddons: true },
             { id: "combo-hot-24", category: "hot-rolls", name: "Combo Kaen (24 peças)", desc: "Os melhores hot rolls, crocantes e recheados com muito cream cheese.", price: 79.90, img: "images/hothothot.webp", hasAddons: true },
@@ -1285,11 +1285,11 @@
                         let highlightClass = 'border-gray-100 bg-[#fafafa]'; 
                         
                         if (key === 'destaques') {
-                            if (p.id === 'combo-rodízio') { 
+                            if (p.id === 'combo-rodízio' || p.id === 'barca-ostentacao') { 
                                 highlightClass = 'card-destaque-master border-2 border-[#EA1D2C] bg-white'; 
                             }
                             
-                            const freeCokes = (p.id === 'combo-rodízio') ? 2 : 1;
+                            const freeCokes = (p.id === 'combo-rodízio' || p.id === 'barca-ostentacao') ? 2 : 1;
                             const cortesiaLabel = freeCokes === 2
                                 ? 'Cortesia: 2 Coca-Cola Lata inclusas'
                                 : 'Cortesia: 1 Coca-Cola Lata inclusa';
@@ -1322,7 +1322,7 @@
                                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                                                 <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-500"></span>
                                             </span>
-                                            <span class="text-[10px] font-bold text-amber-700 whitespace-nowrap" id="stock-label-${p.id}">Restam ${({'combo-rodízio':4,'combo-ashura':6,'combo-rokugan':4})[p.id] || 3} unidades</span>
+                                            <span class="text-[10px] font-bold text-amber-700 whitespace-nowrap" id="stock-label-${p.id}">Restam ${({'barca-ostentacao':3,'combo-rodízio':4,'combo-ashura':6,'combo-rokugan':4})[p.id] || 3} unidades</span>
                                         </div>`}
                                         <div class="flex items-center gap-1.5 px-2 py-0.5 bg-gradient-to-r from-[#fff5f5] to-[#ffecec] rounded-full border border-[#EA1D2C]/20">
                                             <i class="fa-solid fa-gift text-[9px] text-[#EA1D2C]"></i>
@@ -1341,7 +1341,7 @@
                             </div>`;
                         } 
                         else {
-                            if (p.id === 'combo-rodízio') { 
+                            if (p.id === 'combo-rodízio' || p.id === 'barca-ostentacao') { 
                                 highlightClass = 'card-destaque-master border-l-4 border-l-[#EA1D2C]'; 
                             }
                             
@@ -1405,7 +1405,7 @@
 
             const brindeEl = document.getElementById('modal-brinde');
             if (item.category === 'destaques') {
-                const freeCokes = (item.id === 'combo-rodízio') ? 2 : 1;
+                const freeCokes = (item.id === 'combo-rodízio' || item.id === 'barca-ostentacao') ? 2 : 1;
                 const cansMarkup = freeCokes === 2
                     ? `<div class="relative w-12 h-14 flex-shrink-0"><img src="images/coca-lata-brinde.png" class="absolute top-1 left-0 w-8 h-auto -rotate-[16deg] drop-shadow"><img src="images/coca-lata-brinde.png" class="absolute top-0 right-0 w-9 h-auto rotate-[8deg] drop-shadow"></div>`
                     : `<img src="images/coca-lata-brinde.png" class="w-11 h-auto -rotate-[8deg] drop-shadow flex-shrink-0">`;
@@ -1814,7 +1814,7 @@
 
         function getFreeCans(item) {
             if (!item || item.category !== 'destaques') return 0;
-            const doubles = ['combo-rodízio'];
+            const doubles = ['barca-ostentacao', 'combo-rodízio'];
             const per = doubles.indexOf(item.id) !== -1 ? 2 : 1;
             return per * (item.qty || 1);
         }
