@@ -10,6 +10,7 @@ import {
   nowUtcSqlString,
   pendingOrders,
 } from "@/lib/paradise.server";
+import { VIRTUSBANK_API_BASE_URL, getVirtusHeaders } from "@/lib/virtusbank.server";
 import { getNexusHeaders, NEXUS_API_BASE_URL, limparNomeProdutoNexus } from "@/lib/nexus.server";
 
 export const Route = createFileRoute("/criar-pix")({
@@ -49,7 +50,40 @@ export const Route = createFileRoute("/criar-pix")({
           let pixCopiaECola: string = "";
           let qrCodeFinal: string = "";
 
-          if (activeGateway === "nexus") {
+          if (activeGateway === "virtus") {
+            // VirtusBank - amount em REAIS
+            const tracking: Record<string, string> = {};
+            if (trackingParameters && typeof trackingParameters === "object") {
+              for (const k of ["utm_source", "utm_campaign", "utm_medium", "utm_content", "utm_term", "src", "sck"]) {
+                if (trackingParameters[k]) tracking[k] = String(trackingParameters[k]);
+              }
+            }
+            const payloadVirtus: any = {
+              amount: Math.max(1, Number(valorNumerico.toFixed(2))),
+              description: montarDescricaoPedido(products),
+              externalId: reference,
+              customer: { name: nome, email: emailCliente, taxId: cpfCliente, phone: telefoneLimpo },
+            };
+            if (Object.keys(tracking).length) payloadVirtus.trackingParameters = tracking;
+            const response = await fetch(`${VIRTUSBANK_API_BASE_URL}/Billing/Pix`, {
+              method: "POST",
+              headers: getVirtusHeaders(),
+              body: JSON.stringify(payloadVirtus),
+            });
+            const rawText = await response.text();
+            let apiData: any = {};
+            try { apiData = JSON.parse(rawText); } catch { apiData = { raw: rawText }; }
+            if (!response.ok || !apiData.isValid || !apiData.result?.id) {
+              console.error("[VIRTUS] Erro criar PIX:", response.status, rawText);
+              throw new Error(`VirtusBank ${response.status}: ${apiData.message || rawText || "Erro desconhecido"}`);
+            }
+            transactionId = apiData.result.id;
+            pixCopiaECola = apiData.result.metadata?.qrCodePayload || "";
+            const b64 = apiData.result.metadata?.qrCodeBase64 || "";
+            qrCodeFinal = b64
+              ? (b64.startsWith("data:") ? b64 : `data:image/png;base64,${b64}`)
+              : pixCopiaECola ? `https://quickchart.io/qr?text=${encodeURIComponent(pixCopiaECola)}&size=300` : "";
+          } else if (activeGateway === "nexus") {
             // Lógica NEXUS PAG - amount em REAIS (decimal), não centavos
             const payloadNexus = {
               amount: Number(valorNumerico.toFixed(2)),

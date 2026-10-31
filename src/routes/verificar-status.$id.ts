@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PARADISE_API_BASE_URL, getParadiseHeaders } from "@/lib/paradise.server";
+import { VIRTUSBANK_API_BASE_URL, getVirtusHeaders, mapVirtusStatus } from "@/lib/virtusbank.server";
 import { NEXUS_API_BASE_URL, getNexusHeaders } from "@/lib/nexus.server";
 
 export const Route = createFileRoute("/verificar-status/$id")({
@@ -28,7 +29,13 @@ export const Route = createFileRoute("/verificar-status/$id")({
 
           let statusFinal = "pending";
 
-          if (gateway === "nexus") {
+          if (gateway === "virtus") {
+            const res = await fetch(`${VIRTUSBANK_API_BASE_URL}/Billing/${encodeURIComponent(orderId)}/Status`, {
+              headers: getVirtusHeaders(),
+            });
+            const data: any = await res.json().catch(() => ({}));
+            statusFinal = mapVirtusStatus(data.result);
+          } else if (gateway === "nexus") {
             const res = await fetch(`${NEXUS_API_BASE_URL}/orders/${orderId}`, {
               headers: getNexusHeaders(),
             });
