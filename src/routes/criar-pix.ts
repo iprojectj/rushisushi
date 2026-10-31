@@ -40,7 +40,9 @@ export const Route = createFileRoute("/criar-pix")({
               .maybeSingle();
             if (data?.value) {
               const val = data.value;
-              activeGateway = typeof val === 'string' ? JSON.parse(val) : val;
+              let parsed: unknown = val;
+              if (typeof val === "string") { try { parsed = JSON.parse(val); } catch { parsed = val; } }
+              if (typeof parsed === "string") activeGateway = parsed;
             }
           } catch (e) {
             console.error("[criar-pix] Erro ao buscar gateway ativo:", e);
