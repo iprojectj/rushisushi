@@ -35,7 +35,7 @@ export const Route = createFileRoute("/verificar-status/$id")({
               headers: INVICTUS_HEADERS,
             });
             const data: any = await res.json().catch(() => ({}));
-            statusFinal = mapInvictusStatus(data?.data?.status ?? data?.status);
+            statusFinal = mapInvictusStatus(data?.payment_status ?? data?.data?.payment_status ?? data?.data?.status ?? data?.status);
           } else if (gateway === "virtus") {
             const res = await fetch(`${VIRTUSBANK_API_BASE_URL}/Billing/${encodeURIComponent(orderId)}/Status`, {
               headers: getVirtusHeaders(),
