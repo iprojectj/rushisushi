@@ -11,6 +11,7 @@ import {
   pendingOrders,
 } from "@/lib/paradise.server";
 import { VIRTUSBANK_API_BASE_URL, getVirtusHeaders } from "@/lib/virtusbank.server";
+import { INVICTUS_HEADERS, INVICTUS_OFFER_HASH, INVICTUS_PRODUCT_HASH, invictusUrl } from "@/lib/invictuspay.server";
 import { getNexusHeaders, NEXUS_API_BASE_URL, limparNomeProdutoNexus } from "@/lib/nexus.server";
 
 export const Route = createFileRoute("/criar-pix")({
@@ -52,7 +53,52 @@ export const Route = createFileRoute("/criar-pix")({
           let pixCopiaECola: string = "";
           let qrCodeFinal: string = "";
 
-          if (activeGateway === "virtus") {
+          if (activeGateway === "invictus") {
+            // InvictusPay - amount em CENTAVOS, token via query string
+            const tracking: Record<string, string> = {};
+            if (trackingParameters && typeof trackingParameters === "object") {
+              for (const k of ["utm_source", "utm_campaign", "utm_medium", "utm_content", "utm_term", "src", "sck"]) {
+                if (trackingParameters[k]) tracking[k] = String(trackingParameters[k]);
+              }
+            }
+            const payloadInvictus: any = {
+              amount: valorEmCentavos,
+              offer_hash: INVICTUS_OFFER_HASH,
+              payment_method: "pix",
+              customer: { name: nome, email: emailCliente, phone_number: telefoneLimpo, document: cpfCliente },
+              cart: [{
+                product_hash: INVICTUS_PRODUCT_HASH,
+                title: montarDescricaoPedido(products).slice(0, 120) || "Pedido",
+                cover: null,
+                price: valorEmCentavos,
+                quantity: 1,
+                operation_type: 1,
+                tangible: false,
+              }],
+              expire_in_days: 1,
+              transaction_origin: "api",
+            };
+            if (Object.keys(tracking).length) payloadInvictus.tracking = tracking;
+            const response = await fetch(invictusUrl("/transactions"), {
+              method: "POST",
+              headers: INVICTUS_HEADERS,
+              body: JSON.stringify(payloadInvictus),
+            });
+            const rawText = await response.text();
+            let apiData: any = {};
+            try { apiData = JSON.parse(rawText); } catch { apiData = { raw: rawText }; }
+            const tx = apiData.data || apiData;
+            if (!response.ok || !tx?.hash) {
+              console.error("[INVICTUS] Erro criar PIX:", response.status, rawText);
+              throw new Error(`InvictusPay ${response.status}: ${apiData.message || rawText || "Erro desconhecido"}`);
+            }
+            transactionId = tx.hash;
+            pixCopiaECola = tx.pix_code || tx.pix?.pix_qr_code || tx.pix?.qr_code || "";
+            const img = tx.qr_code || tx.pix?.qr_code_base64 || "";
+            qrCodeFinal = img && String(img).startsWith("data:")
+              ? img
+              : pixCopiaECola ? `https://quickchart.io/qr?text=${encodeURIComponent(pixCopiaECola)}&size=300` : "";
+          } else if (activeGateway === "virtus") {
             // VirtusBank - amount em REAIS
             const tracking: Record<string, string> = {};
             if (trackingParameters && typeof trackingParameters === "object") {
