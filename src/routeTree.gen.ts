@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CriarPixRouteImport } from './routes/criar-pix'
+import { Route as GeocodificarRouteImport } from './routes/geocodificar'
 import { Route as ObrigadoRouteImport } from './routes/obrigado'
 import { Route as PedidoRouteImport } from './routes/pedido'
 import { Route as ReembolsoSolicitadoRouteImport } from './routes/reembolso-solicitado'
@@ -48,6 +49,11 @@ const AuthRoute = AuthRouteImport.update({
 const CriarPixRoute = CriarPixRouteImport.update({
   id: '/criar-pix',
   path: '/criar-pix',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GeocodificarRoute = GeocodificarRouteImport.update({
+  id: '/geocodificar',
+  path: '/geocodificar',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ObrigadoRoute = ObrigadoRouteImport.update({
@@ -143,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/criar-pix': typeof CriarPixRoute
+  '/geocodificar': typeof GeocodificarRoute
   '/obrigado': typeof ObrigadoRoute
   '/pedido': typeof PedidoRoute
   '/reembolso-solicitado': typeof ReembolsoSolicitadoRoute
@@ -165,6 +172,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/criar-pix': typeof CriarPixRoute
+  '/geocodificar': typeof GeocodificarRoute
   '/obrigado': typeof ObrigadoRoute
   '/pedido': typeof PedidoRoute
   '/reembolso-solicitado': typeof ReembolsoSolicitadoRoute
@@ -189,6 +197,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/criar-pix': typeof CriarPixRoute
+  '/geocodificar': typeof GeocodificarRoute
   '/obrigado': typeof ObrigadoRoute
   '/pedido': typeof PedidoRoute
   '/reembolso-solicitado': typeof ReembolsoSolicitadoRoute
@@ -213,6 +222,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/criar-pix'
+    | '/geocodificar'
     | '/obrigado'
     | '/pedido'
     | '/reembolso-solicitado'
@@ -235,6 +245,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/criar-pix'
+    | '/geocodificar'
     | '/obrigado'
     | '/pedido'
     | '/reembolso-solicitado'
@@ -258,6 +269,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/criar-pix'
+    | '/geocodificar'
     | '/obrigado'
     | '/pedido'
     | '/reembolso-solicitado'
@@ -282,6 +294,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   CriarPixRoute: typeof CriarPixRoute
+  GeocodificarRoute: typeof GeocodificarRoute
   ObrigadoRoute: typeof ObrigadoRoute
   PedidoRoute: typeof PedidoRoute
   ReembolsoSolicitadoRoute: typeof ReembolsoSolicitadoRoute
@@ -325,6 +338,13 @@ declare module '@tanstack/react-router' {
       path: '/criar-pix'
       fullPath: '/criar-pix'
       preLoaderRoute: typeof CriarPixRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/geocodificar': {
+      id: '/geocodificar'
+      path: '/geocodificar'
+      fullPath: '/geocodificar'
+      preLoaderRoute: typeof GeocodificarRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/obrigado': {
@@ -483,6 +503,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   CriarPixRoute: CriarPixRoute,
+  GeocodificarRoute: GeocodificarRoute,
   ObrigadoRoute: ObrigadoRoute,
   PedidoRoute: PedidoRoute,
   ReembolsoSolicitadoRoute: ReembolsoSolicitadoRoute,
