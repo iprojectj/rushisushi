@@ -106,7 +106,6 @@ export const Route = createFileRoute("/criar-pix")({
             transactionId = apiData.id;
             pixCopiaECola = apiData.pixCode || "";
             const img = apiData.pixQrCode || "";
-            qrCodeFinal = img
             // Azipix às vezes devolve um link externo no lugar da imagem; nesse caso geramos o QR pelo código.
             qrCodeFinal = String(img).startsWith("data:image") && !String(img).includes("http")
               ? img
