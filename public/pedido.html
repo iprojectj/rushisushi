@@ -490,7 +490,12 @@
             try {
                 // Prioriza o endereço completo digitado (rua + número); CEP é só fallback aproximado
                 let coords = null;
-                try { coords = await getCoordinatesFromSearch(); } catch(e) {}
+                // 1º: Google (precisão de número da casa)
+                try {
+                    const gr = await fetch('/geocodificar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ rua: clean(endereco.rua), numero: clean(endereco.numero), bairro: clean(endereco.bairro), cidade: clean(endereco.cidade), estado: clean(endereco.estado), cep: cepLimpo }) });
+                    if (gr.ok) { const gj = await gr.json(); if (gj && gj.result) coords = gj.result; }
+                } catch(e) {}
+                if (!coords) { try { coords = await getCoordinatesFromSearch(); } catch(e) {} }
                 if (!coords) { try { coords = await getCoordinatesFromCep(); } catch(e) {} }
                 if (!coords) throw new Error('Coordenadas não encontradas');
                 renderMap(coords.lat, coords.lon);
