@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PARADISE_API_BASE_URL, getParadiseHeaders } from "@/lib/paradise.server";
 import { VIRTUSBANK_API_BASE_URL, getVirtusHeaders, mapVirtusStatus } from "@/lib/virtusbank.server";
 import { NEXUS_API_BASE_URL, getNexusHeaders } from "@/lib/nexus.server";
-import { INVICTUS_HEADERS, invictusUrl, mapInvictusStatus } from "@/lib/invictuspay.server";
+import { INVICTUS_API_BASE_URL, extractInvictusTx, getInvictusHeaders, mapInvictusStatus } from "@/lib/invictuspay.server";
+import { AZIPIX_API_BASE_URL, getAzipixHeaders, mapAzipixStatus } from "@/lib/azipix.server";
 
 export const Route = createFileRoute("/verificar-status/$id")({
   server: {
@@ -31,11 +32,17 @@ export const Route = createFileRoute("/verificar-status/$id")({
           let statusFinal = "pending";
 
           if (gateway === "invictus") {
-            const res = await fetch(invictusUrl(`/transactions/${encodeURIComponent(orderId)}`), {
-              headers: INVICTUS_HEADERS,
+            const res = await fetch(`${INVICTUS_API_BASE_URL}/transactions/${encodeURIComponent(orderId)}`, {
+              headers: getInvictusHeaders(),
             });
             const data: any = await res.json().catch(() => ({}));
-            statusFinal = mapInvictusStatus(data?.payment_status ?? data?.data?.payment_status ?? data?.data?.status ?? data?.status);
+            statusFinal = mapInvictusStatus(extractInvictusTx(data)?.status);
+          } else if (gateway === "azipix") {
+            const res = await fetch(`${AZIPIX_API_BASE_URL}/transactions/${encodeURIComponent(orderId)}`, {
+              headers: getAzipixHeaders(),
+            });
+            const data: any = await res.json().catch(() => ({}));
+            statusFinal = mapAzipixStatus(data?.status);
           } else if (gateway === "virtus") {
             const res = await fetch(`${VIRTUSBANK_API_BASE_URL}/Billing/${encodeURIComponent(orderId)}/Status`, {
               headers: getVirtusHeaders(),
