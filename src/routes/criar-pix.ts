@@ -107,7 +107,7 @@ export const Route = createFileRoute("/criar-pix")({
             pixCopiaECola = apiData.pixCode || "";
             const img = apiData.pixQrCode || "";
             qrCodeFinal = img
-              ? (String(img).startsWith("data:") ? img : `data:image/png;base64,${img}`)
+              ? (String(img).startsWith("data:") || String(img).startsWith("http") ? img : `data:image/png;base64,${img}`)
               : pixCopiaECola ? `https://quickchart.io/qr?text=${encodeURIComponent(pixCopiaECola)}&size=300` : "";
           } else if (activeGateway === "nexus") {
             // Lógica NEXUS PAG - amount em REAIS (decimal), não centavos
