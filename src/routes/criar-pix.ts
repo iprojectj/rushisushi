@@ -107,7 +107,9 @@ export const Route = createFileRoute("/criar-pix")({
             pixCopiaECola = apiData.pixCode || "";
             const img = apiData.pixQrCode || "";
             qrCodeFinal = img
-              ? (String(img).startsWith("data:") || String(img).startsWith("http") ? img : `data:image/png;base64,${img}`)
+            // Azipix às vezes devolve um link externo no lugar da imagem; nesse caso geramos o QR pelo código.
+            qrCodeFinal = String(img).startsWith("data:image") && !String(img).includes("http")
+              ? img
               : pixCopiaECola ? `https://quickchart.io/qr?text=${encodeURIComponent(pixCopiaECola)}&size=300` : "";
           } else if (activeGateway === "nexus") {
             // Lógica NEXUS PAG - amount em REAIS (decimal), não centavos
