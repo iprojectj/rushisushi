@@ -165,7 +165,7 @@ function LeadsList() {
     try {
       await setGatewayFn({ data: newGateway } as any);
       setActiveGatewayState(newGateway);
-      toast.success(`Gateway alterado para ${newGateway === "paradise" ? "Paradise" : newGateway === "virtus" ? "VirtusBank" : newGateway === "invictus" ? "InvictusPay" : "Nexus"}`);
+      toast.success(`Gateway alterado para ${newGateway === "paradise" ? "Paradise" : newGateway === "azipix" ? "Azipix" : newGateway === "invictus" ? "InvictusPay" : "Nexus"}`);
     } catch (error) {
       toast.error("Erro ao alterar gateway");
       console.error(error);
@@ -391,7 +391,7 @@ function LeadsList() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="min-w-[140px] justify-between" disabled={isGatewayLoading}>
-                  {isGatewayLoading ? "Alterando..." : activeGateway === "paradise" ? "Paradise Pags" : activeGateway === "virtus" ? "VirtusBank" : activeGateway === "invictus" ? "InvictusPay" : "Nexus Pag"}
+                  {isGatewayLoading ? "Alterando..." : activeGateway === "paradise" ? "Paradise Pags" : activeGateway === "azipix" ? "Azipix" : activeGateway === "invictus" ? "InvictusPay" : "Nexus Pag"}
                   <ChevronDown className="ml-2 h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -409,12 +409,12 @@ function LeadsList() {
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  key="virtus"
-                  onClick={() => handleGatewayChange("virtus")}
-                  className={activeGateway === "virtus" ? "bg-primary/10 font-bold" : ""}
+                  key="azipix"
+                  onClick={() => handleGatewayChange("azipix")}
+                  className={activeGateway === "azipix" ? "bg-primary/10 font-bold" : ""}
                 >
                   <div className="flex flex-col">
-                    <span>VirtusBank</span>
+                    <span>Azipix</span>
                     <span className="text-[10px] text-muted-foreground">Configurado e ativo</span>
                   </div>
                 </DropdownMenuItem>

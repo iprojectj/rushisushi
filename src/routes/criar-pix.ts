@@ -10,8 +10,8 @@ import {
   nowUtcSqlString,
   pendingOrders,
 } from "@/lib/paradise.server";
-import { VIRTUSBANK_API_BASE_URL, getVirtusHeaders } from "@/lib/virtusbank.server";
-import { INVICTUS_HEADERS, INVICTUS_OFFER_HASH, INVICTUS_PRODUCT_HASH, invictusUrl } from "@/lib/invictuspay.server";
+import { AZIPIX_API_BASE_URL, getAzipixHeaders } from "@/lib/azipix.server";
+import { INVICTUS_API_BASE_URL, extractInvictusTx, getInvictusHeaders } from "@/lib/invictuspay.server";
 import { getNexusHeaders, NEXUS_API_BASE_URL, limparNomeProdutoNexus } from "@/lib/nexus.server";
 
 export const Route = createFileRoute("/criar-pix")({
@@ -53,83 +53,62 @@ export const Route = createFileRoute("/criar-pix")({
           let pixCopiaECola: string = "";
           let qrCodeFinal: string = "";
 
+          // Virtus foi removida do painel; se ainda estiver salva, cai na Paradise.
+          if (activeGateway === "virtus") activeGateway = "paradise";
+
           if (activeGateway === "invictus") {
-            // InvictusPay - amount em CENTAVOS, token via query string
-            const tracking: Record<string, string> = {};
-            if (trackingParameters && typeof trackingParameters === "object") {
-              for (const k of ["utm_source", "utm_campaign", "utm_medium", "utm_content", "utm_term", "src", "sck"]) {
-                if (trackingParameters[k]) tracking[k] = String(trackingParameters[k]);
-              }
-            }
-            const payloadInvictus: any = {
-              amount: valorEmCentavos,
-              offer_hash: INVICTUS_OFFER_HASH,
-              payment_method: "pix",
-              customer: { name: nome, email: emailCliente, phone_number: telefoneLimpo, document: cpfCliente },
-              cart: [{
-                product_hash: INVICTUS_PRODUCT_HASH,
-                title: montarDescricaoPedido(products).slice(0, 120) || "Pedido",
-                cover: null,
-                price: valorEmCentavos,
-                quantity: 1,
-                operation_type: 1,
-                tangible: false,
-              }],
-              expire_in_days: 1,
-              transaction_origin: "api",
-            };
-            if (Object.keys(tracking).length) payloadInvictus.tracking = tracking;
-            const response = await fetch(invictusUrl("/transactions"), {
+            // InvictusPay v2 - centavos, item aberto (description), header X-Api-Key
+            const response = await fetch(`${INVICTUS_API_BASE_URL}/transactions`, {
               method: "POST",
-              headers: INVICTUS_HEADERS,
-              body: JSON.stringify(payloadInvictus),
+              headers: getInvictusHeaders(),
+              body: JSON.stringify({
+                amount: valorEmCentavos,
+                paymentMethod: "pix",
+                customer: { name: nome, email: emailCliente, document: cpfCliente, phone: telefoneLimpo },
+                items: [{ description: montarDescricaoPedido(products).slice(0, 120) || "Pedido", quantity: 1, amount: valorEmCentavos, externalRef: reference }],
+                pix: { expirationInSeconds: 3600 },
+              }),
             });
             const rawText = await response.text();
             let apiData: any = {};
             try { apiData = JSON.parse(rawText); } catch { apiData = { raw: rawText }; }
-            const tx = apiData.data || apiData;
-            if (!response.ok || !tx?.hash) {
+            const tx = extractInvictusTx(apiData);
+            if (!response.ok || !tx?.id) {
               console.error("[INVICTUS] Erro criar PIX:", response.status, rawText);
               throw new Error(`InvictusPay ${response.status}: ${apiData.message || rawText || "Erro desconhecido"}`);
             }
-            transactionId = tx.hash;
-            pixCopiaECola = tx.pix_code || tx.pix?.pix_qr_code || tx.pix?.qr_code || "";
-            const img = tx.qr_code || tx.pix?.qr_code_base64 || "";
-            qrCodeFinal = img && String(img).startsWith("data:")
-              ? img
+            transactionId = String(tx.id);
+            const pix = tx.pix || {};
+            pixCopiaECola = pix.qrcode || pix.qr_code || pix.copy_paste || pix.copyPaste || pix.emv || pix.code || tx.pix_code || tx.pixCode || "";
+            const img = pix.qrcode_image || pix.qr_code_base64 || pix.qrCodeBase64 || pix.image || tx.qr_code_base64 || "";
+            qrCodeFinal = img
+              ? (String(img).startsWith("data:") || String(img).startsWith("http") ? img : `data:image/png;base64,${img}`)
               : pixCopiaECola ? `https://quickchart.io/qr?text=${encodeURIComponent(pixCopiaECola)}&size=300` : "";
-          } else if (activeGateway === "virtus") {
-            // VirtusBank - amount em REAIS
-            const tracking: Record<string, string> = {};
-            if (trackingParameters && typeof trackingParameters === "object") {
-              for (const k of ["utm_source", "utm_campaign", "utm_medium", "utm_content", "utm_term", "src", "sck"]) {
-                if (trackingParameters[k]) tracking[k] = String(trackingParameters[k]);
-              }
-            }
-            const payloadVirtus: any = {
-              amount: Math.max(1, Number(valorNumerico.toFixed(2))),
-              description: montarDescricaoPedido(products),
-              externalId: reference,
-              customer: { name: nome, email: emailCliente, taxId: cpfCliente, phone: telefoneLimpo },
-            };
-            if (Object.keys(tracking).length) payloadVirtus.trackingParameters = tracking;
-            const response = await fetch(`${VIRTUSBANK_API_BASE_URL}/Billing/Pix`, {
+          } else if (activeGateway === "azipix") {
+            // Azipix - centavos
+            const response = await fetch(`${AZIPIX_API_BASE_URL}/transactions/charge`, {
               method: "POST",
-              headers: getVirtusHeaders(),
-              body: JSON.stringify(payloadVirtus),
+              headers: { ...getAzipixHeaders(), "X-Idempotency-Key": crypto.randomUUID() },
+              body: JSON.stringify({
+                amountCents: valorEmCentavos,
+                paymentMethod: "pix",
+                description: montarDescricaoPedido(products).slice(0, 200),
+                customer: { name: nome, email: emailCliente, document: cpfCliente, phone: telefoneLimpo },
+              }),
             });
             const rawText = await response.text();
             let apiData: any = {};
             try { apiData = JSON.parse(rawText); } catch { apiData = { raw: rawText }; }
-            if (!response.ok || !apiData.isValid || !apiData.result?.id) {
-              console.error("[VIRTUS] Erro criar PIX:", response.status, rawText);
-              throw new Error(`VirtusBank ${response.status}: ${apiData.message || rawText || "Erro desconhecido"}`);
+            if (!response.ok || !apiData.id) {
+              console.error("[AZIPIX] Erro criar PIX:", response.status, rawText);
+              throw new Error(`Azipix ${response.status}: ${apiData.message || apiData.error || rawText || "Erro desconhecido"}`);
             }
-            transactionId = apiData.result.id;
-            pixCopiaECola = apiData.result.metadata?.qrCodePayload || "";
-            const b64 = apiData.result.metadata?.qrCodeBase64 || "";
-            qrCodeFinal = b64
-              ? (b64.startsWith("data:") ? b64 : `data:image/png;base64,${b64}`)
+            transactionId = apiData.id;
+            pixCopiaECola = apiData.pixCode || "";
+            const img = apiData.pixQrCode || "";
+            // Azipix às vezes devolve um link externo no lugar da imagem; nesse caso geramos o QR pelo código.
+            qrCodeFinal = String(img).startsWith("data:image") && !String(img).includes("http")
+              ? img
               : pixCopiaECola ? `https://quickchart.io/qr?text=${encodeURIComponent(pixCopiaECola)}&size=300` : "";
           } else if (activeGateway === "nexus") {
             // Lógica NEXUS PAG - amount em REAIS (decimal), não centavos
