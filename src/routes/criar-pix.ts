@@ -11,6 +11,7 @@ import {
   pendingOrders,
 } from "@/lib/paradise.server";
 import { AZIPIX_API_BASE_URL, getAzipixHeaders } from "@/lib/azipix.server";
+import { GORILLAPAY_API_BASE_URL, getGorillaHeaders } from "@/lib/gorillapay.server";
 import { INVICTUS_API_BASE_URL, extractInvictusTx, getInvictusHeaders } from "@/lib/invictuspay.server";
 import { getNexusHeaders, NEXUS_API_BASE_URL, limparNomeProdutoNexus } from "@/lib/nexus.server";
 
@@ -110,6 +111,32 @@ export const Route = createFileRoute("/criar-pix")({
             // Azipix às vezes devolve um link externo no lugar da imagem; nesse caso geramos o QR pelo código.
             qrCodeFinal = String(img).startsWith("data:image") && !String(img).includes("http")
               ? img
+              : pixCopiaECola ? `https://quickchart.io/qr?text=${encodeURIComponent(pixCopiaECola)}&size=300` : "";
+          } else if (gw === "gorilla") {
+            // GorillaPay - centavos
+            const response = await fetch(`${GORILLAPAY_API_BASE_URL}/charges`, {
+              method: "POST",
+              headers: { ...getGorillaHeaders(), "Idempotency-Key": crypto.randomUUID() },
+              body: JSON.stringify({
+                amount: valorEmCentavos,
+                payment_method: "pix",
+                description: montarDescricaoPedido(products).slice(0, 200),
+                customer: { name: nome, email: emailCliente, document: cpfCliente, phone: telefoneLimpo },
+              }),
+            });
+            const rawText = await response.text();
+            let apiData: any = {};
+            try { apiData = JSON.parse(rawText); } catch { apiData = { raw: rawText }; }
+            const tx = apiData.data || {};
+            if (!response.ok || apiData.success === false || !tx.id) {
+              console.error("[GORILLAPAY] Erro criar PIX:", response.status, rawText);
+              throw new Error(`GorillaPay ${response.status}: ${apiData.error?.message || rawText || "Erro desconhecido"}`);
+            }
+            transactionId = String(tx.id);
+            pixCopiaECola = tx.pix_copy_paste || "";
+            const img = String(tx.pix_qr_code || "");
+            qrCodeFinal = img && !img.startsWith("http")
+              ? (img.startsWith("data:") ? img : `data:image/png;base64,${img}`)
               : pixCopiaECola ? `https://quickchart.io/qr?text=${encodeURIComponent(pixCopiaECola)}&size=300` : "";
           } else if (gw === "nexus") {
             // Lógica NEXUS PAG - amount em REAIS (decimal), não centavos
@@ -211,7 +238,7 @@ export const Route = createFileRoute("/criar-pix")({
           };
 
           // Tenta o gateway ativo; se falhar, usa os outros como reserva automática
-          const ordem = [activeGateway, ...["paradise", "azipix", "invictus"].filter((g) => g !== activeGateway)];
+          const ordem = [activeGateway, ...["paradise", "gorilla", "azipix", "invictus"].filter((g) => g !== activeGateway)];
           const erros: string[] = [];
           for (const gw of ordem) {
             try {
