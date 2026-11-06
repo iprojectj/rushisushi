@@ -56,7 +56,8 @@ export const Route = createFileRoute("/criar-pix")({
           // Virtus foi removida do painel; se ainda estiver salva, cai na Paradise.
           if (activeGateway === "virtus") activeGateway = "paradise";
 
-          if (activeGateway === "invictus") {
+          const gerarPix = async (gw: string): Promise<void> => {
+          if (gw === "invictus") {
             // InvictusPay v2 - centavos, item aberto (description), header X-Api-Key
             const response = await fetch(`${INVICTUS_API_BASE_URL}/transactions`, {
               method: "POST",
@@ -84,7 +85,7 @@ export const Route = createFileRoute("/criar-pix")({
             qrCodeFinal = img
               ? (String(img).startsWith("data:") || String(img).startsWith("http") ? img : `data:image/png;base64,${img}`)
               : pixCopiaECola ? `https://quickchart.io/qr?text=${encodeURIComponent(pixCopiaECola)}&size=300` : "";
-          } else if (activeGateway === "azipix") {
+          } else if (gw === "azipix") {
             // Azipix - centavos
             const response = await fetch(`${AZIPIX_API_BASE_URL}/transactions/charge`, {
               method: "POST",
@@ -110,7 +111,7 @@ export const Route = createFileRoute("/criar-pix")({
             qrCodeFinal = String(img).startsWith("data:image") && !String(img).includes("http")
               ? img
               : pixCopiaECola ? `https://quickchart.io/qr?text=${encodeURIComponent(pixCopiaECola)}&size=300` : "";
-          } else if (activeGateway === "nexus") {
+          } else if (gw === "nexus") {
             // Lógica NEXUS PAG - amount em REAIS (decimal), não centavos
             const payloadNexus = {
               amount: Number(valorNumerico.toFixed(2)),
@@ -206,6 +207,26 @@ export const Route = createFileRoute("/criar-pix")({
               ? `https://quickchart.io/qr?text=${encodeURIComponent(pixCopiaECola)}&size=300` 
               : "");
           }
+          if (!transactionId) throw new Error(`${gw}: resposta sem ID de transação`);
+          };
+
+          // Tenta o gateway ativo; se falhar, usa os outros como reserva automática
+          const ordem = [activeGateway, ...["paradise", "azipix", "invictus"].filter((g) => g !== activeGateway)];
+          const erros: string[] = [];
+          for (const gw of ordem) {
+            try {
+              transactionId = ""; pixCopiaECola = ""; qrCodeFinal = "";
+              await gerarPix(gw);
+              if (gw !== activeGateway) console.warn(`[criar-pix] ${activeGateway} falhou; PIX gerado via reserva ${gw}`);
+              activeGateway = gw;
+              erros.length = 0;
+              break;
+            } catch (e: any) {
+              console.error(`[criar-pix] falha no gateway ${gw}:`, e?.message || e);
+              erros.push(e?.message || String(e));
+            }
+          }
+          if (erros.length) throw new Error(erros.join(" | "));
 
           // 2. Preparar Utmify
           const payloadUtmify = {
