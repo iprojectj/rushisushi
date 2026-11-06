@@ -29,7 +29,6 @@ import { Route as AuthenticatedAdminLeadsRouteImport } from './routes/_authentic
 import { Route as ApiPublicAzipixWebhookRouteImport } from './routes/api/public/azipix-webhook'
 import { Route as ApiPublicCooudWebhookRouteImport } from './routes/api/public/cooud-webhook'
 import { Route as ApiPublicLeadSubmitRouteImport } from './routes/api/public/lead-submit'
-import { Route as ApiPublicNexusWebhookRouteImport } from './routes/api/public/nexus-webhook'
 import { Route as ApiPublicParadiseWebhookRouteImport } from './routes/api/public/paradise-webhook'
 import { Route as AuthenticatedAdminLeadsIdRouteImport } from './routes/_authenticated/admin.leads.$id'
 
@@ -133,11 +132,6 @@ const ApiPublicLeadSubmitRoute = ApiPublicLeadSubmitRouteImport.update({
   path: '/api/public/lead-submit',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicNexusWebhookRoute = ApiPublicNexusWebhookRouteImport.update({
-  id: '/api/public/nexus-webhook',
-  path: '/api/public/nexus-webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiPublicParadiseWebhookRoute =
   ApiPublicParadiseWebhookRouteImport.update({
     id: '/api/public/paradise-webhook',
@@ -170,7 +164,6 @@ export interface FileRoutesByFullPath {
   '/api/public/azipix-webhook': typeof ApiPublicAzipixWebhookRoute
   '/api/public/cooud-webhook': typeof ApiPublicCooudWebhookRoute
   '/api/public/lead-submit': typeof ApiPublicLeadSubmitRoute
-  '/api/public/nexus-webhook': typeof ApiPublicNexusWebhookRoute
   '/api/public/paradise-webhook': typeof ApiPublicParadiseWebhookRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/leads/$id': typeof AuthenticatedAdminLeadsIdRoute
@@ -194,7 +187,6 @@ export interface FileRoutesByTo {
   '/api/public/azipix-webhook': typeof ApiPublicAzipixWebhookRoute
   '/api/public/cooud-webhook': typeof ApiPublicCooudWebhookRoute
   '/api/public/lead-submit': typeof ApiPublicLeadSubmitRoute
-  '/api/public/nexus-webhook': typeof ApiPublicNexusWebhookRoute
   '/api/public/paradise-webhook': typeof ApiPublicParadiseWebhookRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/leads/$id': typeof AuthenticatedAdminLeadsIdRoute
@@ -220,7 +212,6 @@ export interface FileRoutesById {
   '/api/public/azipix-webhook': typeof ApiPublicAzipixWebhookRoute
   '/api/public/cooud-webhook': typeof ApiPublicCooudWebhookRoute
   '/api/public/lead-submit': typeof ApiPublicLeadSubmitRoute
-  '/api/public/nexus-webhook': typeof ApiPublicNexusWebhookRoute
   '/api/public/paradise-webhook': typeof ApiPublicParadiseWebhookRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/leads/$id': typeof AuthenticatedAdminLeadsIdRoute
@@ -246,7 +237,6 @@ export interface FileRouteTypes {
     | '/api/public/azipix-webhook'
     | '/api/public/cooud-webhook'
     | '/api/public/lead-submit'
-    | '/api/public/nexus-webhook'
     | '/api/public/paradise-webhook'
     | '/admin/'
     | '/admin/leads/$id'
@@ -270,7 +260,6 @@ export interface FileRouteTypes {
     | '/api/public/azipix-webhook'
     | '/api/public/cooud-webhook'
     | '/api/public/lead-submit'
-    | '/api/public/nexus-webhook'
     | '/api/public/paradise-webhook'
     | '/admin'
     | '/admin/leads/$id'
@@ -295,7 +284,6 @@ export interface FileRouteTypes {
     | '/api/public/azipix-webhook'
     | '/api/public/cooud-webhook'
     | '/api/public/lead-submit'
-    | '/api/public/nexus-webhook'
     | '/api/public/paradise-webhook'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/leads/$id'
@@ -319,7 +307,6 @@ export interface RootRouteChildren {
   ApiPublicAzipixWebhookRoute: typeof ApiPublicAzipixWebhookRoute
   ApiPublicCooudWebhookRoute: typeof ApiPublicCooudWebhookRoute
   ApiPublicLeadSubmitRoute: typeof ApiPublicLeadSubmitRoute
-  ApiPublicNexusWebhookRoute: typeof ApiPublicNexusWebhookRoute
   ApiPublicParadiseWebhookRoute: typeof ApiPublicParadiseWebhookRoute
 }
 
@@ -465,13 +452,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicLeadSubmitRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/nexus-webhook': {
-      id: '/api/public/nexus-webhook'
-      path: '/api/public/nexus-webhook'
-      fullPath: '/api/public/nexus-webhook'
-      preLoaderRoute: typeof ApiPublicNexusWebhookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/public/paradise-webhook': {
       id: '/api/public/paradise-webhook'
       path: '/api/public/paradise-webhook'
@@ -536,7 +516,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicAzipixWebhookRoute: ApiPublicAzipixWebhookRoute,
   ApiPublicCooudWebhookRoute: ApiPublicCooudWebhookRoute,
   ApiPublicLeadSubmitRoute: ApiPublicLeadSubmitRoute,
-  ApiPublicNexusWebhookRoute: ApiPublicNexusWebhookRoute,
   ApiPublicParadiseWebhookRoute: ApiPublicParadiseWebhookRoute,
 }
 export const routeTree = rootRouteImport
