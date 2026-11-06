@@ -13,7 +13,6 @@ import {
 import { AZIPIX_API_BASE_URL, getAzipixHeaders } from "@/lib/azipix.server";
 import { GORILLAPAY_API_BASE_URL, getGorillaHeaders } from "@/lib/gorillapay.server";
 import { INVICTUS_API_BASE_URL, extractInvictusTx, getInvictusHeaders } from "@/lib/invictuspay.server";
-import { getNexusHeaders, NEXUS_API_BASE_URL, limparNomeProdutoNexus } from "@/lib/nexus.server";
 
 export const Route = createFileRoute("/criar-pix")({
   server: {
@@ -55,7 +54,7 @@ export const Route = createFileRoute("/criar-pix")({
           let qrCodeFinal: string = "";
 
           // Virtus foi removida do painel; se ainda estiver salva, cai na Paradise.
-          if (activeGateway === "virtus") activeGateway = "paradise";
+          if (activeGateway === "virtus" || activeGateway === "nexus") activeGateway = "paradise";
 
           const gerarPix = async (gw: string): Promise<void> => {
           if (gw === "invictus") {
@@ -138,50 +137,6 @@ export const Route = createFileRoute("/criar-pix")({
             qrCodeFinal = img && !img.startsWith("http")
               ? (img.startsWith("data:") ? img : `data:image/png;base64,${img}`)
               : pixCopiaECola ? `https://quickchart.io/qr?text=${encodeURIComponent(pixCopiaECola)}&size=300` : "";
-          } else if (gw === "nexus") {
-            // Lógica NEXUS PAG - amount em REAIS (decimal), não centavos
-            const payloadNexus = {
-              amount: Number(valorNumerico.toFixed(2)),
-              description: montarDescricaoPedido(products),
-              external_id: reference,
-              customer: {
-                name: nome,
-                email: emailCliente,
-                document: cpfCliente,
-                phone: telefoneLimpo,
-              },
-              payment_method: "pix",
-              items: Array.isArray(products) ? products.map(p => ({
-                name: limparNomeProdutoNexus(p.name),
-                price: Number(Number(p.price).toFixed(2)),
-                quantity: p.quantity || 1
-              })) : []
-            };
-
-
-            console.log("[NEXUS] Enviando payload:", JSON.stringify(payloadNexus));
-            const response = await fetch(`${NEXUS_API_BASE_URL}/api/pix/create`, {
-              method: "POST",
-              headers: getNexusHeaders(),
-              body: JSON.stringify(payloadNexus),
-            });
-
-            const rawText = await response.text();
-            let apiData: any = {};
-            try { apiData = JSON.parse(rawText); } catch { apiData = { raw: rawText }; }
-
-            if (!response.ok) {
-              console.error("[NEXUS] Erro criar PIX:", response.status, rawText);
-              throw new Error(`Nexus ${response.status}: ${apiData.message || rawText || "Erro desconhecido"}`);
-            }
-
-            const tx = apiData.transaction || apiData;
-            transactionId = tx.id || tx.txid;
-            pixCopiaECola = tx.pix_copia_cola || tx.pix?.qrcode || tx.qr_code || "";
-            qrCodeFinal = tx.qr_code_base64 || tx.pix?.qrcode_image || (pixCopiaECola
-              ? `https://quickchart.io/qr?text=${encodeURIComponent(pixCopiaECola)}&size=300`
-              : "");
-
           } else {
             // Lógica PARADISE PAGS (Default)
             const payloadParadise: any = {
@@ -273,7 +228,7 @@ export const Route = createFileRoute("/criar-pix")({
             },
             products: Array.isArray(products) ? products.map((p: any) => ({
               id: p.id || "SKU",
-              name: activeGateway === "nexus" ? limparNomeProdutoNexus(p.name) : limparNomeProduto(p.name),
+              name: limparNomeProduto(p.name),
               planId: null,
               planName: null,
               quantity: p.quantity || 1,

@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PARADISE_API_BASE_URL, getParadiseHeaders } from "@/lib/paradise.server";
 import { VIRTUSBANK_API_BASE_URL, getVirtusHeaders, mapVirtusStatus } from "@/lib/virtusbank.server";
-import { NEXUS_API_BASE_URL, getNexusHeaders } from "@/lib/nexus.server";
 import { INVICTUS_API_BASE_URL, extractInvictusTx, getInvictusHeaders, mapInvictusStatus } from "@/lib/invictuspay.server";
 import { AZIPIX_API_BASE_URL, getAzipixHeaders, mapAzipixStatus } from "@/lib/azipix.server";
 import { GORILLAPAY_API_BASE_URL, getGorillaHeaders, mapGorillaStatus } from "@/lib/gorillapay.server";
@@ -57,17 +56,8 @@ export const Route = createFileRoute("/verificar-status/$id")({
             const data: any = await res.json().catch(() => ({}));
             statusFinal = mapVirtusStatus(data.result);
           } else if (gateway === "nexus") {
-            const res = await fetch(`${NEXUS_API_BASE_URL}/orders/${orderId}`, {
-              headers: getNexusHeaders(),
-            });
-            const data: any = await res.json().catch(() => ({}));
-            const rawStatus = String(data.status || "").toLowerCase();
-            
-            if (["paid", "completed", "success", "approved", "paid_out"].includes(rawStatus)) {
-              statusFinal = "paid";
-            } else if (["canceled", "cancelled", "refused", "expired"].includes(rawStatus)) {
-              statusFinal = "failed";
-            }
+            // Nexus foi removido do site; pedidos antigos ficam como pendentes.
+            statusFinal = "pending";
           } else {
             // Paradise Pags
             const res = await fetch(`${PARADISE_API_BASE_URL}/query.php?action=get_transaction&id=${orderId}`, {
