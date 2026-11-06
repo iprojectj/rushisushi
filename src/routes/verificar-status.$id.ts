@@ -76,6 +76,32 @@ export const Route = createFileRoute("/verificar-status/$id")({
             }
           }
 
+          // Envia venda paga para a UTMify uma única vez (cobre gateways sem webhook, ex.: InvictusPay)
+          if (statusFinal === "paid") {
+            try {
+              const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+              const { data: row } = await supabaseAdmin
+                .from("lead_submissions")
+                .select("id, fields")
+                .eq("order_id", orderId)
+                .maybeSingle();
+              const fields: any = row?.fields ?? {};
+              if (row && fields.utmify_payload && !fields.utmify_paid_sent) {
+                const { enviarPedidoParaUtmify, nowUtcSqlString } = await import("@/lib/paradise.server");
+                const payload = { ...fields.utmify_payload, status: "paid", approvedDate: nowUtcSqlString() };
+                const r = await enviarPedidoParaUtmify(payload);
+                if (r?.ok) {
+                  await supabaseAdmin
+                    .from("lead_submissions")
+                    .update({ fields: { ...fields, utmify_paid_sent: true } })
+                    .eq("id", row.id);
+                }
+              }
+            } catch (e) {
+              console.error("[verificar-status] Erro UTMify:", e);
+            }
+          }
+
           return new Response(JSON.stringify({ status: statusFinal }), {
             headers: { "Content-Type": "application/json" },
           });
