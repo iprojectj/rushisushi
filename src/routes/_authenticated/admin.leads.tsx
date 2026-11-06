@@ -409,6 +409,16 @@ function LeadsList() {
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem
+                  key="gorilla"
+                  onClick={() => handleGatewayChange("gorilla")}
+                  className={activeGateway === "gorilla" ? "bg-primary/10 font-bold" : ""}
+                >
+                  <div className="flex flex-col">
+                    <span>GorillaPay</span>
+                    <span className="text-[10px] text-muted-foreground">Configurado e ativo</span>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem
                   key="azipix"
                   onClick={() => handleGatewayChange("azipix")}
                   className={activeGateway === "azipix" ? "bg-primary/10 font-bold" : ""}

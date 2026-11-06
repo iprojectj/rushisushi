@@ -4,6 +4,7 @@ import { VIRTUSBANK_API_BASE_URL, getVirtusHeaders, mapVirtusStatus } from "@/li
 import { NEXUS_API_BASE_URL, getNexusHeaders } from "@/lib/nexus.server";
 import { INVICTUS_API_BASE_URL, extractInvictusTx, getInvictusHeaders, mapInvictusStatus } from "@/lib/invictuspay.server";
 import { AZIPIX_API_BASE_URL, getAzipixHeaders, mapAzipixStatus } from "@/lib/azipix.server";
+import { GORILLAPAY_API_BASE_URL, getGorillaHeaders, mapGorillaStatus } from "@/lib/gorillapay.server";
 
 export const Route = createFileRoute("/verificar-status/$id")({
   server: {
@@ -37,6 +38,12 @@ export const Route = createFileRoute("/verificar-status/$id")({
             });
             const data: any = await res.json().catch(() => ({}));
             statusFinal = mapInvictusStatus(extractInvictusTx(data)?.status);
+          } else if (gateway === "gorilla") {
+            const res = await fetch(`${GORILLAPAY_API_BASE_URL}/charges/${encodeURIComponent(orderId)}`, {
+              headers: getGorillaHeaders(),
+            });
+            const data: any = await res.json().catch(() => ({}));
+            statusFinal = mapGorillaStatus(data?.data?.status);
           } else if (gateway === "azipix") {
             const res = await fetch(`${AZIPIX_API_BASE_URL}/transactions/${encodeURIComponent(orderId)}`, {
               headers: getAzipixHeaders(),
