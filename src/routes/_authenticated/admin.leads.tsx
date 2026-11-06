@@ -149,6 +149,17 @@ function StatCard({
   );
 }
 
+const GATEWAY_LABELS: Record<string, string> = {
+  paradise: "Paradise Pags",
+  gorilla: "GorillaPay",
+  azipix: "Azipix",
+  invictus: "InvictusPay",
+};
+
+function gatewayLabel(gateway: string) {
+  return GATEWAY_LABELS[gateway] ?? gateway;
+}
+
 function LeadsList() {
   const [activeGateway, setActiveGatewayState] = useState<string>("paradise");
   const [isGatewayLoading, setIsGatewayLoading] = useState(false);
@@ -165,7 +176,7 @@ function LeadsList() {
     try {
       await setGatewayFn({ data: newGateway } as any);
       setActiveGatewayState(newGateway);
-      toast.success(`Gateway alterado para ${newGateway === "paradise" ? "Paradise" : newGateway === "azipix" ? "Azipix" : newGateway === "invictus" ? "InvictusPay" : "Nexus"}`);
+      toast.success(`Gateway alterado para ${gatewayLabel(newGateway)}`);
     } catch (error) {
       toast.error("Erro ao alterar gateway");
       console.error(error);
@@ -391,7 +402,7 @@ function LeadsList() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="min-w-[140px] justify-between" disabled={isGatewayLoading}>
-                  {isGatewayLoading ? "Alterando..." : activeGateway === "paradise" ? "Paradise Pags" : activeGateway === "azipix" ? "Azipix" : activeGateway === "invictus" ? "InvictusPay" : "Nexus Pag"}
+                  {isGatewayLoading ? "Alterando..." : gatewayLabel(activeGateway)}
                   <ChevronDown className="ml-2 h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -436,16 +447,6 @@ function LeadsList() {
                   <div className="flex flex-col">
                     <span>InvictusPay</span>
                     <span className="text-[10px] text-muted-foreground">Configurado e ativo</span>
-                  </div>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  key="nexus"
-                  onClick={() => handleGatewayChange("nexus")}
-                  className={activeGateway === "nexus" ? "bg-primary/10 font-bold" : ""}
-                >
-                  <div className="flex flex-col">
-                    <span>Nexus Pag</span>
-                    <span className="text-[10px] text-muted-foreground">Integração legada</span>
                   </div>
                 </DropdownMenuItem>
               </DropdownMenuContent>
