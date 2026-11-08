@@ -38,6 +38,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { TrafficMetrics } from "@/components/admin/TrafficMetrics";
 import { toast } from "sonner";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { LivePresenceBadge } from "@/components/admin/LivePresence";
@@ -464,7 +465,6 @@ function DashboardPage() {
     >
       <div className="mx-auto max-w-7xl space-y-6">
         {/* Live presence badge — visitors right now */}
-        <LivePresenceBadge />
         {/* Filters */}
         <section className="rounded-2xl border bg-card p-4 shadow-sm flex flex-wrap items-center gap-2">
           <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mr-1">
@@ -528,6 +528,7 @@ function DashboardPage() {
             </span>
           )}
         </section>
+        <TrafficMetrics start={range.start} end={range.end} />
 
         {/* KPIs */}
         <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
