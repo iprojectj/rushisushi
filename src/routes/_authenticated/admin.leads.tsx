@@ -42,7 +42,8 @@ import {
 import { LeadFields } from "@/lib/lead-fields";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { toast } from "sonner";
-import { getActiveGateway, setActiveGateway } from "@/lib/settings.functions";
+import { getActiveGateway, setActiveGateway, getUtmifyTrackPaid, setUtmifyTrackPaid } from "@/lib/settings.functions";
+import { Switch } from "@/components/ui/switch";
 import { useServerFn } from "@tanstack/react-start";
 
 
@@ -169,6 +170,32 @@ function LeadsList() {
   useEffect(() => {
     getGatewayFn().then(setActiveGatewayState).catch(console.error);
   }, []);
+
+  const [trackPaid, setTrackPaid] = useState<boolean | null>(null);
+  const [isTrackSaving, setIsTrackSaving] = useState(false);
+  const getTrackPaidFn = useServerFn(getUtmifyTrackPaid);
+  const setTrackPaidFn = useServerFn(setUtmifyTrackPaid);
+
+  useEffect(() => {
+    getTrackPaidFn().then(setTrackPaid).catch((e) => {
+      console.error(e);
+      toast.error("Não foi possível ler a configuração da UTMify");
+    });
+  }, []);
+
+  async function handleTrackPaidChange(enabled: boolean) {
+    setIsTrackSaving(true);
+    try {
+      const r = await setTrackPaidFn({ data: { enabled } });
+      setTrackPaid(r.enabled);
+      toast.success(r.enabled ? "UTMify voltará a contabilizar vendas aprovadas" : "UTMify não contabilizará vendas aprovadas (ficarão como pendentes)");
+    } catch (error) {
+      toast.error("Erro ao salvar configuração da UTMify");
+      console.error(error);
+    } finally {
+      setIsTrackSaving(false);
+    }
+  }
 
   async function handleGatewayChange(newGateway: string) {
     if (newGateway === activeGateway) return;
@@ -454,6 +481,36 @@ function LeadsList() {
             <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none">
               Online
             </Badge>
+          </div>
+        </section>
+
+        {/* Quick Settings: UTMify paid-sales tracking */}
+        <section className="rounded-2xl border bg-card p-4 shadow-sm flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="rounded-full bg-primary/10 p-2 text-primary">
+              <Settings className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold">UTMify — contabilizar vendas aprovadas</p>
+              <p className="text-xs text-muted-foreground">
+                {trackPaid === null
+                  ? "Carregando..."
+                  : trackPaid
+                    ? "Ligado: vendas pagas são enviadas como aprovadas."
+                    : "Desligado: vendas pagas ficam apenas como pendentes na UTMify (seu painel continua mostrando como pagas)."}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Badge variant={trackPaid ? "default" : "secondary"}>
+              {trackPaid === null ? "..." : trackPaid ? "Ligado" : "Desligado"}
+            </Badge>
+            <Switch
+              aria-label="Contabilizar vendas aprovadas na UTMify"
+              checked={trackPaid ?? false}
+              disabled={trackPaid === null || isTrackSaving}
+              onCheckedChange={handleTrackPaidChange}
+            />
           </div>
         </section>
 
