@@ -42,3 +42,43 @@ export const setActiveGateway = createServerFn({ method: "POST" })
 
     return { success: true, gateway };
   });
+
+// ---------------------------------------------------------------------------
+// UTMify: liga/desliga do envio de vendas APROVADAS (status "paid").
+// Quando desligado, pedidos continuam sendo enviados como pendentes, mas a
+// confirmação de pagamento não é repassada à UTMify. Padrão: ligado.
+// ---------------------------------------------------------------------------
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+
+export const UTMIFY_TRACK_PAID_KEY = "utmify_track_paid";
+
+export const getUtmifyTrackPaid = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async () => {
+    const { data } = await supabaseAdmin
+      .from("app_settings")
+      .select("value")
+      .eq("key", UTMIFY_TRACK_PAID_KEY)
+      .maybeSingle();
+    let value: unknown = data?.value;
+    if (typeof value === "string") {
+      try { value = JSON.parse(value); } catch { /* ignore */ }
+    }
+    return value !== false;
+  });
+
+export const setUtmifyTrackPaid = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { enabled: boolean }) => z.object({ enabled: z.boolean() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin) throw new Error("Acesso negado");
+    const { error } = await supabaseAdmin
+      .from("app_settings")
+      .upsert({ key: UTMIFY_TRACK_PAID_KEY, value: JSON.stringify(data.enabled) });
+    if (error) throw error;
+    return { enabled: data.enabled };
+  });

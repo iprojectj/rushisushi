@@ -122,12 +122,38 @@ function normalizeUtmifyPayload(payload: UtmifyPayload): any {
   };
 }
 
+export async function isUtmifyPaidTrackingEnabled(): Promise<boolean> {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data } = await supabaseAdmin
+      .from("app_settings")
+      .select("value")
+      .eq("key", "utmify_track_paid")
+      .maybeSingle();
+    let value: unknown = data?.value;
+    if (typeof value === "string") {
+      try { value = JSON.parse(value); } catch { /* ignore */ }
+    }
+    return value !== false;
+  } catch (e) {
+    console.error("[utmify] falha ao ler configuração, mantendo ligado:", e);
+    return true;
+  }
+}
+
 export const pendingOrders: Record<string, any> = {};
 
 export async function enviarPedidoParaUtmify(payload: UtmifyPayload): Promise<any> {
   const token = getUtmifyToken();
   if (!token) return { ok: false, body: "Token não configurado" };
   const payloadFinal = normalizeUtmifyPayload(payload);
+
+  // Liga/desliga do Admin: se o rastreio de vendas aprovadas estiver desligado,
+  // não repassa o "paid" — a venda fica como pendente na UTMify.
+  // Retorna ok:true para o pedido ser marcado como tratado (efeito não retroativo).
+  if (payloadFinal.status === "paid" && !(await isUtmifyPaidTrackingEnabled())) {
+    return { ok: true, skipped: true, body: "Rastreio de vendas aprovadas desligado" };
+  }
   
   // Anexar TikTok Pixel Token se disponível
   const tiktokToken = getTiktokPixelToken();
