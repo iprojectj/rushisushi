@@ -89,6 +89,7 @@ function readVisitorsFromChannel(channel: PresenceChannel): PresenceVisitor[] {
   const list: PresenceVisitor[] = [];
 
   for (const key of Object.keys(state)) {
+    if (key.startsWith("admin-monitor-")) continue;
     const metas = state[key] as unknown as Array<{
       tz?: string;
       path?: string;
@@ -97,8 +98,8 @@ function readVisitorsFromChannel(channel: PresenceChannel): PresenceVisitor[] {
 
     for (const m of metas) {
       const tz = m.tz ?? "";
-      const coord = TZ_COORDS[tz];
-      if (!coord) continue;
+      // Fusos desconhecidos ainda contam como visitante (centro do Brasil no globo).
+      const coord = TZ_COORDS[tz] ?? { lat: -15.78, lng: -47.93, city: "Desconhecido" };
 
       list.push({
         key,

@@ -4,8 +4,8 @@
   if (window.__rushiPresenceLoaded) return;
   window.__rushiPresenceLoaded = true;
 
-  var SUPABASE_URL = "https://lcvditqesiesrpngmksp.supabase.co";
-  var SUPABASE_KEY = "sb_publishable_8tN-U-SBvpJEyXZ0cWj5mA_-5jG-0hW";
+  var SUPABASE_URL = "https://qgikxfftfmlcjrrcgqrq.supabase.co";
+  var SUPABASE_KEY = "sb_publishable_R4iOEqVVYgIJnTVG7uf5Kg_ttF7ly_p";
 
   function start(supabaseLib) {
     try {
