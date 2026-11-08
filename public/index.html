@@ -1492,6 +1492,7 @@
                 cart[existingItemIndex].qty += currentQty;
                 cart[existingItemIndex].totalPrice = cart[existingItemIndex].qty * unitPrice;
             } else {
+                try{window.rushiStep&&window.rushiStep(2)}catch(e){}
                 cart.push({ ...currentItem, qty: currentQty, unitPrice: unitPrice, totalPrice: unitPrice * currentQty, addons: finalAddons, obs: obs });
             }
             
@@ -1588,6 +1589,7 @@
 
         function setCheckoutStep(n) {
             checkoutStep = n;
+            try{window.rushiStep&&window.rushiStep(n>=4?4:3)}catch(e){}
             document.querySelectorAll('#sacola-tela-2 .checkout-step').forEach(function(el){
                 el.classList.toggle('hidden', parseInt(el.dataset.cstep) !== n);
             });

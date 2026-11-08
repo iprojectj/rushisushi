@@ -118,6 +118,45 @@ export type Database = {
         }
         Relationships: []
       }
+      site_sessions: {
+        Row: {
+          city: string | null
+          device: string | null
+          first_seen: string
+          id: string
+          last_seen: string
+          max_step: number
+          pageviews: number
+          path: string | null
+          utm_campaign: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          city?: string | null
+          device?: string | null
+          first_seen?: string
+          id: string
+          last_seen?: string
+          max_step?: number
+          pageviews?: number
+          path?: string | null
+          utm_campaign?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          city?: string | null
+          device?: string | null
+          first_seen?: string
+          id?: string
+          last_seen?: string
+          max_step?: number
+          pageviews?: number
+          path?: string | null
+          utm_campaign?: string | null
+          utm_source?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
