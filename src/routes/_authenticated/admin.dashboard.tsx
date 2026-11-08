@@ -41,7 +41,6 @@ import { cn } from "@/lib/utils";
 import { TrafficMetrics } from "@/components/admin/TrafficMetrics";
 import { toast } from "sonner";
 import { AdminShell } from "@/components/admin/AdminShell";
-import { LivePresenceBadge } from "@/components/admin/LivePresence";
 
 export const Route = createFileRoute("/_authenticated/admin/dashboard")({
   component: DashboardPage,
