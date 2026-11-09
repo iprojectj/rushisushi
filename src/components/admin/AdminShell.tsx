@@ -1,14 +1,14 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { BarChart3, Users, LogOut, Menu, X, Sparkles } from "lucide-react";
+import { BarChart3, Users, LogOut, Menu, X, Sparkles, Settings } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
-import { LivePresenceBadge } from "./LivePresence";
 import "./admin-theme.css";
 
 const NAV = [
-  { to: "/admin/dashboard", label: "Dashboard", icon: BarChart3 },
-  { to: "/admin/leads", label: "Leads", icon: Users },
+  { to: "/admin/dashboard", label: "Visão geral", icon: BarChart3 },
+  { to: "/admin/leads", label: "Clientes", icon: Users },
+  { to: "/admin/settings", label: "Configurações", icon: Settings },
 ] as const;
 
 export function AdminShell({
@@ -50,7 +50,7 @@ export function AdminShell({
           <div
             className="grid h-10 w-10 place-items-center rounded-xl bg-[var(--primary)] shadow-sm"
           >
-            <Sparkles className="h-5 w-5 text-white" />
+            <Sparkles className="h-5 w-5 text-primary-foreground" />
           </div>
           <div>
             <p className="text-sm font-bold tracking-tight">Rushi</p>
@@ -83,7 +83,6 @@ export function AdminShell({
         </nav>
 
         <div className="mt-auto space-y-2">
-          <LivePresenceBadge />
           <button
             onClick={logout}
             className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--muted-foreground)] transition-all hover:bg-[var(--destructive)]/10 hover:text-[var(--destructive)]"
@@ -115,9 +114,6 @@ export function AdminShell({
                 </div>
               )}
             </div>
-            <div className="hidden md:block">
-              <LivePresenceBadge inline />
-            </div>
             {actions}
           </div>
         </header>
@@ -127,7 +123,7 @@ export function AdminShell({
 
       {/* Mobile bottom nav */}
       <nav className="fixed bottom-0 left-0 right-0 z-30 glass border-t border-[var(--border)] md:hidden">
-        <div className="grid grid-cols-3">
+        <div className="grid grid-cols-4">
           {NAV.map((item) => {
             const active = pathname.startsWith(item.to);
             const Icon = item.icon;
@@ -158,7 +154,7 @@ export function AdminShell({
       {/* Mobile drawer */}
       {openMobile && (
         <div className="fixed inset-0 z-40 md:hidden" onClick={() => setOpenMobile(false)}>
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-foreground/60 backdrop-blur-sm" />
           <div
             className="absolute left-0 top-0 h-full w-72 glass p-4"
             onClick={(e) => e.stopPropagation()}
@@ -168,7 +164,7 @@ export function AdminShell({
                 <div
                   className="grid h-9 w-9 place-items-center rounded-xl bg-[var(--primary)]"
                 >
-                  <Sparkles className="h-4 w-4 text-white" />
+                  <Sparkles className="h-4 w-4 text-primary-foreground" />
                 </div>
                 <p className="font-bold">Rushi Admin</p>
               </div>
@@ -202,8 +198,7 @@ export function AdminShell({
               })}
             </nav>
             <div className="mt-6">
-              <LivePresenceBadge />
-            </div>
+                </div>
           </div>
         </div>
       )}

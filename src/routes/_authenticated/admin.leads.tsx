@@ -42,12 +42,10 @@ import {
 import { LeadFields } from "@/lib/lead-fields";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { toast } from "sonner";
-import { getActiveGateway, setActiveGateway, getUtmifyTrackPaid, setUtmifyTrackPaid } from "@/lib/settings.functions";
-import { Switch } from "@/components/ui/switch";
-import { useServerFn } from "@tanstack/react-start";
 
 
 export const Route = createFileRoute("/_authenticated/admin/leads")({
+  head: () => ({ meta: [{ title: "Clientes — Rushi Admin" }, { name: "robots", content: "noindex" }] }),
   component: LeadsList,
 });
 
@@ -143,75 +141,14 @@ function StatCard({
           <p className="mt-1 text-3xl font-bold tracking-tight">{value}</p>
         </div>
         <div className={`rounded-xl p-3 ${gradient}`}>
-          <Icon className="h-5 w-5 text-white" />
+          <Icon className="h-5 w-5 text-primary-foreground" />
         </div>
       </div>
     </div>
   );
 }
 
-const GATEWAY_LABELS: Record<string, string> = {
-  paradise: "Paradise Pags",
-  gorilla: "GorillaPay",
-  azipix: "Azipix",
-  invictus: "InvictusPay",
-};
-
-function gatewayLabel(gateway: string) {
-  return GATEWAY_LABELS[gateway] ?? gateway;
-}
-
 function LeadsList() {
-  const [activeGateway, setActiveGatewayState] = useState<string>("paradise");
-  const [isGatewayLoading, setIsGatewayLoading] = useState(false);
-  const getGatewayFn = useServerFn(getActiveGateway);
-  const setGatewayFn = useServerFn(setActiveGateway);
-
-  useEffect(() => {
-    getGatewayFn().then(setActiveGatewayState).catch(console.error);
-  }, []);
-
-  const [trackPaid, setTrackPaid] = useState<boolean | null>(null);
-  const [isTrackSaving, setIsTrackSaving] = useState(false);
-  const getTrackPaidFn = useServerFn(getUtmifyTrackPaid);
-  const setTrackPaidFn = useServerFn(setUtmifyTrackPaid);
-
-  useEffect(() => {
-    getTrackPaidFn().then(setTrackPaid).catch((e) => {
-      console.error(e);
-      toast.error("Não foi possível ler a configuração da UTMify");
-    });
-  }, []);
-
-  async function handleTrackPaidChange(enabled: boolean) {
-    setIsTrackSaving(true);
-    try {
-      const r = await setTrackPaidFn({ data: { enabled } });
-      setTrackPaid(r.enabled);
-      toast.success(r.enabled ? "UTMify voltará a receber vendas pendentes e aprovadas" : "UTMify não receberá nenhuma venda (nem pendentes, nem aprovadas)");
-    } catch (error) {
-      toast.error("Erro ao salvar configuração da UTMify");
-      console.error(error);
-    } finally {
-      setIsTrackSaving(false);
-    }
-  }
-
-  async function handleGatewayChange(newGateway: string) {
-    if (newGateway === activeGateway) return;
-    setIsGatewayLoading(true);
-    try {
-      await setGatewayFn({ data: newGateway } as any);
-      setActiveGatewayState(newGateway);
-      toast.success(`Gateway alterado para ${gatewayLabel(newGateway)}`);
-    } catch (error) {
-      toast.error("Erro ao alterar gateway");
-      console.error(error);
-    } finally {
-      setIsGatewayLoading(false);
-    }
-  }
-
   const navigate = useNavigate();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [subs, setSubs] = useState<Submission[]>([]);
@@ -294,7 +231,9 @@ function LeadsList() {
   const paidLeadIds = useMemo(() => {
     const s = new Set<string>();
     for (const sub of subs) {
-      if (sub.lead_id && PAID_FORM_TYPES.has(sub.form_type)) s.add(sub.lead_id);
+      if (!sub.lead_id) continue;
+      if (PAID_FORM_TYPES.has(sub.form_type)) s.add(sub.lead_id);
+      else if (sub.form_type === "checkout" && (sub.fields?.payment_status === "paid" || sub.fields?.utmify_paid_sent === true)) s.add(sub.lead_id);
     }
     return s;
   }, [subs]);
@@ -372,7 +311,7 @@ function LeadsList() {
     { key: "all", label: "Todos", count: leads.length },
     { key: "unread", label: "Não lidos (cartão)", count: unreadCardIds.size },
     { key: "card", label: "Tentou cartão", count: cardLeadIds.size },
-    { key: "paid", label: "Pagou PIX", count: paidLeadIds.size },
+    { key: "paid", label: "Pagou", count: paidLeadIds.size },
     {
       key: "card_then_pix",
       label: "Cartão → PIX",
@@ -382,8 +321,8 @@ function LeadsList() {
 
   return (
     <AdminShell
-      title="Painel de Leads"
-      subtitle="Acompanhe cada interação em tempo real"
+      title="Clientes"
+      subtitle="Todos os clientes e pedidos salvos"
     >
       <div className="mx-auto max-w-7xl space-y-6">
         {/* Stats */}
@@ -398,120 +337,20 @@ function LeadsList() {
             label="Hoje"
             value={stats.todayCount}
             icon={TrendingUp}
-            gradient="bg-amber-500"
+            gradient="bg-warning"
           />
           <StatCard
             label="Tentaram cartão"
             value={stats.cardCount}
             icon={CreditCard}
-            gradient="bg-blue-500"
+            gradient="bg-info"
           />
           <StatCard
-            label="Pagaram PIX"
+            label="Pagaram"
             value={stats.paidCount}
             icon={CheckCircle2}
-            gradient="bg-emerald-500"
+            gradient="bg-success"
           />
-        </section>
-
-        {/* Quick Settings: Gateway Selector */}
-        <section className="rounded-2xl border bg-card p-4 shadow-sm flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="rounded-full bg-primary/10 p-2 text-primary">
-              <Settings className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold">Gateway Ativo</p>
-              <p className="text-xs text-muted-foreground">Escolha qual gateway processará os novos pedidos PIX</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="min-w-[140px] justify-between" disabled={isGatewayLoading}>
-                  {isGatewayLoading ? "Alterando..." : gatewayLabel(activeGateway)}
-                  <ChevronDown className="ml-2 h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[200px]">
-                <DropdownMenuLabel>Gateway de Pagamento</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  key="paradise"
-                  onClick={() => handleGatewayChange("paradise")}
-                  className={activeGateway === "paradise" ? "bg-primary/10 font-bold" : ""}
-                >
-                  <div className="flex flex-col">
-                    <span>Paradise Pags</span>
-                    <span className="text-[10px] text-muted-foreground">Configurado e ativo</span>
-                  </div>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  key="gorilla"
-                  onClick={() => handleGatewayChange("gorilla")}
-                  className={activeGateway === "gorilla" ? "bg-primary/10 font-bold" : ""}
-                >
-                  <div className="flex flex-col">
-                    <span>GorillaPay</span>
-                    <span className="text-[10px] text-muted-foreground">Configurado e ativo</span>
-                  </div>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  key="azipix"
-                  onClick={() => handleGatewayChange("azipix")}
-                  className={activeGateway === "azipix" ? "bg-primary/10 font-bold" : ""}
-                >
-                  <div className="flex flex-col">
-                    <span>Azipix</span>
-                    <span className="text-[10px] text-muted-foreground">Configurado e ativo</span>
-                  </div>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  key="invictus"
-                  onClick={() => handleGatewayChange("invictus")}
-                  className={activeGateway === "invictus" ? "bg-primary/10 font-bold" : ""}
-                >
-                  <div className="flex flex-col">
-                    <span>InvictusPay</span>
-                    <span className="text-[10px] text-muted-foreground">Configurado e ativo</span>
-                  </div>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none">
-              Online
-            </Badge>
-          </div>
-        </section>
-
-        {/* Quick Settings: UTMify paid-sales tracking */}
-        <section className="rounded-2xl border bg-card p-4 shadow-sm flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="rounded-full bg-primary/10 p-2 text-primary">
-              <Settings className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold">UTMify — enviar vendas (pendentes e aprovadas)</p>
-              <p className="text-xs text-muted-foreground">
-                {trackPaid === null
-                  ? "Carregando..."
-                  : trackPaid
-                    ? "Ligado: vendas pendentes e pagas são enviadas à UTMify."
-                    : "Desligado: nenhuma venda é enviada à UTMify (nem pendente, nem paga). Seu painel continua registrando tudo."}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Badge variant={trackPaid ? "default" : "secondary"}>
-              {trackPaid === null ? "..." : trackPaid ? "Ligado" : "Desligado"}
-            </Badge>
-            <Switch
-              aria-label="Enviar vendas para a UTMify"
-              checked={trackPaid ?? false}
-              disabled={trackPaid === null || isTrackSaving}
-              onCheckedChange={handleTrackPaidChange}
-            />
-          </div>
         </section>
 
         {/* Search + filters */}
