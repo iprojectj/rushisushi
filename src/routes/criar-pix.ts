@@ -192,23 +192,13 @@ export const Route = createFileRoute("/criar-pix")({
           if (!transactionId) throw new Error(`${gw}: resposta sem ID de transação`);
           };
 
-          // Tenta o gateway ativo; se falhar, usa os outros como reserva automática
-          const ordem = [activeGateway, ...["paradise", "gorilla", "azipix", "invictus"].filter((g) => g !== activeGateway)];
-          const erros: string[] = [];
-          for (const gw of ordem) {
-            try {
-              transactionId = ""; pixCopiaECola = ""; qrCodeFinal = "";
-              await gerarPix(gw);
-              if (gw !== activeGateway) console.warn(`[criar-pix] ${activeGateway} falhou; PIX gerado via reserva ${gw}`);
-              activeGateway = gw;
-              erros.length = 0;
-              break;
-            } catch (e: any) {
-              console.error(`[criar-pix] falha no gateway ${gw}:`, e?.message || e);
-              erros.push(e?.message || String(e));
-            }
+          // Tentativa única: somente o gateway escolhido no painel (sem fallback).
+          try {
+            await gerarPix(activeGateway);
+          } catch (e: any) {
+            console.error(`[criar-pix] falha no gateway ${activeGateway}:`, e?.message || e);
+            throw e;
           }
-          if (erros.length) throw new Error(erros.join(" | "));
 
           // 2. Preparar Utmify
           const payloadUtmify = {

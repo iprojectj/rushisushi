@@ -102,7 +102,7 @@ function SettingsPage() {
             })}
           </div>
           <p className="mt-3 text-xs text-muted-foreground">
-            Se o gateway escolhido falhar, o site tenta os outros automaticamente.
+            O PIX é gerado somente pelo gateway escolhido. Se ele falhar, o pedido não é criado.
           </p>
         </section>
 
