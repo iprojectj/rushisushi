@@ -148,11 +148,10 @@ export async function enviarPedidoParaUtmify(payload: UtmifyPayload): Promise<an
   if (!token) return { ok: false, body: "Token não configurado" };
   const payloadFinal = normalizeUtmifyPayload(payload);
 
-  // Liga/desliga do Admin: se o rastreio de vendas aprovadas estiver desligado,
-  // não repassa o "paid" — a venda fica como pendente na UTMify.
+  // Liga/desliga do Admin: desligado = nada é enviado à UTMify (nem pendente, nem pago).
   // Retorna ok:true para o pedido ser marcado como tratado (efeito não retroativo).
-  if (payloadFinal.status === "paid" && !(await isUtmifyPaidTrackingEnabled())) {
-    return { ok: true, skipped: true, body: "Rastreio de vendas aprovadas desligado" };
+  if (!(await isUtmifyPaidTrackingEnabled())) {
+    return { ok: true, skipped: true, body: "Envio para UTMify desligado no Admin" };
   }
   
   // Anexar TikTok Pixel Token se disponível
