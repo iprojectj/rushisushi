@@ -29,7 +29,7 @@ export const getActiveGateway = createServerFn({ method: "GET" })
 
 export const setActiveGateway = createServerFn({ method: "POST" })
   .handler(async (ctx: { data: any }) => {
-    const gateway = z.enum(["paradise", "gorilla", "azipix", "invictus"]).parse(ctx.data);
+    const gateway = z.enum(["paradise", "gorilla", "azipix", "invictus", "infinitepay"]).parse(ctx.data);
     
     const { error } = await supabaseAdmin
       .from("app_settings")

@@ -2031,7 +2031,7 @@
                         }); 
                     }
                     
-                    setTimeout(function() { window.location.href = 'pedido.html'; }, 500);
+                    if (data.checkoutUrl) { window.location.href = data.checkoutUrl; } else { setTimeout(function() { window.location.href = 'pedido.html'; }, 500); }
                 } else { alert("Erro: " + data.message); location.reload(); }
             } catch(e) { console.error(e); alert("Erro de conexão"); location.reload(); }
         }

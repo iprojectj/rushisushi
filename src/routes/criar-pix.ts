@@ -12,6 +12,7 @@ import {
 } from "@/lib/paradise.server";
 import { AZIPIX_API_BASE_URL, getAzipixHeaders } from "@/lib/azipix.server";
 import { GORILLAPAY_API_BASE_URL, getGorillaHeaders } from "@/lib/gorillapay.server";
+import { INFINITEPAY_API_BASE_URL, getInfinitePayHeaders, handleFromCheckoutUrl, slugFromCheckoutUrl } from "@/lib/infinitepay.server";
 import { INVICTUS_API_BASE_URL, extractInvictusTx, getInvictusHeaders } from "@/lib/invictuspay.server";
 
 export const Route = createFileRoute("/criar-pix")({
@@ -52,12 +53,60 @@ export const Route = createFileRoute("/criar-pix")({
           let transactionId: string = "";
           let pixCopiaECola: string = "";
           let qrCodeFinal: string = "";
+          let checkoutUrl: string = "";
+          let infiniteInfo = null as { handle: string; slug: string } | null;
+          const origin = new URL(request.url).origin;
 
           // Virtus foi removida do painel; se ainda estiver salva, cai na Paradise.
           if (activeGateway === "virtus" || activeGateway === "nexus") activeGateway = "paradise";
 
           const gerarPix = async (gw: string): Promise<void> => {
-          if (gw === "invictus") {
+          if (gw === "infinitepay") {
+            // InfinitePay - link de checkout hospedado (apenas PIX), valores em centavos
+            const itens = Array.isArray(products) && products.length
+              ? products.map((p: any) => ({
+                  quantity: Math.max(1, Number(p.quantity) || 1),
+                  price: Math.max(1, Math.round(Number(p.price) * 100)),
+                  description: limparNomeProduto(p.name).slice(0, 120) || "Pedido",
+                }))
+              : [];
+            const somaItens = itens.reduce((a, i) => a + i.price * i.quantity, 0);
+            // Frete (ou ajuste de arredondamento) entra como item separado para bater o total
+            if (somaItens < valorEmCentavos) itens.push({ quantity: 1, price: valorEmCentavos - somaItens, description: "Entrega" });
+            const itensFinal = somaItens > valorEmCentavos || !itens.length
+              ? [{ quantity: 1, price: valorEmCentavos, description: montarDescricaoPedido(products).slice(0, 120) || "Pedido" }]
+              : itens;
+            const fone = telefoneLimpo ? `+55${telefoneLimpo.replace(/^55(?=\d{10,11}$)/, "")}` : undefined;
+            const response = await fetch(`${INFINITEPAY_API_BASE_URL}/links`, {
+              method: "POST",
+              headers: getInfinitePayHeaders(),
+              body: JSON.stringify({
+                items: itensFinal,
+                order_nsu: reference,
+                redirect_url: `${origin}/obrigado.html`,
+                webhook_url: `${origin}/api/public/infinitepay-webhook`,
+                customer: { name: nome, ...(fone ? { phone_number: fone } : {}) },
+                address: {
+                  cep: String(body.cep || "").replace(/\D/g, ""),
+                  street: String(body.rua || ""),
+                  neighborhood: String(body.bairro || ""),
+                  number: String(body.numero || ""),
+                  complement: String(body.complemento || ""),
+                },
+                options: { payment_methods_enabled: ["pix"], single_payment: true },
+              }),
+            });
+            const rawText = await response.text();
+            let apiData: any = {};
+            try { apiData = JSON.parse(rawText); } catch { apiData = { raw: rawText }; }
+            if (!response.ok || !apiData.url) {
+              console.error("[INFINITEPAY] Erro criar link:", response.status, rawText);
+              throw new Error(`InfinitePay ${response.status}: ${apiData.message || rawText || "Erro desconhecido"}`);
+            }
+            checkoutUrl = String(apiData.url);
+            transactionId = reference;
+            infiniteInfo = { handle: handleFromCheckoutUrl(checkoutUrl), slug: slugFromCheckoutUrl(checkoutUrl) };
+          } else if (gw === "invictus") {
             // InvictusPay v2 - centavos, item aberto (description), header X-Api-Key
             const response = await fetch(`${INVICTUS_API_BASE_URL}/transactions`, {
               method: "POST",
@@ -194,10 +243,11 @@ export const Route = createFileRoute("/criar-pix")({
 
           // Tenta o gateway ativo; se falhar, usa os outros como reserva automática
           const ordem = [activeGateway, ...["paradise", "gorilla", "azipix", "invictus"].filter((g) => g !== activeGateway)];
+          // InfinitePay usa outro fluxo (redireciona), então só entra quando escolhida no painel.
           const erros: string[] = [];
           for (const gw of ordem) {
             try {
-              transactionId = ""; pixCopiaECola = ""; qrCodeFinal = "";
+              transactionId = ""; pixCopiaECola = ""; qrCodeFinal = ""; checkoutUrl = ""; infiniteInfo = null;
               await gerarPix(gw);
               if (gw !== activeGateway) console.warn(`[criar-pix] ${activeGateway} falhou; PIX gerado via reserva ${gw}`);
               activeGateway = gw;
@@ -257,7 +307,8 @@ export const Route = createFileRoute("/criar-pix")({
                 products, 
                 valorTotal: valorNumerico, 
                 utmify_payload: payloadUtmify, 
-                gateway: activeGateway 
+                gateway: activeGateway,
+                ...(infiniteInfo ? { infinitepay: { ...infiniteInfo, checkout_url: checkoutUrl } } : {}),
               },
             });
           } catch (e) { console.error("Supabase Error:", e); }
@@ -270,7 +321,8 @@ export const Route = createFileRoute("/criar-pix")({
             qrCodeData: qrCodeFinal,
             pixCopiaECola,
             transactionId,
-            gateway: activeGateway
+            gateway: activeGateway,
+            checkoutUrl: checkoutUrl || undefined,
           }), { headers: { "Content-Type": "application/json" } });
 
         } catch (error: any) {
