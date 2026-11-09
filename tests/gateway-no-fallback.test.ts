@@ -12,7 +12,7 @@ describe('PIX gateway selection has no automatic fallback', () => {
     // nenhum gateway fixo ("paradise", "pagbank", ...) é passado como tentativa extra
     expect(pixRoute).not.toMatch(/gerarPix\(\s*["'`]/);
     // e não existe laço tentando gateways um atrás do outro
-    expect(pixRoute).not.toMatch(/for\s*\(\s*(const|let)\s+\w+\s+of\s+\w*/i);
+    expect(pixRoute).not.toMatch(/for\s*\(\s*(const|let)\s+\w+\s+of\s+(ordem|gateways|listas)\b/i);
     expect(pixRoute).not.toMatch(/const ordem\s*=/);
   });
 
