@@ -6,19 +6,22 @@
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 import { publicProtectionPlugin, protectPublishedAssets } from "./build/public-protection";
+import type { NitroConfig } from "nitro/types";
+
+const protectedNitro: NitroConfig = {
+  hooks: {
+    compiled: async (nitro) => {
+      await protectPublishedAssets(nitro.options.output.publicDir);
+    },
+  },
+};
 
 export default defineConfig({
   vite: {
     plugins: [publicProtectionPlugin()],
     build: { sourcemap: false },
   },
-  nitro: {
-    hooks: {
-      compiled: async (nitro) => {
-        await protectPublishedAssets(nitro.options.output.publicDir);
-      },
-    },
-  },
+  nitro: protectedNitro,
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this

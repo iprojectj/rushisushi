@@ -31,8 +31,9 @@ describe("public protection", () => {
   for (const file of ["index", "pedido", "obrigado", "reembolso-solicitado", "mx/index", "mx/pedido", "mx/gracias", "mx/reembolso"]) {
     it(`compacts ${file} while retaining parseable scripts`, async () => {
       const original = await readFile(`public/${file}.html`, "utf8");
-      const compact = await compactHtml(addShortcutGuard(original));
-      expect(compact.length).toBeLessThan(original.length);
+      const guarded = addShortcutGuard(original);
+      const compact = await compactHtml(guarded);
+      expect(compact.length).toBeLessThan(guarded.length);
       for (const match of compact.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
         if (/src=|application\/ld\+json/i.test(match[1] ?? "")) continue;
         new Script(match[2] ?? "");
