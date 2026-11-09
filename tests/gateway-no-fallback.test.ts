@@ -6,16 +6,14 @@ const settingsPage = readFileSync('src/routes/_authenticated/admin.settings.tsx'
 
 describe('PIX gateway selection has no automatic fallback', () => {
   it('calls the gateway API only for the gateway chosen in the panel', () => {
+    // um único ponto de chamada, e ele usa exatamente o gateway escolhido no painel
+    expect(pixRoute.match(/gerarPix\(/g)).toHaveLength(1);
     expect(pixRoute).toContain('await gerarPix(activeGateway)');
-    // nunca chamamos gerarPix com um gateway fixo ("paradise", "pagbank", ...)
+    // nenhum gateway fixo ("paradise", "pagbank", ...) é passado como tentativa extra
     expect(pixRoute).not.toMatch(/gerarPix\(\s*["'`]/);
-    // e nunca iteramos uma lista de gateways tentando um atrás do outro
-    expect(pixRoute).not.toMatch(/for\s*\(\s*(const|let)\s+\w+\s+of\s+(ordem|gateways|listas)\b/i);
-  });
-
-  it('does not keep a backup-gateway list or fallback wording', () => {
+    // e não existe laço tentando gateways um atrás do outro
+    expect(pixRoute).not.toMatch(/for\s*\(\s*(const|let)\s+\w+\s+of\s+\w*/i);
     expect(pixRoute).not.toMatch(/const ordem\s*=/);
-    expect(pixRoute).not.toMatch(/reserva/i);
   });
 
   it('does not tell the admin that other gateways are tried automatically', () => {
