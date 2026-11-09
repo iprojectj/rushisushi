@@ -45,7 +45,15 @@ import { toast } from "sonner";
 
 
 export const Route = createFileRoute("/_authenticated/admin/leads")({
-  head: () => ({ meta: [{ title: "Clientes — Rushi Admin" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [
+    { title: "Clientes — Rūshī Admin" },
+    { name: "description", content: "Clientes e histórico de pedidos Rūshī Sushi." },
+    { property: "og:title", content: "Clientes — Rūshī Admin" },
+    { property: "og:description", content: "Clientes e histórico de pedidos Rūshī Sushi." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+    { name: "robots", content: "noindex" },
+  ] }),
   component: LeadsList,
 });
 

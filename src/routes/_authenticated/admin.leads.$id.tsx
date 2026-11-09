@@ -6,9 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { LeadFields } from "@/lib/lead-fields";
 import { AdminShell } from "@/components/admin/AdminShell";
+import { pageHead } from "@/lib/page-head";
 
 
 export const Route = createFileRoute("/_authenticated/admin/leads/$id")({
+  head: () => pageHead("Detalhes do cliente — Rūshī Admin", "Histórico e dados do cliente no painel Rūshī Sushi.", true),
   component: LeadDetail,
 });
 
