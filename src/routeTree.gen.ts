@@ -26,6 +26,7 @@ import { Route as VerificarStatusIdRouteImport } from './routes/verificar-status
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin.dashboard'
 import { Route as AuthenticatedAdminLeadsRouteImport } from './routes/_authenticated/admin.leads'
+import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as ApiPublicAzipixWebhookRouteImport } from './routes/api/public/azipix-webhook'
 import { Route as ApiPublicCooudWebhookRouteImport } from './routes/api/public/cooud-webhook'
 import { Route as ApiPublicLeadSubmitRouteImport } from './routes/api/public/lead-submit'
@@ -118,6 +119,12 @@ const AuthenticatedAdminLeadsRoute = AuthenticatedAdminLeadsRouteImport.update({
   path: '/admin/leads',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminSettingsRoute =
+  AuthenticatedAdminSettingsRouteImport.update({
+    id: '/admin/settings',
+    path: '/admin/settings',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiPublicAzipixWebhookRoute = ApiPublicAzipixWebhookRouteImport.update({
   id: '/api/public/azipix-webhook',
   path: '/api/public/azipix-webhook',
@@ -167,6 +174,7 @@ export interface FileRoutesByFullPath {
   '/mx/': typeof MxIndexRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/api/public/azipix-webhook': typeof ApiPublicAzipixWebhookRoute
   '/api/public/cooud-webhook': typeof ApiPublicCooudWebhookRoute
   '/api/public/lead-submit': typeof ApiPublicLeadSubmitRoute
@@ -191,6 +199,7 @@ export interface FileRoutesByTo {
   '/mx': typeof MxIndexRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/api/public/azipix-webhook': typeof ApiPublicAzipixWebhookRoute
   '/api/public/cooud-webhook': typeof ApiPublicCooudWebhookRoute
   '/api/public/lead-submit': typeof ApiPublicLeadSubmitRoute
@@ -217,6 +226,7 @@ export interface FileRoutesById {
   '/mx/': typeof MxIndexRoute
   '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/_authenticated/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
+  '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/api/public/azipix-webhook': typeof ApiPublicAzipixWebhookRoute
   '/api/public/cooud-webhook': typeof ApiPublicCooudWebhookRoute
   '/api/public/lead-submit': typeof ApiPublicLeadSubmitRoute
@@ -243,6 +253,7 @@ export interface FileRouteTypes {
     | '/mx/'
     | '/admin/dashboard'
     | '/admin/leads'
+    | '/admin/settings'
     | '/api/public/azipix-webhook'
     | '/api/public/cooud-webhook'
     | '/api/public/lead-submit'
@@ -267,6 +278,7 @@ export interface FileRouteTypes {
     | '/mx'
     | '/admin/dashboard'
     | '/admin/leads'
+    | '/admin/settings'
     | '/api/public/azipix-webhook'
     | '/api/public/cooud-webhook'
     | '/api/public/lead-submit'
@@ -292,6 +304,7 @@ export interface FileRouteTypes {
     | '/mx/'
     | '/_authenticated/admin/dashboard'
     | '/_authenticated/admin/leads'
+    | '/_authenticated/admin/settings'
     | '/api/public/azipix-webhook'
     | '/api/public/cooud-webhook'
     | '/api/public/lead-submit'
@@ -444,6 +457,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminLeadsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/settings': {
+      id: '/_authenticated/admin/settings'
+      path: '/admin/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/azipix-webhook': {
       id: '/api/public/azipix-webhook'
       path: '/api/public/azipix-webhook'
@@ -506,12 +526,14 @@ const AuthenticatedAdminLeadsRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
   AuthenticatedAdminLeadsRoute: typeof AuthenticatedAdminLeadsRouteWithChildren
+  AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
   AuthenticatedAdminLeadsRoute: AuthenticatedAdminLeadsRouteWithChildren,
+  AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 

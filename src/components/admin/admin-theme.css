@@ -23,6 +23,8 @@
   --input: oklch(0.95 0.01 260);
   --ring: oklch(0.603 0.231 25.132);
   --success: oklch(0.627 0.194 149.215); /* iFood Success Green */
+  --warning: oklch(0.75 0.16 70);
+  --info: oklch(0.6 0.15 240);
 
   background-color: var(--background);
   color: var(--foreground);

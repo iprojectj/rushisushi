@@ -75,6 +75,8 @@ export const Route = createFileRoute("/verificar-status/$id")({
 
           // Envia venda paga para a UTMify uma única vez (cobre gateways sem webhook, ex.: InvictusPay)
           if (statusFinal === "paid") {
+            const { marcarPedidoPago } = await import("@/lib/order-status.server");
+            await marcarPedidoPago(orderId);
             try {
               const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
               const { data: row } = await supabaseAdmin
