@@ -54,7 +54,7 @@ export const Route = createFileRoute("/criar-pix")({
           let pixCopiaECola: string = "";
           let qrCodeFinal: string = "";
           let checkoutUrl: string = "";
-          let infiniteInfo: { handle: string; slug: string } | null = null;
+          let infiniteInfo = null as { handle: string; slug: string } | null;
           const origin = new URL(request.url).origin;
 
           // Virtus foi removida do painel; se ainda estiver salva, cai na Paradise.
