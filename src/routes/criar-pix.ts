@@ -274,24 +274,16 @@ export const Route = createFileRoute("/criar-pix")({
           if (!transactionId) throw new Error(`${gw}: resposta sem ID de transação`);
           };
 
-          // Tenta o gateway ativo; se falhar, usa os outros como reserva automática
-          const ordem = [activeGateway, ...["paradise", "pagbank", "gorilla", "azipix", "invictus"].filter((g) => g !== activeGateway)];
-          // InfinitePay usa outro fluxo (redireciona), então só entra quando escolhida no painel.
-          const erros: string[] = [];
-          for (const gw of ordem) {
-            try {
-              transactionId = ""; pixCopiaECola = ""; qrCodeFinal = ""; checkoutUrl = ""; infiniteInfo = null;
-              await gerarPix(gw);
-              if (gw !== activeGateway) console.warn(`[criar-pix] ${activeGateway} falhou; PIX gerado via reserva ${gw}`);
-              activeGateway = gw;
-              erros.length = 0;
-              break;
-            } catch (e: any) {
-              console.error(`[criar-pix] falha no gateway ${gw}:`, e?.message || e);
-              erros.push(e?.message || String(e));
-            }
+          // Gera o PIX SOMENTE no gateway escolhido no painel.
+          // Sem reserva automática: se ele falhar, o erro volta para o cliente
+          // e nenhum outro gateway chega a ser chamado.
+          transactionId = ""; pixCopiaECola = ""; qrCodeFinal = ""; checkoutUrl = ""; infiniteInfo = null;
+          try {
+            await gerarPix(activeGateway);
+          } catch (e: any) {
+            console.error(`[criar-pix] falha no gateway ${activeGateway}:`, e?.message || e);
+            throw new Error(`${activeGateway}: ${e?.message || String(e)}`);
           }
-          if (erros.length) throw new Error(erros.join(" | "));
 
           // 2. Preparar Utmify
           const payloadUtmify = {
