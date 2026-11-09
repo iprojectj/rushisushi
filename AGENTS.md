@@ -12,6 +12,7 @@
 ## Application structure
 - Legacy storefront HTML is served through raw-import TanStack routes; preserve its checkout integration when changing presentation.
 - Public asset compaction lives only in the build layer: preserve global handler names, exclude backup/map copies from deployment, and never treat shortcut interception as authorization.
+- Keep build-tool source helpers in scripts/, not build/, so deployment does not omit them as generated output.
 - Content routes use pageHead for unique metadata; legacy HTML responses retain their embedded document head.
 
 - UTMify "paid" reports pass through enviarPedidoParaUtmify, which checks app_settings key utmify_track_paid (default on); keep all UTMify sends going through it so the admin switch applies everywhere.
