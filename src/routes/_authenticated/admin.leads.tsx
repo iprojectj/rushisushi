@@ -188,7 +188,7 @@ function LeadsList() {
     try {
       const r = await setTrackPaidFn({ data: { enabled } });
       setTrackPaid(r.enabled);
-      toast.success(r.enabled ? "UTMify voltará a contabilizar vendas aprovadas" : "UTMify não contabilizará vendas aprovadas (ficarão como pendentes)");
+      toast.success(r.enabled ? "UTMify voltará a receber vendas pendentes e aprovadas" : "UTMify não receberá nenhuma venda (nem pendentes, nem aprovadas)");
     } catch (error) {
       toast.error("Erro ao salvar configuração da UTMify");
       console.error(error);
@@ -491,13 +491,13 @@ function LeadsList() {
               <Settings className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-sm font-semibold">UTMify — contabilizar vendas aprovadas</p>
+              <p className="text-sm font-semibold">UTMify — enviar vendas (pendentes e aprovadas)</p>
               <p className="text-xs text-muted-foreground">
                 {trackPaid === null
                   ? "Carregando..."
                   : trackPaid
-                    ? "Ligado: vendas pagas são enviadas como aprovadas."
-                    : "Desligado: vendas pagas ficam apenas como pendentes na UTMify (seu painel continua mostrando como pagas)."}
+                    ? "Ligado: vendas pendentes e pagas são enviadas à UTMify."
+                    : "Desligado: nenhuma venda é enviada à UTMify (nem pendente, nem paga). Seu painel continua registrando tudo."}
               </p>
             </div>
           </div>
@@ -506,7 +506,7 @@ function LeadsList() {
               {trackPaid === null ? "..." : trackPaid ? "Ligado" : "Desligado"}
             </Badge>
             <Switch
-              aria-label="Contabilizar vendas aprovadas na UTMify"
+              aria-label="Enviar vendas para a UTMify"
               checked={trackPaid ?? false}
               disabled={trackPaid === null || isTrackSaving}
               onCheckedChange={handleTrackPaidChange}

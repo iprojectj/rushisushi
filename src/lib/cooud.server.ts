@@ -182,6 +182,11 @@ export async function enviarUtmifyMx(
     console.warn("[UTMIFY-MX] Ignorado. Token não configurado.");
     return { ok: false, status: 0, body: "sem token" };
   }
+  // Mesmo liga/desliga do Admin: desligado = nenhum envio à UTMify.
+  const { isUtmifyPaidTrackingEnabled } = await import("@/lib/paradise.server");
+  if (!(await isUtmifyPaidTrackingEnabled())) {
+    return { ok: true, status: 0, body: "Envio para UTMify desligado no Admin" };
+  }
 
   // Anexar TikTok Pixel Token se disponível (usando o mesmo token global)
   const tiktokToken = "9fd0aa0cceb1fc037e3bfa82fbee3a3eb7720bc1";
