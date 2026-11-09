@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { TrafficMetrics } from "@/components/admin/TrafficMetrics";
 import { cn } from "@/lib/utils";
+import { pageHead } from "@/lib/page-head";
 import {
   type CheckoutRow,
   customerName,
@@ -18,7 +19,7 @@ import {
 } from "@/lib/admin-orders";
 
 export const Route = createFileRoute("/_authenticated/admin/dashboard")({
-  head: () => ({ meta: [{ title: "Visão geral — Rushi Admin" }, { name: "robots", content: "noindex" }] }),
+  head: () => pageHead("Visão geral — Rūshī Admin", "Vendas, pedidos e tráfego no painel Rūshī Sushi.", true),
   component: DashboardPage,
 });
 

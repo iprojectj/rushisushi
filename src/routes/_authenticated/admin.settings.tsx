@@ -7,6 +7,7 @@ import { AdminShell } from "@/components/admin/AdminShell";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { pageHead } from "@/lib/page-head";
 import { GATEWAY_LABELS } from "@/lib/admin-orders";
 import {
   getActiveGateway,
@@ -16,7 +17,7 @@ import {
 } from "@/lib/settings.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/settings")({
-  head: () => ({ meta: [{ title: "Configurações — Rushi Admin" }, { name: "robots", content: "noindex" }] }),
+  head: () => pageHead("Configurações — Rūshī Admin", "Configurações de pagamentos e rastreamento da Rūshī Sushi.", true),
   component: SettingsPage,
 });
 

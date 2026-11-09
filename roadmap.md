@@ -6,4 +6,4 @@
 
 - [x] Add low-impact source shortcut deterrence without blocking form editing.
 - [x] Compact published HTML, CSS and JavaScript and exclude backup/source-map copies.
-- [ ] Verify storefront navigation and protection without generating a payment.
+- [x] Verify storefront navigation and protection without generating a payment.
