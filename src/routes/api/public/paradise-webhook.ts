@@ -14,6 +14,10 @@ export const Route = createFileRoute("/api/public/paradise-webhook")({
 
           if (!orderId) return new Response("Missing order ID", { status: 400 });
 
+          if (["paid", "completed", "success", "approved"].includes(String(status).toLowerCase())) {
+            const { marcarPedidoPago } = await import("@/lib/order-status.server");
+            await marcarPedidoPago(orderId);
+          }
           let utmifyPayload = pendingOrders[orderId];
 
           if (!utmifyPayload) {

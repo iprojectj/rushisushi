@@ -41,6 +41,10 @@ export const Route = createFileRoute("/api/public/azipix-webhook")({
           const status = mapAzipixStatus(body.data?.status);
           console.log("[AZIPIX WEBHOOK]", body.event, orderId, status);
 
+          if (status === "paid") {
+            const { marcarPedidoPago } = await import("@/lib/order-status.server");
+            await marcarPedidoPago(orderId);
+          }
           let utmifyPayload: any = pendingOrders[orderId];
           if (!utmifyPayload) {
             const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
