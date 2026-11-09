@@ -3,7 +3,7 @@ import { readFile, mkdtemp, mkdir, access, writeFile, rm } from "node:fs/promise
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Script, runInNewContext } from "node:vm";
-import { addShortcutGuard, compactHtml, protectPublishedAssets, shortcutGuard } from "../scripts/public-protection";
+import { addShortcutGuard, compactHtml, protectPublishedAssets, shortcutGuard } from "../build/public-protection";
 
 describe("public protection", () => {
   it("blocks source/save shortcuts but preserves form editing and ordinary keys", () => {

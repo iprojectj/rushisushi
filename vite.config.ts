@@ -5,7 +5,7 @@
 //     React/TanStack dedupe, error logger plugins, and sandbox detection (port/host/strictPort).
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
-import { publicProtectionPlugin, protectPublishedAssets } from "./scripts/public-protection";
+import { publicProtectionPlugin, protectPublishedAssets } from "./build/public-protection";
 import type { NitroConfig } from "nitro/types";
 
 const protectedNitro: NitroConfig = {
