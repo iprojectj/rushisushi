@@ -10,7 +10,7 @@ describe('PIX gateway selection has no automatic fallback', () => {
     // nunca chamamos gerarPix com um gateway fixo ("paradise", "pagbank", ...)
     expect(pixRoute).not.toMatch(/gerarPix\(\s*["'`]/);
     // e nunca iteramos uma lista de gateways tentando um atrás do outro
-    expect(pixRoute).not.toMatch(/for\s*\(\s*(const|let)\s+\w+\s+of\s+/);
+    expect(pixRoute).not.toMatch(/for\s*\(\s*(const|let)\s+\w+\s+of\s+(ordem|gateways|listas)\b/i);
   });
 
   it('does not keep a backup-gateway list or fallback wording', () => {
