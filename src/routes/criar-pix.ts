@@ -332,7 +332,7 @@ export const Route = createFileRoute("/criar-pix")({
                 valorTotal: valorNumerico, 
                 utmify_payload: payloadUtmify, 
                 gateway: activeGateway,
-                ...(infiniteInfo ? { infinitepay: { ...infiniteInfo, checkout_url: checkoutUrl } } : {}),
+                ...(infiniteInfo ? { infinitepay: { handle: infiniteInfo.handle, slug: infiniteInfo.slug, checkout_url: checkoutUrl } } : {}),
               },
             });
           } catch (e) { console.error("Supabase Error:", e); }
