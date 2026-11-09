@@ -277,7 +277,6 @@ export const Route = createFileRoute("/criar-pix")({
           // Gera o PIX SOMENTE no gateway escolhido no painel.
           // Sem reserva automática: se ele falhar, o erro volta para o cliente
           // e nenhum outro gateway chega a ser chamado.
-          transactionId = ""; pixCopiaECola = ""; qrCodeFinal = ""; checkoutUrl = ""; infiniteInfo = null;
           try {
             await gerarPix(activeGateway);
           } catch (e: any) {
