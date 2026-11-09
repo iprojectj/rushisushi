@@ -43,6 +43,13 @@ export const Route = createFileRoute("/verificar-status/$id")({
             });
             const data: any = await res.json().catch(() => ({}));
             statusFinal = mapInvictusStatus(extractInvictusTx(data)?.status);
+          } else if (gateway === "pagbank") {
+            const { PAGBANK_API_BASE_URL, getPagBankHeaders, mapPagBankOrder } = await import("@/lib/pagbank.server");
+            const res = await fetch(`${PAGBANK_API_BASE_URL}/orders/${encodeURIComponent(orderId)}`, {
+              headers: getPagBankHeaders(),
+            });
+            const data: any = await res.json().catch(() => ({}));
+            statusFinal = res.ok ? mapPagBankOrder(data) : "pending";
           } else if (gateway === "gorilla") {
             const res = await fetch(`${GORILLAPAY_API_BASE_URL}/charges/${encodeURIComponent(orderId)}`, {
               headers: getGorillaHeaders(),

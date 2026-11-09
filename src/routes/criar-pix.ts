@@ -11,6 +11,7 @@ import {
   pendingOrders,
 } from "@/lib/paradise.server";
 import { AZIPIX_API_BASE_URL, getAzipixHeaders } from "@/lib/azipix.server";
+import { PAGBANK_API_BASE_URL, getPagBankHeaders } from "@/lib/pagbank.server";
 import { GORILLAPAY_API_BASE_URL, getGorillaHeaders } from "@/lib/gorillapay.server";
 import { INFINITEPAY_API_BASE_URL, getInfinitePayHeaders, handleFromCheckoutUrl, slugFromCheckoutUrl } from "@/lib/infinitepay.server";
 import { INVICTUS_API_BASE_URL, extractInvictusTx, getInvictusHeaders } from "@/lib/invictuspay.server";
@@ -160,6 +161,38 @@ export const Route = createFileRoute("/criar-pix")({
             qrCodeFinal = String(img).startsWith("data:image") && !String(img).includes("http")
               ? img
               : pixCopiaECola ? `https://quickchart.io/qr?text=${encodeURIComponent(pixCopiaECola)}&size=300` : "";
+          } else if (gw === "pagbank") {
+            // PagBank Orders API v4 - centavos; QR PIX expira em 1h
+            const fone = telefoneLimpo.replace(/^55(?=\d{10,11}$)/, "");
+            const expiracao = new Date(Date.now() + 3600_000).toISOString().replace(/\.\d{3}Z$/, "-00:00");
+            const response = await fetch(`${PAGBANK_API_BASE_URL}/orders`, {
+              method: "POST",
+              headers: { ...getPagBankHeaders(), "x-idempotency-key": crypto.randomUUID() },
+              body: JSON.stringify({
+                reference_id: reference,
+                customer: {
+                  name: String(nome || "Cliente").slice(0, 120),
+                  email: emailCliente,
+                  tax_id: cpfCliente.replace(/\D/g, ""),
+                  ...(fone.length >= 10 ? { phones: [{ country: "55", area: fone.slice(0, 2), number: fone.slice(2), type: "MOBILE" }] } : {}),
+                },
+                items: [{ reference_id: "pedido", name: montarDescricaoPedido(products).slice(0, 100) || "Pedido", quantity: 1, unit_amount: valorEmCentavos }],
+                qr_codes: [{ amount: { value: valorEmCentavos }, expiration_date: expiracao }],
+                notification_urls: [`${origin}/api/public/pagbank-webhook`],
+              }),
+            });
+            const rawText = await response.text();
+            let apiData: any = {};
+            try { apiData = JSON.parse(rawText); } catch { apiData = { raw: rawText }; }
+            const qr = apiData?.qr_codes?.[0];
+            if (!response.ok || !apiData.id || !qr?.text) {
+              console.error("[PAGBANK] Erro criar PIX:", response.status, rawText);
+              const msg = apiData?.error_messages?.map((m: any) => m.description || m.message).join("; ");
+              throw new Error(`PagBank ${response.status}: ${msg || rawText || "Erro desconhecido"}`);
+            }
+            transactionId = String(apiData.id);
+            pixCopiaECola = String(qr.text);
+            qrCodeFinal = `https://quickchart.io/qr?text=${encodeURIComponent(pixCopiaECola)}&size=300`;
           } else if (gw === "gorilla") {
             // GorillaPay - centavos
             const response = await fetch(`${GORILLAPAY_API_BASE_URL}/charges`, {
@@ -242,7 +275,7 @@ export const Route = createFileRoute("/criar-pix")({
           };
 
           // Tenta o gateway ativo; se falhar, usa os outros como reserva automática
-          const ordem = [activeGateway, ...["paradise", "gorilla", "azipix", "invictus"].filter((g) => g !== activeGateway)];
+          const ordem = [activeGateway, ...["paradise", "pagbank", "gorilla", "azipix", "invictus"].filter((g) => g !== activeGateway)];
           // InfinitePay usa outro fluxo (redireciona), então só entra quando escolhida no painel.
           const erros: string[] = [];
           for (const gw of ordem) {
