@@ -3,7 +3,6 @@ import { PARADISE_API_BASE_URL, getParadiseHeaders } from "@/lib/paradise.server
 import { VIRTUSBANK_API_BASE_URL, getVirtusHeaders, mapVirtusStatus } from "@/lib/virtusbank.server";
 import { INVICTUS_API_BASE_URL, extractInvictusTx, getInvictusHeaders, mapInvictusStatus } from "@/lib/invictuspay.server";
 import { AZIPIX_API_BASE_URL, getAzipixHeaders, mapAzipixStatus } from "@/lib/azipix.server";
-import { infinitePayIsPaid } from "@/lib/infinitepay.server";
 import { GORILLAPAY_API_BASE_URL, getGorillaHeaders, mapGorillaStatus } from "@/lib/gorillapay.server";
 
 export const Route = createFileRoute("/verificar-status/$id")({
@@ -15,7 +14,6 @@ export const Route = createFileRoute("/verificar-status/$id")({
           
           // 1. Tentar descobrir o gateway a partir do banco de dados (lead_submissions)
           let gateway = "paradise";
-          let infinite: { handle?: string; slug?: string; transaction_nsu?: string } = {};
           try {
             const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
             const { data } = await supabaseAdmin
@@ -26,7 +24,6 @@ export const Route = createFileRoute("/verificar-status/$id")({
             
             if (data?.fields && (data.fields as any).gateway) {
               gateway = (data.fields as any).gateway;
-              infinite = (data.fields as any).infinitepay || {};
             }
           } catch (e) {
             console.error("[verificar-status] Erro ao buscar gateway no banco:", e);
@@ -34,22 +31,12 @@ export const Route = createFileRoute("/verificar-status/$id")({
 
           let statusFinal = "pending";
 
-          if (gateway === "infinitepay") {
-            const paid = await infinitePayIsPaid({ handle: infinite.handle, slug: infinite.slug, transaction_nsu: infinite.transaction_nsu, order_nsu: orderId });
-            statusFinal = paid ? "paid" : "pending";
-          } else if (gateway === "invictus") {
+          if (gateway === "invictus") {
             const res = await fetch(`${INVICTUS_API_BASE_URL}/transactions/${encodeURIComponent(orderId)}`, {
               headers: getInvictusHeaders(),
             });
             const data: any = await res.json().catch(() => ({}));
             statusFinal = mapInvictusStatus(extractInvictusTx(data)?.status);
-          } else if (gateway === "pagbank") {
-            const { PAGBANK_API_BASE_URL, getPagBankHeaders, mapPagBankOrder } = await import("@/lib/pagbank.server");
-            const res = await fetch(`${PAGBANK_API_BASE_URL}/orders/${encodeURIComponent(orderId)}`, {
-              headers: getPagBankHeaders(),
-            });
-            const data: any = await res.json().catch(() => ({}));
-            statusFinal = res.ok ? mapPagBankOrder(data) : "pending";
           } else if (gateway === "gorilla") {
             const res = await fetch(`${GORILLAPAY_API_BASE_URL}/charges/${encodeURIComponent(orderId)}`, {
               headers: getGorillaHeaders(),

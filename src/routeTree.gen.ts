@@ -29,9 +29,7 @@ import { Route as AuthenticatedAdminLeadsRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as ApiPublicAzipixWebhookRouteImport } from './routes/api/public/azipix-webhook'
 import { Route as ApiPublicCooudWebhookRouteImport } from './routes/api/public/cooud-webhook'
-import { Route as ApiPublicInfinitepayWebhookRouteImport } from './routes/api/public/infinitepay-webhook'
 import { Route as ApiPublicLeadSubmitRouteImport } from './routes/api/public/lead-submit'
-import { Route as ApiPublicPagbankWebhookRouteImport } from './routes/api/public/pagbank-webhook'
 import { Route as ApiPublicParadiseWebhookRouteImport } from './routes/api/public/paradise-webhook'
 import { Route as ApiPublicTrackRouteImport } from './routes/api/public/track'
 import { Route as AuthenticatedAdminLeadsIdRouteImport } from './routes/_authenticated/admin.leads.$id'
@@ -137,20 +135,9 @@ const ApiPublicCooudWebhookRoute = ApiPublicCooudWebhookRouteImport.update({
   path: '/api/public/cooud-webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicInfinitepayWebhookRoute =
-  ApiPublicInfinitepayWebhookRouteImport.update({
-    id: '/api/public/infinitepay-webhook',
-    path: '/api/public/infinitepay-webhook',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const ApiPublicLeadSubmitRoute = ApiPublicLeadSubmitRouteImport.update({
   id: '/api/public/lead-submit',
   path: '/api/public/lead-submit',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicPagbankWebhookRoute = ApiPublicPagbankWebhookRouteImport.update({
-  id: '/api/public/pagbank-webhook',
-  path: '/api/public/pagbank-webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicParadiseWebhookRoute =
@@ -190,9 +177,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/api/public/azipix-webhook': typeof ApiPublicAzipixWebhookRoute
   '/api/public/cooud-webhook': typeof ApiPublicCooudWebhookRoute
-  '/api/public/infinitepay-webhook': typeof ApiPublicInfinitepayWebhookRoute
   '/api/public/lead-submit': typeof ApiPublicLeadSubmitRoute
-  '/api/public/pagbank-webhook': typeof ApiPublicPagbankWebhookRoute
   '/api/public/paradise-webhook': typeof ApiPublicParadiseWebhookRoute
   '/api/public/track': typeof ApiPublicTrackRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -217,9 +202,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/api/public/azipix-webhook': typeof ApiPublicAzipixWebhookRoute
   '/api/public/cooud-webhook': typeof ApiPublicCooudWebhookRoute
-  '/api/public/infinitepay-webhook': typeof ApiPublicInfinitepayWebhookRoute
   '/api/public/lead-submit': typeof ApiPublicLeadSubmitRoute
-  '/api/public/pagbank-webhook': typeof ApiPublicPagbankWebhookRoute
   '/api/public/paradise-webhook': typeof ApiPublicParadiseWebhookRoute
   '/api/public/track': typeof ApiPublicTrackRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -246,9 +229,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/api/public/azipix-webhook': typeof ApiPublicAzipixWebhookRoute
   '/api/public/cooud-webhook': typeof ApiPublicCooudWebhookRoute
-  '/api/public/infinitepay-webhook': typeof ApiPublicInfinitepayWebhookRoute
   '/api/public/lead-submit': typeof ApiPublicLeadSubmitRoute
-  '/api/public/pagbank-webhook': typeof ApiPublicPagbankWebhookRoute
   '/api/public/paradise-webhook': typeof ApiPublicParadiseWebhookRoute
   '/api/public/track': typeof ApiPublicTrackRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -275,9 +256,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/api/public/azipix-webhook'
     | '/api/public/cooud-webhook'
-    | '/api/public/infinitepay-webhook'
     | '/api/public/lead-submit'
-    | '/api/public/pagbank-webhook'
     | '/api/public/paradise-webhook'
     | '/api/public/track'
     | '/admin/'
@@ -302,9 +281,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/api/public/azipix-webhook'
     | '/api/public/cooud-webhook'
-    | '/api/public/infinitepay-webhook'
     | '/api/public/lead-submit'
-    | '/api/public/pagbank-webhook'
     | '/api/public/paradise-webhook'
     | '/api/public/track'
     | '/admin'
@@ -330,9 +307,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/settings'
     | '/api/public/azipix-webhook'
     | '/api/public/cooud-webhook'
-    | '/api/public/infinitepay-webhook'
     | '/api/public/lead-submit'
-    | '/api/public/pagbank-webhook'
     | '/api/public/paradise-webhook'
     | '/api/public/track'
     | '/_authenticated/admin/'
@@ -356,9 +331,7 @@ export interface RootRouteChildren {
   MxIndexRoute: typeof MxIndexRoute
   ApiPublicAzipixWebhookRoute: typeof ApiPublicAzipixWebhookRoute
   ApiPublicCooudWebhookRoute: typeof ApiPublicCooudWebhookRoute
-  ApiPublicInfinitepayWebhookRoute: typeof ApiPublicInfinitepayWebhookRoute
   ApiPublicLeadSubmitRoute: typeof ApiPublicLeadSubmitRoute
-  ApiPublicPagbankWebhookRoute: typeof ApiPublicPagbankWebhookRoute
   ApiPublicParadiseWebhookRoute: typeof ApiPublicParadiseWebhookRoute
   ApiPublicTrackRoute: typeof ApiPublicTrackRoute
 }
@@ -505,25 +478,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCooudWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/infinitepay-webhook': {
-      id: '/api/public/infinitepay-webhook'
-      path: '/api/public/infinitepay-webhook'
-      fullPath: '/api/public/infinitepay-webhook'
-      preLoaderRoute: typeof ApiPublicInfinitepayWebhookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/public/lead-submit': {
       id: '/api/public/lead-submit'
       path: '/api/public/lead-submit'
       fullPath: '/api/public/lead-submit'
       preLoaderRoute: typeof ApiPublicLeadSubmitRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/pagbank-webhook': {
-      id: '/api/public/pagbank-webhook'
-      path: '/api/public/pagbank-webhook'
-      fullPath: '/api/public/pagbank-webhook'
-      preLoaderRoute: typeof ApiPublicPagbankWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/paradise-webhook': {
@@ -598,9 +557,7 @@ const rootRouteChildren: RootRouteChildren = {
   MxIndexRoute: MxIndexRoute,
   ApiPublicAzipixWebhookRoute: ApiPublicAzipixWebhookRoute,
   ApiPublicCooudWebhookRoute: ApiPublicCooudWebhookRoute,
-  ApiPublicInfinitepayWebhookRoute: ApiPublicInfinitepayWebhookRoute,
   ApiPublicLeadSubmitRoute: ApiPublicLeadSubmitRoute,
-  ApiPublicPagbankWebhookRoute: ApiPublicPagbankWebhookRoute,
   ApiPublicParadiseWebhookRoute: ApiPublicParadiseWebhookRoute,
   ApiPublicTrackRoute: ApiPublicTrackRoute,
 }

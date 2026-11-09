@@ -45,11 +45,9 @@ export function customerName(r: CheckoutRow): string {
 
 export const GATEWAY_LABELS: Record<string, string> = {
   paradise: "Paradise Pags",
-  pagbank: "PagBank",
   gorilla: "GorillaPay",
   azipix: "Azipix",
   invictus: "InvictusPay",
-  infinitepay: "InfinitePay",
 };
 
 export function gatewayLabel(g: unknown): string {
