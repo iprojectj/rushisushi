@@ -63,7 +63,7 @@ function Kpi({ label, value, hint, icon: Icon, tone }: KpiProps) {
         <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</p>
         <span className={cn("rounded-lg p-2", TONE[tone])}><Icon className="h-4 w-4" /></span>
       </div>
-      <p className="mt-2 text-2xl font-bold tabular-nums md:text-3xl">{value}</p>
+      <p className="mt-2 truncate text-2xl font-bold tabular-nums md:text-3xl">{value}</p>
       {hint && <p className="mt-0.5 text-xs text-muted-foreground">{hint}</p>}
     </div>
   );
@@ -147,7 +147,7 @@ function DashboardPage() {
       <div className="mx-auto max-w-7xl space-y-8">
         <section aria-labelledby="vendas">
           <h2 id="vendas" className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Vendas</h2>
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-6">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
             <Kpi label="Faturamento" value={loading ? "…" : fmtBRL(m.revenue)} hint="Pedidos pagos" icon={DollarSign} tone="success" />
             <Kpi label="Pedidos pagos" value={loading ? "…" : String(m.paid)} icon={CheckCircle2} tone="success" />
             <Kpi label="PIX gerados" value={loading ? "…" : String(m.orders)} icon={ShoppingBag} tone="primary" />
