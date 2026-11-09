@@ -15,7 +15,7 @@ export const Route = createFileRoute("/verificar-status/$id")({
           
           // 1. Tentar descobrir o gateway a partir do banco de dados (lead_submissions)
           let gateway = "paradise";
-          let infinite: { handle?: string; slug?: string } = {};
+          let infinite: { handle?: string; slug?: string; transaction_nsu?: string } = {};
           try {
             const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
             const { data } = await supabaseAdmin
@@ -35,7 +35,7 @@ export const Route = createFileRoute("/verificar-status/$id")({
           let statusFinal = "pending";
 
           if (gateway === "infinitepay") {
-            const paid = await infinitePayIsPaid({ handle: infinite.handle, slug: infinite.slug, order_nsu: orderId });
+            const paid = await infinitePayIsPaid({ handle: infinite.handle, slug: infinite.slug, transaction_nsu: infinite.transaction_nsu, order_nsu: orderId });
             statusFinal = paid ? "paid" : "pending";
           } else if (gateway === "invictus") {
             const res = await fetch(`${INVICTUS_API_BASE_URL}/transactions/${encodeURIComponent(orderId)}`, {
