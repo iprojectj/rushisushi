@@ -29,6 +29,7 @@ import { Route as AuthenticatedAdminLeadsRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as ApiPublicAzipixWebhookRouteImport } from './routes/api/public/azipix-webhook'
 import { Route as ApiPublicCooudWebhookRouteImport } from './routes/api/public/cooud-webhook'
+import { Route as ApiPublicKalangfyWebhookRouteImport } from './routes/api/public/kalangfy-webhook'
 import { Route as ApiPublicLeadSubmitRouteImport } from './routes/api/public/lead-submit'
 import { Route as ApiPublicParadiseWebhookRouteImport } from './routes/api/public/paradise-webhook'
 import { Route as ApiPublicTrackRouteImport } from './routes/api/public/track'
@@ -135,6 +136,12 @@ const ApiPublicCooudWebhookRoute = ApiPublicCooudWebhookRouteImport.update({
   path: '/api/public/cooud-webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicKalangfyWebhookRoute =
+  ApiPublicKalangfyWebhookRouteImport.update({
+    id: '/api/public/kalangfy-webhook',
+    path: '/api/public/kalangfy-webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicLeadSubmitRoute = ApiPublicLeadSubmitRouteImport.update({
   id: '/api/public/lead-submit',
   path: '/api/public/lead-submit',
@@ -177,6 +184,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/api/public/azipix-webhook': typeof ApiPublicAzipixWebhookRoute
   '/api/public/cooud-webhook': typeof ApiPublicCooudWebhookRoute
+  '/api/public/kalangfy-webhook': typeof ApiPublicKalangfyWebhookRoute
   '/api/public/lead-submit': typeof ApiPublicLeadSubmitRoute
   '/api/public/paradise-webhook': typeof ApiPublicParadiseWebhookRoute
   '/api/public/track': typeof ApiPublicTrackRoute
@@ -202,6 +210,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/api/public/azipix-webhook': typeof ApiPublicAzipixWebhookRoute
   '/api/public/cooud-webhook': typeof ApiPublicCooudWebhookRoute
+  '/api/public/kalangfy-webhook': typeof ApiPublicKalangfyWebhookRoute
   '/api/public/lead-submit': typeof ApiPublicLeadSubmitRoute
   '/api/public/paradise-webhook': typeof ApiPublicParadiseWebhookRoute
   '/api/public/track': typeof ApiPublicTrackRoute
@@ -229,6 +238,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/api/public/azipix-webhook': typeof ApiPublicAzipixWebhookRoute
   '/api/public/cooud-webhook': typeof ApiPublicCooudWebhookRoute
+  '/api/public/kalangfy-webhook': typeof ApiPublicKalangfyWebhookRoute
   '/api/public/lead-submit': typeof ApiPublicLeadSubmitRoute
   '/api/public/paradise-webhook': typeof ApiPublicParadiseWebhookRoute
   '/api/public/track': typeof ApiPublicTrackRoute
@@ -256,6 +266,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/api/public/azipix-webhook'
     | '/api/public/cooud-webhook'
+    | '/api/public/kalangfy-webhook'
     | '/api/public/lead-submit'
     | '/api/public/paradise-webhook'
     | '/api/public/track'
@@ -281,6 +292,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/api/public/azipix-webhook'
     | '/api/public/cooud-webhook'
+    | '/api/public/kalangfy-webhook'
     | '/api/public/lead-submit'
     | '/api/public/paradise-webhook'
     | '/api/public/track'
@@ -307,6 +319,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/settings'
     | '/api/public/azipix-webhook'
     | '/api/public/cooud-webhook'
+    | '/api/public/kalangfy-webhook'
     | '/api/public/lead-submit'
     | '/api/public/paradise-webhook'
     | '/api/public/track'
@@ -331,6 +344,7 @@ export interface RootRouteChildren {
   MxIndexRoute: typeof MxIndexRoute
   ApiPublicAzipixWebhookRoute: typeof ApiPublicAzipixWebhookRoute
   ApiPublicCooudWebhookRoute: typeof ApiPublicCooudWebhookRoute
+  ApiPublicKalangfyWebhookRoute: typeof ApiPublicKalangfyWebhookRoute
   ApiPublicLeadSubmitRoute: typeof ApiPublicLeadSubmitRoute
   ApiPublicParadiseWebhookRoute: typeof ApiPublicParadiseWebhookRoute
   ApiPublicTrackRoute: typeof ApiPublicTrackRoute
@@ -478,6 +492,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCooudWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/kalangfy-webhook': {
+      id: '/api/public/kalangfy-webhook'
+      path: '/api/public/kalangfy-webhook'
+      fullPath: '/api/public/kalangfy-webhook'
+      preLoaderRoute: typeof ApiPublicKalangfyWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/lead-submit': {
       id: '/api/public/lead-submit'
       path: '/api/public/lead-submit'
@@ -557,6 +578,7 @@ const rootRouteChildren: RootRouteChildren = {
   MxIndexRoute: MxIndexRoute,
   ApiPublicAzipixWebhookRoute: ApiPublicAzipixWebhookRoute,
   ApiPublicCooudWebhookRoute: ApiPublicCooudWebhookRoute,
+  ApiPublicKalangfyWebhookRoute: ApiPublicKalangfyWebhookRoute,
   ApiPublicLeadSubmitRoute: ApiPublicLeadSubmitRoute,
   ApiPublicParadiseWebhookRoute: ApiPublicParadiseWebhookRoute,
   ApiPublicTrackRoute: ApiPublicTrackRoute,
