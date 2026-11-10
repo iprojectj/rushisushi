@@ -1,6 +1,5 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
-import { ClientOnly } from "@tanstack/react-router";
-const VisitorGlobe = lazy(() => import("./VisitorGlobe"));
+import { useEffect, useMemo, useState } from "react";
+import BrazilVisitorMap from "./BrazilVisitorMap";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -123,12 +122,8 @@ export function TrafficMetrics({ start, end }: { start: Date; end: Date }) {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="rounded-2xl border bg-card p-5 shadow-sm lg:col-span-2">
           <h3 className="font-semibold">De onde estão acessando</h3>
-          <p className="mb-2 text-xs text-muted-foreground">Pontos maiores = mais visitantes. Pontos pulsando = online agora.</p>
-          <ClientOnly fallback={<div className="h-[380px] animate-pulse rounded-xl bg-muted" />}>
-            <Suspense fallback={<div className="h-[380px] animate-pulse rounded-xl bg-muted" />}>
-              <VisitorGlobe rows={rows} live={live} />
-            </Suspense>
-          </ClientOnly>
+          <p className="mb-2 text-xs text-muted-foreground">Bolinhas maiores = mais visitas. Bolinhas pulsando = online agora.</p>
+          <BrazilVisitorMap rows={rows} live={live} />
         </div>
         <div className="rounded-2xl border bg-card p-5 shadow-sm">
           <h3 className="font-semibold">Visitas por estado</h3>
