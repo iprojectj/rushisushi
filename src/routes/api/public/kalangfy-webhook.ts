@@ -20,7 +20,7 @@ export const Route = createFileRoute("/api/public/kalangfy-webhook")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const secret = process.env.KALANGFY_WEBHOOK_SECRET;
+        const secret = process.env.KALANGFY_SIGNING_SECRET || process.env.KALANGFY_WEBHOOK_SECRET;
         if (!secret) return new Response("Webhook not configured", { status: 500 });
         const raw = await request.text();
         const received = (request.headers.get("x-kalangfy-signature") || "").replace(/^sha256=/, "").toLowerCase();

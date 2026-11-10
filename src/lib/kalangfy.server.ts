@@ -2,7 +2,7 @@
 export const KALANGFY_API_BASE_URL = "https://kalangfy.lovable.app/api/public/v1";
 
 export function getKalangfyHeaders(): Record<string, string> {
-  const key = process.env.KALANGFY_API_KEY;
+  const key = process.env.KALANGFY_TOKEN || process.env.KALANGFY_API_KEY;
   if (!key) throw new Error("Chave da Kalangfy não configurada");
   return { "Content-Type": "application/json", Accept: "application/json", Authorization: `Bearer ${key}` };
 }
