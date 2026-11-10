@@ -14,7 +14,15 @@ export const Route = createFileRoute("/api/public/track")({
           if (!sid || !/^[a-z0-9]+$/i.test(sid)) return new Response(null, { status: 204 });
           if (!checkRateLimit(`trk:${sid}`, 30, 60_000).allowed) return new Response(null, { status: 204 });
           const step = Math.max(1, Math.min(6, Number(b.step) || 1));
-          const city = clip(request.headers.get("cf-ipcity"), 60);
+          const h = request.headers;
+          const city = clip(h.get("cf-ipcity"), 60);
+          const num = (v: string | null) => { const n = Number(v); return v && Number.isFinite(n) ? n : null; };
+          const geo = {
+            region: clip(h.get("cf-region"), 60),
+            region_code: clip(h.get("cf-region-code"), 10),
+            lat: num(h.get("cf-iplatitude")),
+            lng: num(h.get("cf-iplongitude")),
+          };
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
           const now = new Date().toISOString();
           const { data: cur } = await supabaseAdmin
@@ -29,7 +37,7 @@ export const Route = createFileRoute("/api/public/track")({
             await supabaseAdmin.from("site_sessions").insert({
               id: sid, path: clip(b.path, 120), max_step: step,
               utm_source: clip(b.us, 60), utm_campaign: clip(b.uc, 120),
-              device: b.d === "mobile" ? "mobile" : "desktop", city,
+              device: b.d === "mobile" ? "mobile" : "desktop", city, ...geo,
             });
           }
         } catch (e) {
