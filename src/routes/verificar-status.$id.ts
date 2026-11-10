@@ -3,6 +3,7 @@ import { PARADISE_API_BASE_URL, getParadiseHeaders } from "@/lib/paradise.server
 import { VIRTUSBANK_API_BASE_URL, getVirtusHeaders, mapVirtusStatus } from "@/lib/virtusbank.server";
 import { INVICTUS_API_BASE_URL, extractInvictusTx, getInvictusHeaders, mapInvictusStatus } from "@/lib/invictuspay.server";
 import { AZIPIX_API_BASE_URL, getAzipixHeaders, mapAzipixStatus } from "@/lib/azipix.server";
+import { KALANGFY_API_BASE_URL, extractKalangfyCharge, getKalangfyHeaders, mapKalangfyStatus } from "@/lib/kalangfy.server";
 import { GORILLAPAY_API_BASE_URL, getGorillaHeaders, mapGorillaStatus } from "@/lib/gorillapay.server";
 
 export const Route = createFileRoute("/verificar-status/$id")({
@@ -31,7 +32,13 @@ export const Route = createFileRoute("/verificar-status/$id")({
 
           let statusFinal = "pending";
 
-          if (gateway === "invictus") {
+          if (gateway === "kalangfy") {
+            const res = await fetch(`${KALANGFY_API_BASE_URL}/charges/${encodeURIComponent(orderId)}`, {
+              headers: getKalangfyHeaders(),
+            });
+            const data: any = await res.json().catch(() => ({}));
+            statusFinal = mapKalangfyStatus(extractKalangfyCharge(data)?.status);
+          } else if (gateway === "invictus") {
             const res = await fetch(`${INVICTUS_API_BASE_URL}/transactions/${encodeURIComponent(orderId)}`, {
               headers: getInvictusHeaders(),
             });
