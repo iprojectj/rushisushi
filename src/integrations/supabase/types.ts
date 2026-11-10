@@ -125,9 +125,13 @@ export type Database = {
           first_seen: string
           id: string
           last_seen: string
+          lat: number | null
+          lng: number | null
           max_step: number
           pageviews: number
           path: string | null
+          region: string | null
+          region_code: string | null
           utm_campaign: string | null
           utm_source: string | null
         }
@@ -137,9 +141,13 @@ export type Database = {
           first_seen?: string
           id: string
           last_seen?: string
+          lat?: number | null
+          lng?: number | null
           max_step?: number
           pageviews?: number
           path?: string | null
+          region?: string | null
+          region_code?: string | null
           utm_campaign?: string | null
           utm_source?: string | null
         }
@@ -149,9 +157,13 @@ export type Database = {
           first_seen?: string
           id?: string
           last_seen?: string
+          lat?: number | null
+          lng?: number | null
           max_step?: number
           pageviews?: number
           path?: string | null
+          region?: string | null
+          region_code?: string | null
           utm_campaign?: string | null
           utm_source?: string | null
         }

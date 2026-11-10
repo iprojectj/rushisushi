@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { ClientOnly } from "@tanstack/react-router";
+const VisitorGlobe = lazy(() => import("./VisitorGlobe"));
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -13,6 +15,10 @@ interface Session {
   utm_campaign: string | null;
   device: string | null;
   city: string | null;
+  region: string | null;
+  region_code: string | null;
+  lat: number | null;
+  lng: number | null;
 }
 
 const STEPS = ["Entraram no site", "Adicionaram ao carrinho", "Iniciaram checkout", "Chegaram no pagamento", "Geraram PIX", "Pagaram"];
@@ -38,7 +44,7 @@ export function TrafficMetrics({ start, end }: { start: Date; end: Date }) {
     const load = async () => {
       const { data, error: e } = await supabase
         .from("site_sessions")
-        .select("id,last_seen,path,max_step,pageviews,utm_source,utm_campaign,device,city")
+        .select("id,last_seen,path,max_step,pageviews,utm_source,utm_campaign,device,city,region,region_code,lat,lng")
         .gte("first_seen", start.toISOString())
         .lte("first_seen", end.toISOString())
         .order("last_seen", { ascending: false })
@@ -60,7 +66,7 @@ export function TrafficMetrics({ start, end }: { start: Date; end: Date }) {
     const load = async () => {
       const { data } = await supabase
         .from("site_sessions")
-        .select("id,last_seen,path,max_step,pageviews,utm_source,utm_campaign,device,city")
+        .select("id,last_seen,path,max_step,pageviews,utm_source,utm_campaign,device,city,region,region_code,lat,lng")
         .gte("last_seen", new Date(Date.now() - 60000).toISOString())
         .limit(2000);
       if (alive) setLive(data ?? []);
@@ -72,6 +78,11 @@ export function TrafficMetrics({ start, end }: { start: Date; end: Date }) {
 
   const funnel = useMemo(() => STEPS.map((_, i) => rows.filter((r) => r.max_step >= i + 1).length), [rows]);
   const total = funnel[0] || 0;
+  const states = useMemo(() => {
+    const m = new Map<string, number>();
+    rows.forEach((r) => { const k = r.region || "Não identificado"; m.set(k, (m.get(k) ?? 0) + 1); });
+    return [...m.entries()].sort((a, b) => b[1] - a[1]);
+  }, [rows]);
   const bounce = total ? Math.round((rows.filter((r) => r.pageviews <= 1 && r.max_step === 1).length / total) * 100) : 0;
   const mobile = total ? Math.round((rows.filter((r) => r.device === "mobile").length / total) * 100) : 0;
 
@@ -106,6 +117,33 @@ export function TrafficMetrics({ start, end }: { start: Date; end: Date }) {
               <div className="mt-2 text-3xl font-bold tabular-nums">{v}</div>
             </div>
           ))}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="rounded-2xl border bg-card p-5 shadow-sm lg:col-span-2">
+          <h3 className="font-semibold">De onde estão acessando</h3>
+          <p className="mb-2 text-xs text-muted-foreground">Pontos maiores = mais visitantes. Pontos pulsando = online agora.</p>
+          <ClientOnly fallback={<div className="h-[380px] animate-pulse rounded-xl bg-muted" />}>
+            <Suspense fallback={<div className="h-[380px] animate-pulse rounded-xl bg-muted" />}>
+              <VisitorGlobe rows={rows} live={live} />
+            </Suspense>
+          </ClientOnly>
+        </div>
+        <div className="rounded-2xl border bg-card p-5 shadow-sm">
+          <h3 className="font-semibold">Visitas por estado</h3>
+          <p className="mb-3 text-xs text-muted-foreground">No período escolhido.</p>
+          <div className="max-h-[380px] space-y-2 overflow-y-auto pr-1">
+            {states.length === 0 && <p className="text-sm text-muted-foreground">Sem dados ainda.</p>}
+            {states.map(([k, v]) => (
+              <div key={k}>
+                <div className="flex justify-between text-sm"><span className="truncate">{k}</span><b className="tabular-nums">{v}</b></div>
+                <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted">
+                  <div className="h-full rounded-full bg-primary" style={{ width: `${(v / states[0][1]) * 100}%` }} />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
