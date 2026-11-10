@@ -12,7 +12,6 @@ import {
 } from "@/lib/paradise.server";
 import { AZIPIX_API_BASE_URL, getAzipixHeaders } from "@/lib/azipix.server";
 import { GORILLAPAY_API_BASE_URL, getGorillaHeaders } from "@/lib/gorillapay.server";
-import { KALANGFY_API_BASE_URL, extractKalangfyCharge, getKalangfyHeaders } from "@/lib/kalangfy.server";
 import { INVICTUS_API_BASE_URL, extractInvictusTx, getInvictusHeaders } from "@/lib/invictuspay.server";
 
 export const Route = createFileRoute("/criar-pix")({
@@ -111,40 +110,6 @@ export const Route = createFileRoute("/criar-pix")({
             // Azipix às vezes devolve um link externo no lugar da imagem; nesse caso geramos o QR pelo código.
             qrCodeFinal = String(img).startsWith("data:image") && !String(img).includes("http")
               ? img
-              : pixCopiaECola ? `https://quickchart.io/qr?text=${encodeURIComponent(pixCopiaECola)}&size=300` : "";
-          } else if (gw === "kalangfy") {
-            // Kalangfy - centavos
-            const tracking: Record<string, string> = {};
-            if (trackingParameters && typeof trackingParameters === "object") {
-              for (const [k, v] of Object.entries(trackingParameters)) {
-                if (v != null && v !== "") tracking[k] = String(v).slice(0, 500);
-              }
-            }
-            const response = await fetch(`${KALANGFY_API_BASE_URL}/charges`, {
-              method: "POST",
-              headers: getKalangfyHeaders(),
-              body: JSON.stringify({
-                amount_cents: valorEmCentavos,
-                description: montarDescricaoPedido(products).slice(0, 200) || "Pedido",
-                external_reference: reference,
-                customer: { name: nome, email: emailCliente, document: cpfCliente, phone: telefoneLimpo },
-                tracking_parameters: tracking,
-              }),
-            });
-            const rawText = await response.text();
-            let apiData: any = {};
-            try { apiData = JSON.parse(rawText); } catch { apiData = { raw: rawText }; }
-            const tx = extractKalangfyCharge(apiData);
-            if (!response.ok || !tx.id) {
-              console.error("[KALANGFY] Erro criar PIX:", response.status, rawText);
-              throw new Error(`Kalangfy ${response.status}: ${apiData.error?.message || apiData.error || apiData.message || rawText || "Erro desconhecido"}`);
-            }
-            transactionId = String(tx.id);
-            const pix = tx.pix || {};
-            pixCopiaECola = pix.copy_paste || pix.qr_code || tx.pix_copy_paste || "";
-            const img = String(pix.qr_code_base64 || tx.qr_code_base64 || "");
-            qrCodeFinal = img && !img.startsWith("http")
-              ? (img.startsWith("data:") ? img : `data:image/png;base64,${img}`)
               : pixCopiaECola ? `https://quickchart.io/qr?text=${encodeURIComponent(pixCopiaECola)}&size=300` : "";
           } else if (gw === "gorilla") {
             // GorillaPay - centavos
