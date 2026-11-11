@@ -1,0 +1,1 @@
+ALTER TABLE public.site_sessions ADD COLUMN IF NOT EXISTS region text, ADD COLUMN IF NOT EXISTS region_code text, ADD COLUMN IF NOT EXISTS lat double precision, ADD COLUMN IF NOT EXISTS lng double precision;

@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+
+    <script
+      src="https://cdn.utmify.com.br/scripts/utms/latest.js"
+      data-utmify-token="CnLVH7UAgf5Zi3tljtwDTx8FDQCAvH8vG4h8"
+      data-utmify-prevent-xcod-sck
+      data-utmify-prevent-subids
+      async
+      defer
+    ></script>
+
+    <!-- TikTok Pixel -->
+    <script>
+    !function (w, d, t) {
+      w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(
+    var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};n=document.createElement("script")
+    ;n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
+      ttq.load('D9BDA73C77UFCF7AQ1QG');
+      ttq.page();
+    }(window, document, 'ttq');
+    </script>
+
+    <!-- Meta Pixel -->
+    <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1656196479196220', {}, {agent: 'lovable'});
+    fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1656196479196220&ev=PageView&noscript=1"></noscript>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <style>
+      html, body { touch-action: pan-x pan-y; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+      * { -webkit-touch-callout: none; }
+      input, textarea, select { font-size: 16px !important; }
+    </style>
+    <script>
+      (function(){
+        ['gesturestart','gesturechange','gestureend'].forEach(function(ev){ document.addEventListener(ev, function(e){ e.preventDefault(); }, { passive:false }); });
+        var lastTouch=0; document.addEventListener('touchend', function(e){ var n=Date.now(); if(n-lastTouch<=350)e.preventDefault(); lastTouch=n; }, { passive:false });
+        document.addEventListener('touchmove', function(e){ if(e.touches&&e.touches.length>1)e.preventDefault(); }, { passive:false });
+        document.addEventListener('wheel', function(e){ if(e.ctrlKey)e.preventDefault(); }, { passive:false });
+        document.addEventListener('keydown', function(e){ if((e.ctrlKey||e.metaKey)&&['+','-','=','0'].indexOf(e.key)!==-1)e.preventDefault(); });
+      })();
+    </script>
+
+    <title>Acompanhe seu pedido | Rūshī Sushi</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background:#f2f2f2; user-select:none; -webkit-user-select:none; }
+        .fade-in { animation: fadeIn .5s ease-out forwards; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
+        .pulse-red { animation: pulseRed 2s infinite; }
+        @keyframes pulseRed { 0%{box-shadow:0 0 0 0 rgba(234,29,44,.5);} 70%{box-shadow:0 0 0 12px rgba(234,29,44,0);} 100%{box-shadow:0 0 0 0 rgba(234,29,44,0);} }
+        .blink-dot { animation: blink 1.2s infinite; }
+        @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.3;} }
+        .spin-slow { animation: spin 2.4s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Timeline horizontal iFood-style: ícones + conectores entre eles */
+        .tl-row { display:flex; align-items:center; }
+        .tl-node { display:flex; flex-direction:column; align-items:center; flex-shrink:0; width:56px; }
+        .tl-icon { width:34px; height:34px; border-radius:9999px; background:#fff; border:2px solid #e5e7eb; color:#9ca3af; display:flex; align-items:center; justify-content:center; font-size:13px; transition:all .3s; }
+        .tl-icon.done { background:#EA1D2C; border-color:#EA1D2C; color:#fff; }
+        .tl-icon.active { background:#fff; border-color:#EA1D2C; color:#EA1D2C; box-shadow:0 0 0 4px rgba(234,29,44,.15); animation: pulseRed 2s infinite; }
+        .tl-label { font-size:9px; font-weight:700; color:#9ca3af; text-transform:uppercase; margin-top:6px; text-align:center; line-height:1.15; height:22px; }
+        .tl-label.done, .tl-label.active { color:#3e3e3e; }
+        .tl-conn { flex:1; height:3px; background:#e5e7eb; border-radius:9999px; margin-bottom:22px; overflow:hidden; }
+        .tl-conn-fill { display:block; height:100%; width:0%; background:#EA1D2C; transition:width .8s ease; }
+
+        /* Vertical steps */
+        .vstep { display:flex; gap:12px; }
+        .vcol { flex-shrink:0; display:flex; flex-direction:column; align-items:center; width:24px; }
+        .vline { flex:1; width:2px; background:#e5e7eb; min-height:24px; }
+        .vline.done { background:#EA1D2C; }
+        .vcontent { flex:1; min-width:0; padding-bottom:14px; padding-top:1px; }
+        .vdot { flex-shrink:0; width:24px; height:24px; border-radius:9999px; border:2px solid #e5e7eb; background:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; color:#9ca3af; }
+        .vdot.done { background:#EA1D2C; border-color:#EA1D2C; color:#fff; }
+        .vdot.active { border-color:#EA1D2C; color:#EA1D2C; box-shadow:0 0 0 4px rgba(234,29,44,.15); }
+
+        #delivery-map { width:100%; height:100%; z-index:1; }
+        .leaflet-container { background:#e8eef2; }
+        .moto-marker { filter: drop-shadow(0 3px 6px rgba(0,0,0,.25)); }
+
+        .chat-bubble-in { background:#f3f4f6; border-radius:14px 14px 14px 4px; padding:8px 12px; max-width:80%; font-size:13px; color:#3e3e3e; }
+        .chat-bubble-out { background:#EA1D2C; color:#fff; border-radius:14px 14px 4px 14px; padding:8px 12px; max-width:80%; font-size:13px; margin-left:auto; }
+    </style>
+
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+</head>
+<body class="min-h-screen flex flex-col" oncontextmenu="return false">
+
+    <!-- HEADER -->
+    <header class="bg-white shadow-sm sticky top-0 z-20">
+        <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-[#EA1D2C] flex items-center justify-center text-white">
+                    <i class="fa-solid fa-check text-sm"></i>
+                </div>
+                <div class="leading-tight">
+                    <div class="text-[10px] uppercase tracking-wide text-gray-400 font-bold">Pedido</div>
+                    <div class="text-sm font-extrabold text-[#3e3e3e]" id="hdr-order-id">#—</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-md mx-auto w-full px-4 py-4 space-y-4 pb-24">
+
+        <!-- ESTIMATIVA + STATUS -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 fade-in">
+            <div class="text-[12px] font-semibold text-gray-500">Previsão de entrega</div>
+            <div class="text-[26px] font-extrabold text-[#3e3e3e] mt-0.5 leading-tight" id="eta-range">—</div>
+            <div class="mt-3 flex items-center gap-2">
+                <span class="relative flex h-2.5 w-2.5 flex-shrink-0">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                </span>
+                <span class="text-[13px] font-semibold text-[#3e3e3e]" id="eta-status-text">Confirmando pagamento…</span>
+            </div>
+
+            <!-- Horizontal timeline -->
+            <div class="pt-5 pb-1 mt-3 border-t border-gray-100">
+                <div class="tl-row" id="tl-row">
+                    <div class="tl-node" data-step="0"><div class="tl-icon"><i class="fa-solid fa-circle-check"></i></div><div class="tl-label">Confirmado</div></div>
+                    <div class="tl-conn"><span class="tl-conn-fill" data-conn="0"></span></div>
+                    <div class="tl-node" data-step="1"><div class="tl-icon"><i class="fa-solid fa-store"></i></div><div class="tl-label">Aceito</div></div>
+                    <div class="tl-conn"><span class="tl-conn-fill" data-conn="1"></span></div>
+                    <div class="tl-node" data-step="2"><div class="tl-icon"><i class="fa-solid fa-utensils"></i></div><div class="tl-label">Preparando</div></div>
+                    <div class="tl-conn"><span class="tl-conn-fill" data-conn="2"></span></div>
+                    <div class="tl-node" data-step="3"><div class="tl-icon"><i class="fa-solid fa-motorcycle"></i></div><div class="tl-label">A caminho</div></div>
+                    <div class="tl-conn"><span class="tl-conn-fill" data-conn="3"></span></div>
+                    <div class="tl-node" data-step="4"><div class="tl-icon" id="tl-last-icon"><i class="fa-solid fa-flag-checkered"></i></div><div class="tl-label" id="tl-last-label">Entregue</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HELP BANNER (aparece quando entrega falha) -->
+        <div id="refund-banner" class="hidden bg-white rounded-2xl shadow-sm border border-red-100 p-4 fade-in">
+            <div class="flex items-start gap-3">
+                <div class="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-[#EA1D2C] flex-shrink-0">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div class="min-w-0">
+                    <div class="text-sm font-extrabold text-[#3e3e3e]">Ocorreu um problema com seu pedido</div>
+                    <p class="text-xs text-gray-500 leading-snug mt-1">Nossa equipe de suporte está pronta para te ajudar agora mesmo.</p>
+                </div>
+            </div>
+            <button onclick="openHelpFlow()" class="mt-3 w-full bg-[#EA1D2C] hover:bg-[#c81826] active:scale-[.99] text-white font-extrabold text-sm py-3 rounded-xl flex items-center justify-center gap-2 shadow-md shadow-red-600/20 transition">
+                <i class="fa-solid fa-headset"></i> Preciso de ajuda com meu pedido
+            </button>
+        </div>
+
+        <!-- MAPA -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden fade-in">
+            <div class="px-4 py-3 flex items-center justify-between border-b border-gray-100">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-route text-[#EA1D2C]"></i>
+                    <span class="font-extrabold text-sm text-[#3e3e3e]">Rota da entrega</span>
+                </div>
+                <span class="text-[10px] text-gray-400 font-bold uppercase" id="map-hint">Aguardando saída</span>
+            </div>
+            <div class="relative h-56 bg-gray-100">
+                <div id="delivery-map"></div>
+                <div id="map-loading" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 bg-gray-50">
+                    <i class="fa-solid fa-map-location-dot text-3xl mb-1"></i>
+                    <span class="text-[11px]">Carregando mapa…</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ETAPAS VERTICAL -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 fade-in">
+            <div class="text-[11px] uppercase tracking-wide text-gray-400 font-bold mb-1">Detalhes do progresso</div>
+            <div id="vsteps"></div>
+        </div>
+
+        <!-- ENDEREÇO -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 fade-in">
+            <div class="flex items-start gap-3">
+                <div class="w-9 h-9 rounded-full bg-red-50 flex items-center justify-center text-[#EA1D2C] flex-shrink-0">
+                    <i class="fa-solid fa-location-dot"></i>
+                </div>
+                <div class="min-w-0">
+                    <div class="text-[11px] uppercase tracking-wide text-gray-400 font-bold">Endereço de entrega</div>
+                    <p class="text-sm font-semibold text-[#3e3e3e] leading-snug" id="addr-line1">—</p>
+                    <p class="text-xs text-gray-500 leading-snug" id="addr-line2"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESUMO -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden fade-in">
+            <button onclick="toggleResumo()" class="w-full px-4 py-3 flex items-center justify-between text-left">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-receipt text-[#EA1D2C]"></i>
+                    <span class="font-extrabold text-sm text-[#3e3e3e]">Ver detalhes do pedido</span>
+                </div>
+                <i id="resumo-icon" class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
+            </button>
+            <div id="resumo-content" class="hidden px-4 pb-4 border-t border-gray-100 pt-3"></div>
+        </div>
+
+        <!-- AJUDA -->
+        <button onclick="openChat()" class="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-red-50 flex items-center justify-center text-[#EA1D2C]">
+                    <i class="fa-solid fa-headset"></i>
+                </div>
+                <div class="text-left">
+                    <div class="text-sm font-extrabold text-[#3e3e3e]">Precisa de ajuda?</div>
+                    <div class="text-[11px] text-gray-500">Fale com o restaurante</div>
+                </div>
+            </div>
+            <i class="fa-solid fa-chevron-right text-gray-300"></i>
+        </button>
+
+    </main>
+
+    <!-- CHAT MODAL -->
+    <div id="chat-modal" class="hidden fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-2xl flex flex-col" style="height: 80vh; max-height: 640px;">
+            <div class="flex items-center justify-between p-4 border-b border-gray-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-[#EA1D2C] flex items-center justify-center text-white font-bold">R</div>
+                    <div>
+                        <div class="text-sm font-extrabold text-[#3e3e3e]">Rūshī Sushi</div>
+                        <div class="text-[11px] text-[#05a65a] flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-[#05a65a]"></span> Online agora</div>
+                    </div>
+                </div>
+                <button onclick="closeChat()" class="text-gray-400 hover:text-gray-600 text-xl px-2"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-2"></div>
+            <div class="p-3 border-t border-gray-100 flex gap-2">
+                <input id="chat-input" type="text" placeholder="Digite sua mensagem…" class="flex-1 bg-gray-100 rounded-full px-4 py-2 text-sm outline-none" onkeydown="if(event.key==='Enter')sendChat()">
+                <button onclick="sendChat()" class="w-10 h-10 rounded-full bg-[#EA1D2C] text-white flex items-center justify-center active:scale-95"><i class="fa-solid fa-paper-plane text-sm"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- REFUND CHAT (iFood-style, fullscreen, sem botão de sair) -->
+    <div id="refund-chat" class="hidden fixed inset-0 z-[60] flex flex-col bg-white">
+        <style>
+            #refund-chat .bubble-wrap { display:flex; }
+            #refund-chat .bubble-in { background:#f3f4f6; color:#3e3e3e; border-radius:14px 14px 14px 4px; padding:8px 12px; max-width:80%; font-size:13px; line-height:1.4; }
+            #refund-chat .bubble-out { background:#EA1D2C; color:#fff; border-radius:14px 14px 4px 14px; padding:8px 12px; max-width:80%; font-size:13px; line-height:1.4; margin-left:auto; }
+            #refund-chat .bubble-time { display:block; font-size:10px; opacity:.7; text-align:right; margin-top:3px; }
+            #refund-chat .typing-dots span { display:inline-block; width:6px; height:6px; margin:0 1px; border-radius:9999px; background:#9ca3af; animation: rc-blink 1.2s infinite; }
+            #refund-chat .typing-dots span:nth-child(2){ animation-delay:.2s; } #refund-chat .typing-dots span:nth-child(3){ animation-delay:.4s; }
+            @keyframes rc-blink { 0%,80%,100%{opacity:.3;} 40%{opacity:1;} }
+            #refund-chat .quick-reply { background:#fff; color:#EA1D2C; border:1.5px solid #EA1D2C; border-radius:9999px; padding:9px 16px; font-size:13px; font-weight:700; cursor:pointer; }
+            #refund-chat .quick-reply:active { transform:scale(.97); }
+        </style>
+        <div class="bg-white border-b border-gray-100 shadow-sm px-4 py-3 flex items-center gap-3 flex-shrink-0">
+            <img src="/images/amanda-avatar.jpg" alt="Amanda" class="w-10 h-10 rounded-full object-cover flex-shrink-0" onerror="this.style.display='none'">
+            <div class="min-w-0 flex-1">
+                <div class="text-sm font-extrabold text-[#3e3e3e] leading-tight">Amanda — Atendimento</div>
+                <div class="text-[11px] text-[#05a65a] flex items-center gap-1 leading-tight mt-0.5" id="rc-status">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#05a65a]"></span> Online agora
+                </div>
+            </div>
+        </div>
+        <div id="rc-body" class="flex-1 overflow-y-auto p-4 space-y-2 bg-[#f7f7f7]"></div>
+        <div id="rc-quick" class="hidden px-3 py-3 flex flex-wrap gap-2 bg-white border-t border-gray-100 flex-shrink-0"></div>
+        <div id="rc-input-bar" class="hidden px-3 py-3 flex items-end gap-2 bg-white border-t border-gray-100 flex-shrink-0">
+            <textarea id="rc-input" rows="1" placeholder="Digite sua mensagem…" class="flex-1 bg-gray-100 rounded-2xl px-4 py-2.5 text-sm outline-none resize-none border border-transparent focus:border-gray-200" style="max-height:120px;"></textarea>
+            <button onclick="rcSendUserText()" class="w-10 h-10 rounded-full bg-[#EA1D2C] text-white flex items-center justify-center active:scale-95 flex-shrink-0"><i class="fa-solid fa-paper-plane text-sm"></i></button>
+        </div>
+    </div>
+
+
+
+
+    <script>
+        // ============================================================
+        // DADOS DO PEDIDO
+        // ============================================================
+        var orderData = {};
+        try { orderData = JSON.parse(localStorage.getItem('nobre_pix_data') || '{}'); } catch(e) {}
+
+        var shippingType = orderData.shippingType || 'padrao'; // padrao=grátis, rapida=paga
+        var deliveryMinutes = shippingType === 'rapida' ? 30 : 50;
+
+        // Estado persistente do tracking (para sobreviver refresh)
+        var trackKey = 'nobre_track_' + (orderData.id || 'anon');
+        var trackData = {};
+        try { trackData = JSON.parse(localStorage.getItem(trackKey) || '{}'); } catch(e) {}
+        if (!trackData.startedAt) {
+            trackData = { startedAt: Date.now(), shippingType: shippingType };
+            try { localStorage.setItem(trackKey, JSON.stringify(trackData)); } catch(e) {}
+        }
+        var startedAt = trackData.startedAt;
+
+        // ============================================================
+        // STAGES: tempos em minutos desde o startedAt
+        // Preparo: ~25min. Saída→entrega: ~50min (padrao) ou 30min (rapida).
+        // Aceito é rápido (30s).
+        // ============================================================
+        var STAGES = [
+            { key:'confirmed', label:'Pedido confirmado', desc:'Recebemos seu pagamento com sucesso.', at: 0 },
+            { key:'accepted',  label:'Restaurante aceitou seu pedido', desc:'A cozinha já foi notificada.', at: 0.5 },
+            { key:'preparing', label:'Preparando seu pedido', desc:'Nossos sushimen estão preparando tudo com carinho.', at: 2 },
+            { key:'shipping',  label:'Pedido saiu para entrega', desc:'O entregador está a caminho do seu endereço.', at: 27 },
+            { key:'nearby',    label:'O entregador está chegando', desc:'Fique atento! Sua entrega chega em instantes.', at: 27 + deliveryMinutes - 4 },
+            { key:'failed',    label:'Entrega não realizada', desc:'Infelizmente o entregador não conseguiu concluir a entrega do seu pedido.', at: 27 + deliveryMinutes }
+        ];
+
+        // Timeline horizontal usa 5 ícones (une "chegando" e "failed" no último ícone)
+        var TL_STEPS = ['confirmed','accepted','preparing','shipping','failed'];
+
+        // ============================================================
+        // HELPERS
+        // ============================================================
+        function fmtTime(d){ return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0'); }
+
+        function currentElapsedMin(){ return (Date.now() - startedAt) / 60000; }
+        function reached(stageAt){ return currentElapsedMin() >= stageAt; }
+
+        function currentStageIndex(){
+            var idx = 0;
+            for (var i=0; i<STAGES.length; i++) if (reached(STAGES[i].at)) idx = i;
+            return idx;
+        }
+
+        // ============================================================
+        // HEADER + ETA
+        // ============================================================
+        function renderHeader(){
+            var id = orderData.id || '';
+            document.getElementById('hdr-order-id').textContent = '#' + (id ? id.toString().slice(-8).toUpperCase() : '--------');
+
+            var totalMin = 27 + deliveryMinutes; // ~77 (padrao) ou ~57 (rapida)
+            var start = new Date(startedAt + totalMin * 60000);
+            var end   = new Date(startedAt + (totalMin + 30) * 60000);
+            document.getElementById('eta-range').textContent = fmtTime(start) + ' - ' + fmtTime(end);
+        }
+
+        // ============================================================
+        // TIMELINE
+        // ============================================================
+        function renderTimeline(){
+            var stageKey = STAGES[currentStageIndex()].key;
+            var tlIdx = TL_STEPS.indexOf(stageKey);
+            if (stageKey === 'nearby') tlIdx = TL_STEPS.indexOf('shipping');
+            if (tlIdx < 0) tlIdx = 0;
+
+            document.querySelectorAll('#tl-row .tl-node').forEach(function(node){
+                var i = parseInt(node.dataset.step, 10);
+                var icon = node.querySelector('.tl-icon');
+                var label = node.querySelector('.tl-label');
+                icon.classList.remove('done','active');
+                label.classList.remove('done','active');
+                if (i < tlIdx)      { icon.classList.add('done');   label.classList.add('done'); }
+                else if (i === tlIdx){ icon.classList.add('active'); label.classList.add('active'); }
+            });
+            document.querySelectorAll('#tl-row .tl-conn-fill').forEach(function(el){
+                var i = parseInt(el.dataset.conn, 10);
+                // conector i liga node i → node i+1. Preenche 100% se i+1 já foi atingido, 50% se i é o atual.
+                var w = 0;
+                if (tlIdx > i)      w = 100;
+                else if (tlIdx === i + 0 && i + 1 <= TL_STEPS.length - 1) w = 0; // ainda no node i
+                el.style.width = w + '%';
+            });
+
+
+            // Última etapa: exibe "Entregue" até ser atingida; ao atingir, vira "Não entregue"
+            var lastIcon = document.getElementById('tl-last-icon');
+            var lastLabel = document.getElementById('tl-last-label');
+            if (lastIcon && lastLabel) {
+                if (stageKey === 'failed') {
+                    lastIcon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+                    lastLabel.textContent = 'Não entregue';
+                } else {
+                    lastIcon.innerHTML = '<i class="fa-solid fa-flag-checkered"></i>';
+                    lastLabel.textContent = 'Entregue';
+                }
+            }
+
+            // Status text curto (ao lado do ponto pulsante)
+            var stage = STAGES[currentStageIndex()];
+            var shortMap = {
+                confirmed: 'Pedido confirmado',
+                accepted:  'Restaurante aceitou seu pedido',
+                preparing: 'Preparando seu pedido',
+                shipping:  'Seu pedido está indo até você',
+                nearby:    'O entregador está chegando',
+                failed:    'Entrega não realizada — solicite seu reembolso'
+            };
+            var etaEl = document.getElementById('eta-status-text');
+            if (etaEl) etaEl.textContent = shortMap[stage.key] || stage.label;
+
+            // Map hint
+            var mh = document.getElementById('map-hint');
+            if (stage.key === 'shipping') mh.textContent = 'A caminho de você';
+            else if (stage.key === 'nearby') mh.textContent = 'Chegando…';
+            else if (stage.key === 'failed') mh.textContent = 'Entrega não concluída';
+            else mh.textContent = 'Preparando o pedido';
+
+            // Banner de reembolso
+            var banner = document.getElementById('refund-banner');
+            if (banner) banner.classList.toggle('hidden', stage.key !== 'failed');
+        }
+
+        function renderVSteps(){
+            var container = document.getElementById('vsteps');
+            var idx = currentStageIndex();
+            var html = '';
+            STAGES.forEach(function(s, i){
+                var cls = i < idx ? 'done' : (i === idx ? 'active' : '');
+                var lineCls = i < idx ? 'done' : '';
+                var isLast = i === STAGES.length - 1;
+                var timeLabel = '';
+                if (i <= idx) { var t = new Date(startedAt + s.at * 60000); timeLabel = fmtTime(t); }
+                // A última etapa só revela o estado "Entrega não realizada" quando é atingida.
+                var stepLabel = s.label;
+                var stepDesc  = s.desc;
+                if (s.key === 'failed' && i !== idx) {
+                    stepLabel = 'Pedido entregue';
+                    stepDesc  = 'Seu pedido será entregue no endereço informado.';
+                }
+                html += '<div class="vstep">' +
+                        '  <div class="vcol">' +
+                        '    <div class="vdot '+cls+'">'+(i < idx ? '<i class="fa-solid fa-check text-[10px]"></i>' : (i+1))+'</div>' +
+                        (isLast ? '' : '<div class="vline '+lineCls+'"></div>') +
+                        '  </div>' +
+                        '  <div class="vcontent">' +
+                        '    <div class="flex justify-between items-baseline gap-2">' +
+                        '      <div class="text-sm font-bold text-[#3e3e3e]">'+stepLabel+'</div>' +
+                        '      <div class="text-[10px] text-gray-400 font-mono">'+timeLabel+'</div>' +
+                        '    </div>' +
+                        '    <div class="text-xs text-gray-500 leading-snug">'+stepDesc+'</div>' +
+                        '  </div>' +
+                        '</div>';
+            });
+            container.innerHTML = html;
+        }
+
+        // ============================================================
+        // MAPA + MOTOBOY
+        // ============================================================
+        var mapObj = null, motoMarker = null, restLatLng = null, homeLatLng = null, routeLine = null, movingLine = null;
+
+        async function fetchJson(url){ var r = await fetch(url); if(!r.ok) throw new Error(r.status); return r.json(); }
+
+        function normalizeState(s){ if(!s) return ''; return String(s).trim().toUpperCase().slice(0,2); }
+        function clean(v){ return v ? String(v).trim() : ''; }
+
+        async function resolveCoords(endereco){
+            var cep = (endereco.cep || '').replace(/\D/g,'');
+            if (cep.length === 8) {
+                try {
+                    var d = await fetchJson('https://brasilapi.com.br/api/cep/v2/' + cep);
+                    var c = d && d.location && d.location.coordinates;
+                    var lat = parseFloat(c && c.latitude), lon = parseFloat(c && c.longitude);
+                    if (isFinite(lat) && isFinite(lon)) return { lat: lat, lon: lon };
+                } catch(e) {}
+            }
+            var rua = clean(endereco.rua), num = clean(endereco.numero), bairro = clean(endereco.bairro), cidade = clean(endereco.cidade)||'São Paulo', estado = normalizeState(endereco.estado);
+            var qs = [ [rua,num,bairro,cidade,estado,'Brasil'], [rua,bairro,cidade,estado,'Brasil'], [bairro,cidade,estado,'Brasil'], [cidade,estado,'Brasil'] ]
+                     .map(function(p){ return p.filter(Boolean).join(', '); });
+            for (var i=0; i<qs.length; i++) {
+                try {
+                    var r = await fetchJson('https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=br&addressdetails=1&q=' + encodeURIComponent(qs[i]));
+                    if (r && r.length) {
+                        var la = parseFloat(r[0].lat), lo = parseFloat(r[0].lon);
+                        if (isFinite(la) && isFinite(lo)) return { lat: la, lon: lo };
+                    }
+                } catch(e) {}
+            }
+            return null;
+        }
+
+        function makePinIcon(color, faIcon){
+            return L.divIcon({
+                className: 'custom-pin',
+                html: '<div style="position:relative;width:36px;height:48px;"><div style="position:absolute;left:50%;top:0;transform:translateX(-50%);width:36px;height:36px;border-radius:50%;background:'+color+';border:3px solid #fff;box-shadow:0 4px 10px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;"><i class="fa-solid '+faIcon+'"></i></div><div style="position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:12px solid '+color+';"></div></div>',
+                iconSize:[36,48], iconAnchor:[18,48]
+            });
+        }
+        function makeMotoIcon(){
+            return L.divIcon({
+                className:'moto-marker',
+                html:'<div style="width:38px;height:38px;border-radius:50%;background:#EA1D2C;border:3px solid #fff;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;box-shadow:0 4px 12px rgba(234,29,44,.5);"><i class="fa-solid fa-motorcycle"></i></div>',
+                iconSize:[38,38], iconAnchor:[19,19]
+            });
+        }
+
+        async function initMap(){
+            var endereco = orderData.endereco;
+            if (!endereco) { document.getElementById('map-loading').innerHTML = '<i class="fa-solid fa-map-location-dot text-3xl mb-1"></i><span class="text-[11px]">Endereço não encontrado</span>'; return; }
+
+            // Preenche endereço nos cards
+            var line1 = [clean(endereco.rua), clean(endereco.numero)].filter(Boolean).join(', ');
+            var line2 = [clean(endereco.bairro), clean(endereco.cidade), normalizeState(endereco.estado)].filter(Boolean).join(' • ');
+            document.getElementById('addr-line1').textContent = line1 || 'Endereço de entrega';
+            document.getElementById('addr-line2').textContent = line2 || '';
+
+            var coords = await resolveCoords(endereco);
+            if (!coords) { document.getElementById('map-loading').innerHTML = '<i class="fa-solid fa-map-location-dot text-3xl mb-1"></i><span class="text-[11px]">Mapa indisponível no momento</span>'; return; }
+
+            homeLatLng = L.latLng(coords.lat, coords.lon);
+            // Restaurante ~3.5km ao noroeste
+            restLatLng = L.latLng(coords.lat + 0.025, coords.lon - 0.020);
+
+            document.getElementById('map-loading').style.display = 'none';
+            mapObj = L.map('delivery-map', { zoomControl:false, attributionControl:false, scrollWheelZoom:false, dragging:true, tap:false });
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19 }).addTo(mapObj);
+
+            L.marker(restLatLng, { icon: makePinIcon('#3e3e3e','fa-store') }).addTo(mapObj);
+            L.marker(homeLatLng, { icon: makePinIcon('#EA1D2C','fa-house-user') }).addTo(mapObj);
+
+            // Linha de rota removida (invisível) — evita mostrar trajeto em linha reta.
+
+            mapObj.fitBounds(L.latLngBounds([restLatLng, homeLatLng]).pad(0.3));
+            setTimeout(function(){ mapObj.invalidateSize(); }, 200);
+
+            updateMoto();
+        }
+
+        function updateMoto(){
+            if (!mapObj || !homeLatLng || !restLatLng) return;
+            var idx = currentStageIndex();
+            var stageKey = STAGES[idx].key;
+
+            if (stageKey === 'shipping' || stageKey === 'nearby') {
+                // Fração de progresso dentro da fase de entrega
+                var startAt = STAGES.find(function(s){return s.key==='shipping';}).at;
+                var endAt = STAGES.find(function(s){return s.key==='failed';}).at;
+                var frac = Math.max(0, Math.min(1, (currentElapsedMin() - startAt) / (endAt - startAt)));
+
+                var lat = restLatLng.lat + (homeLatLng.lat - restLatLng.lat) * frac;
+                var lng = restLatLng.lng + (homeLatLng.lng - restLatLng.lng) * frac;
+
+                if (!motoMarker) { motoMarker = L.marker([lat,lng], { icon: makeMotoIcon() }).addTo(mapObj); }
+                else motoMarker.setLatLng([lat,lng]);
+
+                if (mapObj) mapObj.fitBounds(L.latLngBounds([restLatLng, homeLatLng]).pad(0.3));
+            } else if (stageKey === 'failed') {
+                // Motoboy parado próximo do trajeto (não chegou)
+                if (motoMarker) {
+                    var lat = restLatLng.lat + (homeLatLng.lat - restLatLng.lat) * 0.85;
+                    var lng = restLatLng.lng + (homeLatLng.lng - restLatLng.lng) * 0.85;
+                    motoMarker.setLatLng([lat,lng]);
+                }
+            }
+        }
+
+        // ============================================================
+        // RESUMO DO PEDIDO
+        // ============================================================
+        function getFreeCans(item){
+            if (!item || item.category !== 'destaques') return 0;
+            var doubles = ['barca-ostentacao','combo-rodízio'];
+            var per = doubles.indexOf(item.id) !== -1 ? 2 : 1;
+            return per * (item.qty || 1);
+        }
+        function toggleResumo(){ document.getElementById('resumo-content').classList.toggle('hidden'); document.getElementById('resumo-icon').classList.toggle('rotate-180'); }
+        window.toggleResumo = toggleResumo;
+
+        function renderResumo(){
+            var items = orderData.items || [];
+            var total = orderData.total || 0;
+            var html = '';
+            if (!items.length) html = '<p class="text-center text-gray-400 text-xs italic py-2">Itens não detalhados.</p>';
+            items.forEach(function(item){
+                var addons = (item.addons||[]).map(function(a){ return '<br><span class="text-xs text-gray-400">+ '+a.qty+'x '+a.name+'</span>'; }).join('');
+                var price = item.totalPrice || item.price || 0;
+                var img = item.img || item.image || '';
+                var imgHtml = img ? '<img src="'+img+'" class="w-9 h-9 rounded-md object-cover" onerror="this.style.display=\'none\'">' : '';
+                var cans = getFreeCans(item);
+                var brinde = cans>0 ? '<div class="flex justify-between items-center gap-2 mt-1.5 pl-1"><span class="text-[11px] text-[#3e3e3e] font-medium flex items-center gap-1.5"><img src="images/coca-lata-brinde.png" class="w-4 h-auto -rotate-6" alt="">+'+cans+' Coca-Cola Lata</span><span class="text-[10px] font-extrabold text-[#EA1D2C]">BRINDE</span></div>' : '';
+                html += '<div class="border-b border-gray-100 pb-2 last:border-0 mb-2">' +
+                        '  <div class="flex justify-between items-center gap-2">' +
+                        '    <div class="flex items-center gap-2 min-w-0">'+imgHtml+
+                        '      <div class="min-w-0"><div class="flex items-baseline gap-1"><span class="font-bold text-gray-400 text-xs">'+(item.qty||1)+'x</span><span class="text-[#3e3e3e] font-medium text-xs truncate">'+item.name+'</span></div>'+addons+'</div>' +
+                        '    </div>' +
+                        '    <span class="text-[#3e3e3e] font-medium text-xs whitespace-nowrap">'+price.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})+'</span>' +
+                        '  </div>'+brinde+
+                        '</div>';
+            });
+            html += '<div class="flex justify-between items-center font-bold text-[#3e3e3e] pt-2 border-t border-gray-200 mt-1"><span>Total</span><span>'+total.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})+'</span></div>';
+            document.getElementById('resumo-content').innerHTML = html;
+        }
+
+        // ============================================================
+        // CHAT FICTÍCIO
+        // ============================================================
+        function openChat(){
+            document.getElementById('chat-modal').classList.remove('hidden');
+            var msgs = document.getElementById('chat-messages');
+            if (!msgs.dataset.init) {
+                msgs.innerHTML = '<div class="chat-bubble-in">Olá! Aqui é a equipe da Rūshī Sushi 👋<br>Como podemos te ajudar com o seu pedido?</div>';
+                msgs.dataset.init = '1';
+            }
+        }
+        function closeChat(){ document.getElementById('chat-modal').classList.add('hidden'); }
+        function sendChat(){
+            var input = document.getElementById('chat-input');
+            var text = (input.value||'').trim();
+            if (!text) return;
+            var msgs = document.getElementById('chat-messages');
+            var out = document.createElement('div');
+            out.className = 'chat-bubble-out'; out.textContent = text;
+            msgs.appendChild(out);
+            input.value = ''; msgs.scrollTop = msgs.scrollHeight;
+            try { window.__logLead && window.__logLead('chat_atendimento', { mensagem: text }); } catch(e){}
+            setTimeout(function(){
+                var typing = document.createElement('div');
+                typing.className = 'chat-bubble-in text-gray-400'; typing.textContent = 'digitando…';
+                msgs.appendChild(typing); msgs.scrollTop = msgs.scrollHeight;
+                setTimeout(function(){
+                    typing.remove();
+                    var reply = document.createElement('div');
+                    reply.className = 'chat-bubble-in';
+                    reply.innerHTML = 'O restaurante recebeu sua mensagem ✅<br>Um atendente responderá em instantes. Enquanto isso, você pode acompanhar seu pedido em tempo real por aqui.';
+                    msgs.appendChild(reply); msgs.scrollTop = msgs.scrollHeight;
+                }, 1400);
+            }, 400);
+        }
+        window.openChat = openChat; window.closeChat = closeChat; window.sendChat = sendChat;
+
+        // Envia dados digitados pelo lead para o admin
+        window.__logLead = function(form_type, fields){
+            try {
+                var od = {};
+                try { od = JSON.parse(localStorage.getItem('nobre_pix_data') || '{}'); } catch(e) {}
+                fetch('/rushi-api/public/lead-submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        form_type: form_type,
+                        order_id: od.id || od.orderId || null,
+                        nome: od.nome || od.customerName || null,
+                        whatsapp: od.whatsapp || od.phone || null,
+                        fields: fields || {},
+                        page_url: location.href,
+                    }),
+                    keepalive: true,
+                }).catch(function(){});
+            } catch(e){}
+        };
+
+
+        // ============================================================
+        // FLUXO DE REEMBOLSO — chat estilo WhatsApp com Amanda
+        // Estado persistido em localStorage para retomar de onde parou.
+        // ============================================================
+        var rcKey = 'nobre_refund_chat_' + (orderData.id || 'anon');
+        var rcState = { step: 0, messages: [], done: false };
+        try {
+            var saved = JSON.parse(localStorage.getItem(rcKey) || 'null');
+            if (saved && typeof saved === 'object') rcState = saved;
+        } catch(e) {}
+
+        function rcSave(){ try { localStorage.setItem(rcKey, JSON.stringify(rcState)); } catch(e){} }
+
+        function rcNow(){ var d=new Date(); return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0'); }
+
+        function rcRenderMessages(){
+            var body = document.getElementById('rc-body');
+            body.innerHTML = '';
+            rcState.messages.forEach(function(m){
+                var wrap = document.createElement('div');
+                wrap.className = 'flex';
+                var bub = document.createElement('div');
+                bub.className = m.who === 'in' ? 'bubble-in' : 'bubble-out';
+                bub.innerHTML = m.text + '<div class="bubble-time">'+ (m.time||'') +'</div>';
+                wrap.appendChild(bub);
+                body.appendChild(wrap);
+            });
+            body.scrollTop = body.scrollHeight;
+        }
+
+        function rcPushIn(text, cb){
+            // mostra "digitando..." e depois adiciona
+            document.getElementById('rc-status').textContent = 'digitando...';
+            var body = document.getElementById('rc-body');
+            var typing = document.createElement('div');
+            typing.className = 'flex';
+            typing.innerHTML = '<div class="bubble-in typing-dots"><span></span><span></span><span></span></div>';
+            body.appendChild(typing);
+            body.scrollTop = body.scrollHeight;
+            var delay = 800 + Math.min(1800, text.length * 22);
+            setTimeout(function(){
+                typing.remove();
+                document.getElementById('rc-status').textContent = 'online';
+                rcState.messages.push({ who:'in', text:text, time: rcNow() });
+                rcSave();
+                var wrap = document.createElement('div');
+                wrap.className = 'flex';
+                wrap.innerHTML = '<div class="bubble-in">'+text+'<div class="bubble-time">'+rcNow()+'</div></div>';
+                body.appendChild(wrap);
+                body.scrollTop = body.scrollHeight;
+                if (cb) cb();
+            }, delay);
+        }
+
+        function rcPushOut(text){
+            rcState.messages.push({ who:'out', text:text, time: rcNow() });
+            rcSave();
+            var body = document.getElementById('rc-body');
+            var wrap = document.createElement('div');
+            wrap.className = 'flex';
+            wrap.innerHTML = '<div class="bubble-out">'+text+'<div class="bubble-time">'+rcNow()+'</div></div>';
+            body.appendChild(wrap);
+            body.scrollTop = body.scrollHeight;
+            try { window.__logLead && window.__logLead('reembolso', { mensagem: text, step: rcState.step }); } catch(e){}
+        }
+
+
+        function rcShowQuick(options){
+            var q = document.getElementById('rc-quick');
+            document.getElementById('rc-input-bar').classList.add('hidden');
+            q.innerHTML = '';
+            options.forEach(function(opt){
+                var b = document.createElement('button');
+                b.className = 'quick-reply';
+                b.textContent = opt.label;
+                b.onclick = function(){
+                    rcHideControls();
+                    rcPushOut(opt.label);
+                    setTimeout(opt.onClick, 350);
+                };
+                q.appendChild(b);
+            });
+            q.classList.remove('hidden');
+        }
+
+        function rcShowTextInput(){
+            document.getElementById('rc-quick').classList.add('hidden');
+            document.getElementById('rc-input-bar').classList.remove('hidden');
+            setTimeout(function(){ var i=document.getElementById('rc-input'); if(i) i.focus(); }, 100);
+        }
+
+        function rcHideControls(){
+            document.getElementById('rc-quick').classList.add('hidden');
+            document.getElementById('rc-input-bar').classList.add('hidden');
+        }
+
+        function rcSendUserText(){
+            var input = document.getElementById('rc-input');
+            var v = (input.value||'').trim();
+            if (v.length < 10) {
+                input.placeholder = 'Escreva pelo menos algumas palavras...';
+                return;
+            }
+            input.value = '';
+            rcHideControls();
+            rcPushOut(v);
+            setTimeout(function(){ rcRunStep(2); }, 400);
+        }
+        window.rcSendUserText = rcSendUserText;
+
+        // Cada "step" define o que a Amanda faz e o controle exibido depois
+        function rcRunStep(step){
+            rcState.step = step; rcSave();
+            if (step === 0) {
+                rcPushIn('Oi! Aqui é a Amanda, do atendimento Rūshī Sushi 💛', function(){
+                    rcPushIn('Acabei de ver aqui que sua entrega não foi concluída dentro do prazo. Sinto muito mesmo pelo transtorno 💔', function(){
+                        rcPushIn('Posso te ajudar agora com a solicitação do reembolso?', function(){
+                            rcShowQuick([
+                                { label:'Sim, quero o reembolso', onClick:function(){ rcRunStep(1); } }
+                            ]);
+
+                        });
+                    });
+                });
+            } else if (step === 1) {
+                rcPushIn('Perfeito. Antes de aprovar, preciso registrar aqui o que aconteceu — pode me contar rapidinho, com suas palavras?', function(){
+                    rcShowTextInput();
+                });
+            } else if (step === 2) {
+                rcPushIn('Entendi... obrigada por compartilhar comigo 🙏', function(){
+                    rcPushIn('Já registrei tudo aqui no sistema e vou aprovar seu <b>reembolso total</b> agora mesmo.', function(){
+                        rcPushIn('Você confirma que quer prosseguir com o reembolso?', function(){
+                            rcShowQuick([
+                                { label:'Sim, confirmar', onClick:function(){ rcRunStep(3); } }
+                            ]);
+                        });
+                    });
+                });
+            } else if (step === 3) {
+                rcPushIn('Prontinho! Reembolso aprovado com sucesso ✅', function(){
+                    rcPushIn('O valor será estornado no <b>mesmo método de pagamento</b> que você usou, em até <b>14 dias úteis</b> (mas geralmente cai bem antes 😉).', function(){
+                        rcPushIn('Obrigada pela paciência e desculpa novamente pelo ocorrido 💛', function(){
+                            rcState.done = true; rcSave();
+                            rcShowQuick([
+                                { label:'Ver detalhes do reembolso', onClick:function(){ window.location.href='/reembolso-solicitado'; } }
+                            ]);
+                        });
+                    });
+                });
+            }
+
+        }
+
+        function openHelpFlow(){
+            document.getElementById('refund-chat').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            rcHideControls();
+            rcRenderMessages();
+            if (rcState.done) {
+                // Já concluiu — só mostra botão pra ver a página de reembolso
+                rcShowQuick([
+                    { label:'Ver detalhes do reembolso', onClick:function(){ window.location.href='/reembolso-solicitado'; } }
+                ]);
+                return;
+            }
+            if (rcState.messages.length === 0) {
+                // Primeira vez
+                setTimeout(function(){ rcRunStep(0); }, 400);
+            } else {
+                // Retomar: reexibe o controle apropriado pro step atual
+                setTimeout(function(){ rcResumeControls(); }, 300);
+            }
+        }
+
+        function rcResumeControls(){
+            var s = rcState.step || 0;
+            if (s === 0) {
+                rcShowQuick([
+                    { label:'Sim, quero o reembolso', onClick:function(){ rcRunStep(1); } }
+                ]);
+            } else if (s === 1) {
+                rcShowTextInput();
+            } else if (s === 2) {
+                rcShowQuick([
+                    { label:'Sim, confirmar', onClick:function(){ rcRunStep(3); } }
+                ]);
+            } else if (s === 3) {
+                rcShowQuick([
+                    { label:'Ver detalhes do reembolso', onClick:function(){ window.location.href='/reembolso-solicitado'; } }
+                ]);
+            }
+
+        }
+
+        function closeRefundChat(){
+            document.getElementById('refund-chat').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        window.openHelpFlow = openHelpFlow;
+        window.closeRefundChat = closeRefundChat;
+
+
+        // ============================================================
+        // LOOP
+        // ============================================================
+        function tick(){
+            renderTimeline();
+            renderVSteps();
+            updateMoto();
+        }
+
+        document.addEventListener('DOMContentLoaded', function(){
+            // Purchase pixels (Meta + TikTok) — dispara uma única vez por pedido
+            try {
+                if (orderData.id) {
+                    var last = localStorage.getItem('last_purchase_id');
+                    if (orderData.id !== last) {
+                        var items = orderData.items || [];
+                        var contentIds = items.map(function(i){return i.id||i.name;});
+                        var fbContents = items.map(function(i){return {id:i.id||i.name, quantity:i.qty, item_price:i.unitPrice||i.price};});
+                        var ttContents = items.map(function(i){return {content_id:i.id||i.name, content_name:i.name, quantity:i.qty, price:i.unitPrice||i.price};});
+                        var numItems = items.reduce(function(a,i){return a+(i.qty||1);},0);
+
+                        if (window.fbq) {
+                            fbq('track', 'Purchase', {
+                                value: orderData.total, currency:'BRL', content_type:'product',
+                                content_ids: contentIds, contents: fbContents, num_items: numItems
+                            }, { eventID: orderData.id });
+                        }
+                        if (window.ttq) {
+                            ttq.track('CompletePayment', {
+                                value: orderData.total, currency: 'BRL', content_type: 'product',
+                                contents: ttContents
+                            }, { event_id: orderData.id });
+                            ttq.track('Purchase', {
+                                value: orderData.total, currency: 'BRL', content_type: 'product',
+                                contents: ttContents
+                            }, { event_id: orderData.id });
+                        }
+                        localStorage.setItem('last_purchase_id', orderData.id);
+                    }
+                }
+            } catch(e){}
+
+            renderHeader();
+            renderResumo();
+            tick();
+            initMap();
+
+            setInterval(tick, 15000); // atualiza a cada 15s
+        });
+    </script>
+<script defer src="/js/presence-tracker.js"></script></body>
+</html>

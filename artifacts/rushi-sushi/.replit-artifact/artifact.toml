@@ -8,21 +8,31 @@ router = "path"
 
 [[services]]
 name = "web"
-paths = [ "/" ]
+paths = ["/"]
 localPort = 25664
 
 [services.development]
 run = "pnpm --filter @workspace/rushi-sushi run dev"
 
-[services.production]
-build = [ "pnpm", "--filter", "@workspace/rushi-sushi", "run", "build" ]
-serve = "static"
-publicDir = "artifacts/rushi-sushi/dist/public"
-
-[[services.production.rewrites]]
-from = "/*"
-to = "/index.html"
-
 [services.env]
 PORT = "25664"
 BASE_PATH = "/"
+
+[services.production.build]
+args = ["pnpm", "--filter", "@workspace/rushi-sushi", "run", "build"]
+
+[services.production.build.env]
+NODE_ENV = "production"
+PORT = "25664"
+BASE_PATH = "/"
+
+[services.production.run]
+args = ["node", "--enable-source-maps", "artifacts/rushi-sushi/.output/server/index.mjs"]
+
+[services.production.run.env]
+NODE_ENV = "production"
+PORT = "25664"
+BASE_PATH = "/"
+
+[services.production.health.startup]
+path = "/"

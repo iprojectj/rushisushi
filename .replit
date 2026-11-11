@@ -18,3 +18,12 @@ expertMode = true
 [postMerge]
 path = "scripts/post-merge.sh"
 timeoutMs = 20000
+
+[userenv]
+
+[userenv.shared]
+SUPABASE_PUBLISHABLE_KEY = "sb_publishable_R4iOEqVVYgIJnTVG7uf5Kg_ttF7ly_p"
+SUPABASE_URL = "https://c--c40323d8-fd09-44ed-b40f-d2130849de05-prod.lovable.cloud"
+VITE_SUPABASE_PROJECT_ID = "qgikxfftfmlcjrrcgqrq"
+VITE_SUPABASE_PUBLISHABLE_KEY = "sb_publishable_R4iOEqVVYgIJnTVG7uf5Kg_ttF7ly_p"
+VITE_SUPABASE_URL = "https://c--c40323d8-fd09-44ed-b40f-d2130849de05-prod.lovable.cloud"

