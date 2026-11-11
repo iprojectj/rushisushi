@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { CheckCircle2, Clock, DollarSign, Receipt, ShoppingBag, Target } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { getAdminDashboardRows } from "@/lib/admin-data.functions";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { TrafficMetrics } from "@/components/admin/TrafficMetrics";
 import { cn } from "@/lib/utils";
@@ -71,6 +72,7 @@ function Kpi({ label, value, hint, icon: Icon, tone }: KpiProps) {
 }
 
 function DashboardPage() {
+  const loadRowsFn = useServerFn(getAdminDashboardRows);
   const [preset, setPreset] = useState<Preset>("today");
   const range = useMemo(() => rangeFor(preset), [preset]);
   const [rows, setRows] = useState<CheckoutRow[]>([]);
@@ -79,18 +81,14 @@ function DashboardPage() {
   useEffect(() => {
     let alive = true;
     const load = async () => {
-      const { data, error } = await supabase
-        .from("lead_submissions")
-        .select("id, lead_id, order_id, created_at, nome, fields")
-        .eq("form_type", "checkout")
-        .gte("created_at", range.start.toISOString())
-        .lte("created_at", range.end.toISOString())
-        .order("created_at", { ascending: false })
-        .limit(5000);
-      if (!alive) return;
-      if (error) toast.error("Erro ao carregar pedidos", { description: error.message });
-      else setRows((data ?? []) as CheckoutRow[]);
-      setLoading(false);
+      try {
+        const data = await loadRowsFn({ data: { start: range.start.toISOString(), end: range.end.toISOString() } });
+        if (alive) setRows(data as CheckoutRow[]);
+      } catch {
+        if (alive) toast.error("Erro ao carregar pedidos");
+      } finally {
+        if (alive) setLoading(false);
+      }
     };
     setLoading(true);
     load();
@@ -99,7 +97,7 @@ function DashboardPage() {
       alive = false;
       clearInterval(t);
     };
-  }, [range.start, range.end]);
+  }, [range.start, range.end, loadRowsFn]);
 
   const m = useMemo(() => {
     const paid = rows.filter(isPaid);

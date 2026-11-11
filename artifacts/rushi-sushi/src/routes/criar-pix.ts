@@ -32,7 +32,7 @@ export const Route = createFileRoute("/criar-pix")({
           const reference = `rushi-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
           // 1. Identificar gateway ativo
-          let activeGateway = "paradise";
+          let activeGateway = "kalangfy";
           try {
             const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
             const { data } = await supabaseAdmin

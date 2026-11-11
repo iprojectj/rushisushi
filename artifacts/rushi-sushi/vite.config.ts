@@ -20,6 +20,7 @@ const protectedNitro: NitroConfig = {
 export default defineConfig({
   vite: {
     plugins: [publicProtectionPlugin()],
+    server: { allowedHosts: true },
     build: { sourcemap: false },
   },
   nitro: protectedNitro,

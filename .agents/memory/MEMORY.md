@@ -1,0 +1,1 @@
+- [Rūshī payment priority](rushi-payments.md) — Kalangfy is the user's priority gateway; UTMify is available for attribution.

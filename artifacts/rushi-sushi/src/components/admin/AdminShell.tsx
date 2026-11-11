@@ -1,7 +1,6 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { BarChart3, Users, LogOut, Menu, X, Sparkles, Settings } from "lucide-react";
 import { useState, type ReactNode } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import "./admin-theme.css";
 
@@ -27,7 +26,7 @@ export function AdminShell({
   const pathname = useRouterState({ select: (r) => r.location.pathname });
 
   async function logout() {
-    await supabase.auth.signOut();
+    await fetch("/admin-logout", { method: "POST" });
     navigate({ to: "/auth" });
   }
 

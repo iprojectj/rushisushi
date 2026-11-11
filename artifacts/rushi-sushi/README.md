@@ -19,8 +19,8 @@ pnpm --filter @workspace/rushi-sushi run build
 
 ## Configuration
 
-Copying the source repository's `.env` is intentionally avoided. Keep private credentials in Replit Secrets. The blank `.env.example` lists the variables used by Supabase, payment providers, and geocoding.
+Copying the source repository's `.env` is intentionally avoided. The app now stores leads, orders, settings, and traffic in Replit PostgreSQL; it no longer needs the old Supabase project or Lovable secrets.
 
-The Supabase service-role key, selected Pix provider credentials, and geocoding credentials are required for their respective server features. A missing provider must not be treated as a successful payment.
+Keep private credentials in Replit Secrets. `ADMIN_PASSWORD` protects the admin panel, `SESSION_SECRET` signs its secure session cookie, and `KALANGFY_API_KEY` plus `KALANGFY_SIGNING_SECRET` enable PIX creation and payment confirmation. `UTMIFY_API_TOKEN` enables sales attribution. The active gateway defaults to Kalangfy. A missing or failing payment provider must never be treated as a successful payment.
 
-The workspace already assigns `/api` to its shared API service. Rūshī's application API routes therefore use `/rushi-api/...` in Replit; configure provider webhook URLs with that prefix.
+The workspace already assigns `/api` to its shared API service. Rūshī's application API routes therefore use `/rushi-api/...` in Replit; for Kalangfy, configure the webhook URL as `/rushi-api/public/kalangfy-webhook` on the app's domain.

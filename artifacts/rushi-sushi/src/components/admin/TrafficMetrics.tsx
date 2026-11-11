@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import BrazilVisitorMap from "./BrazilVisitorMap";
-import { supabase } from "@/integrations/supabase/client";
+import { getAdminLiveSessions, getAdminTrafficSessions } from "@/lib/admin-data.functions";
 import { cn } from "@/lib/utils";
 
 /** Live visitors + funnel, read from anonymous heartbeats (site_sessions). Admin-only via RLS. */
@@ -34,6 +35,8 @@ function top(list: Session[], f: (s: Session) => string) {
 }
 
 export function TrafficMetrics({ start, end }: { start: Date; end: Date }) {
+  const loadRowsFn = useServerFn(getAdminTrafficSessions);
+  const loadLiveFn = useServerFn(getAdminLiveSessions);
   const [rows, setRows] = useState<Session[]>([]);
   const [now, setNow] = useState(Date.now());
   const [error, setError] = useState<string | null>(null);
@@ -41,39 +44,36 @@ export function TrafficMetrics({ start, end }: { start: Date; end: Date }) {
   useEffect(() => {
     let alive = true;
     const load = async () => {
-      const { data, error: e } = await supabase
-        .from("site_sessions")
-        .select("id,last_seen,path,max_step,pageviews,utm_source,utm_campaign,device,city,region,region_code,lat,lng")
-        .gte("first_seen", start.toISOString())
-        .lte("first_seen", end.toISOString())
-        .order("last_seen", { ascending: false })
-        .limit(5000);
       if (!alive) return;
-      if (e) setError(e.message);
-      else { setError(null); setRows(data ?? []); }
+      try {
+        const data = await loadRowsFn({ data: { start: start.toISOString(), end: end.toISOString() } });
+        if (alive) { setError(null); setRows(data as Session[]); }
+      } catch (e) {
+        if (alive) setError(e instanceof Error ? e.message : "Erro ao carregar tráfego");
+      }
       setNow(Date.now());
     };
     load();
     const id = setInterval(load, 10000);
     return () => { alive = false; clearInterval(id); };
-  }, [start, end]);
+  }, [start, end, loadRowsFn]);
 
   // "Online agora" = sinal recebido nos últimos 60s (independe do período escolhido).
   const [live, setLive] = useState<Session[]>([]);
   useEffect(() => {
     let alive = true;
     const load = async () => {
-      const { data } = await supabase
-        .from("site_sessions")
-        .select("id,last_seen,path,max_step,pageviews,utm_source,utm_campaign,device,city,region,region_code,lat,lng")
-        .gte("last_seen", new Date(Date.now() - 60000).toISOString())
-        .limit(2000);
-      if (alive) setLive(data ?? []);
+      try {
+        const data = await loadLiveFn();
+        if (alive) setLive(data as unknown as Session[]);
+      } catch {
+        if (alive) setLive([]);
+      }
     };
     load();
     const id = setInterval(load, 5000);
     return () => { alive = false; clearInterval(id); };
-  }, []);
+  }, [loadLiveFn]);
 
   const funnel = useMemo(() => STEPS.map((_, i) => rows.filter((r) => r.max_step >= i + 1).length), [rows]);
   const total = funnel[0] || 0;

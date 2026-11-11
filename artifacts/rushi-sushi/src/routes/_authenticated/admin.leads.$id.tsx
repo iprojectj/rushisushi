@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { getAdminLeadDetail } from "@/lib/admin-data.functions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -41,29 +42,22 @@ function formatPhone(w: string | null) {
 
 function LeadDetail() {
   const { id } = Route.useParams();
+  const loadLeadFn = useServerFn(getAdminLeadDetail);
   const [lead, setLead] = useState<Lead | null>(null);
   const [subs, setSubs] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
-      const [{ data: leadData }, { data: subsData }] = await Promise.all([
-        supabase
-          .from("leads")
-          .select("id, nome, whatsapp, email, first_seen_at, last_seen_at")
-          .eq("id", id)
-          .maybeSingle(),
-        supabase
-          .from("lead_submissions")
-          .select("id, form_type, order_id, created_at, fields, page_url")
-          .eq("lead_id", id)
-          .order("created_at", { ascending: false }),
-      ]);
-      setLead(leadData as Lead | null);
-      setSubs((subsData ?? []) as Submission[]);
-      setLoading(false);
+      try {
+        const result = await loadLeadFn({ data: { id } });
+        setLead(result.lead as Lead | null);
+        setSubs(result.submissions as Submission[]);
+      } finally {
+        setLoading(false);
+      }
     })();
-  }, [id]);
+  }, [id, loadLeadFn]);
 
   if (loading) {
     return <div className="p-8">Carregando...</div>;

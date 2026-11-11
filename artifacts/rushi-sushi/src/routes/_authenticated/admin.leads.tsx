@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, Fragment } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import {
   BarChart3,
   ChevronDown,
@@ -17,7 +18,7 @@ import {
   Trash2,
   Settings,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { deleteAdminLead, getAdminLeadsData } from "@/lib/admin-data.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -158,6 +159,8 @@ function StatCard({
 
 function LeadsList() {
   const navigate = useNavigate();
+  const loadLeadsFn = useServerFn(getAdminLeadsData);
+  const deleteLeadFn = useServerFn(deleteAdminLead);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [subs, setSubs] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
@@ -197,27 +200,17 @@ function LeadsList() {
 
   useEffect(() => {
     (async () => {
-      const [{ data: leadsData, error: le }, { data: subsData, error: se }] =
-        await Promise.all([
-          supabase
-            .from("leads")
-            .select("id, nome, whatsapp, email, last_seen_at, first_seen_at")
-            .order("last_seen_at", { ascending: false })
-            .limit(500),
-          supabase
-            .from("lead_submissions")
-            .select("id, lead_id, form_type, order_id, created_at, fields, page_url")
-            .in("form_type", Array.from(ALLOWED_FORM_TYPES))
-            .order("created_at", { ascending: false })
-            .limit(5000),
-        ]);
-      if (le) toast.error("Erro ao carregar leads", { description: le.message });
-      if (se) toast.error("Erro ao carregar interações", { description: se.message });
-      setLeads((leadsData ?? []) as Lead[]);
-      setSubs((subsData ?? []) as Submission[]);
-      setLoading(false);
+      try {
+        const { leads: leadsData, submissions: subsData } = await loadLeadsFn();
+        setLeads(leadsData as Lead[]);
+        setSubs((subsData as Submission[]).filter((sub) => ALLOWED_FORM_TYPES.has(sub.form_type)));
+      } catch {
+        toast.error("Não foi possível carregar os clientes.");
+      } finally {
+        setLoading(false);
+      }
     })();
-  }, []);
+  }, [loadLeadsFn]);
 
   const subsByLead = useMemo(() => {
     const m: Record<string, Submission[]> = {};
@@ -256,7 +249,7 @@ function LeadsList() {
   }, [leads, cardLeadIds, paidLeadIds]);
 
   async function logout() {
-    await supabase.auth.signOut();
+    await fetch("/admin-logout", { method: "POST" });
     navigate({ to: "/auth" });
   }
 
@@ -264,15 +257,10 @@ function LeadsList() {
     if (!pendingDelete) return;
     const id = pendingDelete.id;
     setDeleting(true);
-    const { error: se } = await supabase.from("lead_submissions").delete().eq("lead_id", id);
-    if (se) {
-      toast.error("Erro ao apagar interações", { description: se.message });
-      setDeleting(false);
-      return;
-    }
-    const { error: le } = await supabase.from("leads").delete().eq("id", id);
-    if (le) {
-      toast.error("Erro ao apagar lead", { description: le.message });
+    try {
+      await deleteLeadFn({ data: { id } });
+    } catch {
+      toast.error("Erro ao apagar o cliente e suas interações.");
       setDeleting(false);
       return;
     }

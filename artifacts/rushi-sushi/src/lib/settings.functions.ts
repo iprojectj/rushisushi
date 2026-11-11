@@ -1,8 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { requireAdmin } from "@/lib/admin-auth.functions";
 
 export const getActiveGateway = createServerFn({ method: "GET" })
+  .middleware([requireAdmin])
   .handler(async () => {
     const { data, error } = await supabaseAdmin
       .from("app_settings")
@@ -12,7 +14,7 @@ export const getActiveGateway = createServerFn({ method: "GET" })
     
     if (error) {
       console.error("Error fetching active gateway:", error);
-      return "paradise";
+      return "kalangfy";
     }
     
     let value = data?.value;
@@ -24,10 +26,11 @@ export const getActiveGateway = createServerFn({ method: "GET" })
       }
     }
     
-    return (value as string) || "paradise";
+    return (value as string) || "kalangfy";
   });
 
 export const setActiveGateway = createServerFn({ method: "POST" })
+  .middleware([requireAdmin])
   .handler(async (ctx: { data: any }) => {
     const gateway = z.enum(["paradise", "gorilla", "azipix", "invictus", "kalangfy"]).parse(ctx.data);
     
@@ -43,17 +46,12 @@ export const setActiveGateway = createServerFn({ method: "POST" })
     return { success: true, gateway };
   });
 
-// ---------------------------------------------------------------------------
-// UTMify: liga/desliga do envio de vendas APROVADAS (status "paid").
-// Quando desligado, pedidos continuam sendo enviados como pendentes, mas a
-// confirmação de pagamento não é repassada à UTMify. Padrão: ligado.
-// ---------------------------------------------------------------------------
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+// UTMify approval tracking defaults to enabled.
 
 export const UTMIFY_TRACK_PAID_KEY = "utmify_track_paid";
 
 export const getUtmifyTrackPaid = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdmin])
   .handler(async () => {
     const { data } = await supabaseAdmin
       .from("app_settings")
@@ -68,14 +66,9 @@ export const getUtmifyTrackPaid = createServerFn({ method: "GET" })
   });
 
 export const setUtmifyTrackPaid = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdmin])
   .inputValidator((input: { enabled: boolean }) => z.object({ enabled: z.boolean() }).parse(input))
-  .handler(async ({ data, context }) => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
-    });
-    if (!isAdmin) throw new Error("Acesso negado");
+  .handler(async ({ data }) => {
     const { error } = await supabaseAdmin
       .from("app_settings")
       .upsert({ key: UTMIFY_TRACK_PAID_KEY, value: JSON.stringify(data.enabled) });

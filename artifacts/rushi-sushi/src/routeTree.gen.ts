@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AdminLoginRouteImport } from './routes/admin-login'
+import { Route as AdminLogoutRouteImport } from './routes/admin-logout'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CriarPixRouteImport } from './routes/criar-pix'
 import { Route as GeocodificarRouteImport } from './routes/geocodificar'
@@ -42,6 +44,16 @@ const IndexRoute = IndexRouteImport.update({
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin-login',
+  path: '/admin-login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLogoutRoute = AdminLogoutRouteImport.update({
+  id: '/admin-logout',
+  path: '/admin-logout',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -167,6 +179,8 @@ const AuthenticatedAdminLeadsIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin-login': typeof AdminLoginRoute
+  '/admin-logout': typeof AdminLogoutRoute
   '/auth': typeof AuthRoute
   '/criar-pix': typeof CriarPixRoute
   '/geocodificar': typeof GeocodificarRoute
@@ -193,6 +207,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin-login': typeof AdminLoginRoute
+  '/admin-logout': typeof AdminLogoutRoute
   '/auth': typeof AuthRoute
   '/criar-pix': typeof CriarPixRoute
   '/geocodificar': typeof GeocodificarRoute
@@ -221,6 +237,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/admin-login': typeof AdminLoginRoute
+  '/admin-logout': typeof AdminLogoutRoute
   '/auth': typeof AuthRoute
   '/criar-pix': typeof CriarPixRoute
   '/geocodificar': typeof GeocodificarRoute
@@ -249,6 +267,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin-login'
+    | '/admin-logout'
     | '/auth'
     | '/criar-pix'
     | '/geocodificar'
@@ -275,6 +295,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin-login'
+    | '/admin-logout'
     | '/auth'
     | '/criar-pix'
     | '/geocodificar'
@@ -302,6 +324,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/admin-login'
+    | '/admin-logout'
     | '/auth'
     | '/criar-pix'
     | '/geocodificar'
@@ -330,6 +354,8 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AdminLoginRoute: typeof AdminLoginRoute
+  AdminLogoutRoute: typeof AdminLogoutRoute
   AuthRoute: typeof AuthRoute
   CriarPixRoute: typeof CriarPixRoute
   GeocodificarRoute: typeof GeocodificarRoute
@@ -364,6 +390,20 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin-login': {
+      id: '/admin-login'
+      path: '/admin-login'
+      fullPath: '/admin-login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin-logout': {
+      id: '/admin-logout'
+      path: '/admin-logout'
+      fullPath: '/admin-logout'
+      preLoaderRoute: typeof AdminLogoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -564,6 +604,8 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AdminLoginRoute: AdminLoginRoute,
+  AdminLogoutRoute: AdminLogoutRoute,
   AuthRoute: AuthRoute,
   CriarPixRoute: CriarPixRoute,
   GeocodificarRoute: GeocodificarRoute,

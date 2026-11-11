@@ -1,6 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,28 +12,23 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
-function normalizeUser(input: string): string {
-  const v = input.trim();
-  if (v.includes("@")) return v;
-  return `${v}@rushi.local`;
-}
-
 function AuthPage() {
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email: normalizeUser(username),
-      password,
+    const response = await fetch("/admin-login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: "admin", password }),
     });
+    const result = await response.json().catch(() => ({}));
     setLoading(false);
-    if (error) {
-      toast.error("Login inválido", { description: error.message });
+    if (!response.ok || !result.success) {
+      toast.error("Login inválido", { description: result.message || "Verifique usuário e senha." });
       return;
     }
     navigate({ to: "/admin/leads" });
@@ -54,9 +48,8 @@ function AuthPage() {
               <Input
                 id="user"
                 autoComplete="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
+                value="admin"
+                readOnly
               />
             </div>
             <div className="space-y-2">
