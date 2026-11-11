@@ -3,7 +3,8 @@ import { z } from "zod";
 import { queryDb } from "@/lib/db.server";
 import { requireAdmin } from "@/lib/admin-auth.functions";
 
-const rangeSchema = z.object({ start: z.string().datetime(), end: z.string().datetime() });
+const rangeSchema = z.object({ start: z.string().datetime(), end: z.string().datetime() })
+  .refine((range) => Date.parse(range.start) <= Date.parse(range.end), "Período inválido");
 const idSchema = z.object({ id: z.string().uuid() });
 const sessionColumns = "id, last_seen, path, max_step, pageviews, utm_source, utm_campaign, device, city, region, region_code, lat, lng";
 
@@ -62,3 +63,20 @@ export const getAdminLiveSessions = createServerFn({ method: "GET" })
     `SELECT ${sessionColumns} FROM site_sessions WHERE last_seen >= $1 ORDER BY last_seen DESC LIMIT 2000`,
     [new Date(Date.now() - 60_000).toISOString()],
   ));
+
+export const getAdminPurchaseGeography = createServerFn({ method: "GET" })
+  .middleware([requireAdmin])
+  .inputValidator((input: unknown) => rangeSchema.parse(input))
+  .handler(async ({ data }) => {
+    const { aggregatePurchaseGeography } = await import("./purchase-geography.server");
+    // Do not cap this query: state totals must include every paid order, not just
+    // the newest visitor sessions. Date filtering uses confirmation time below.
+    const rows = await queryDb(
+      `SELECT id, order_id, created_at, fields FROM lead_submissions
+       WHERE form_type = 'checkout' AND created_at <= $1
+       AND (fields->>'payment_status' = 'paid' OR fields->>'utmify_paid_sent' = 'true')
+       ORDER BY created_at DESC`,
+      [data.end],
+    );
+    return aggregatePurchaseGeography(rows, data.start, data.end);
+  });

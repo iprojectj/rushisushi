@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import BrazilVisitorMap from "./BrazilVisitorMap";
-import { getAdminLiveSessions, getAdminTrafficSessions } from "@/lib/admin-data.functions";
+import BrazilPurchaseMap from "./BrazilPurchaseMap";
+import { getAdminLiveSessions, getAdminPurchaseGeography, getAdminTrafficSessions } from "@/lib/admin-data.functions";
+import type { PurchaseGeography } from "@/lib/purchase-geography.types";
 import { cn } from "@/lib/utils";
 
 /** Live visitors + funnel, read from anonymous heartbeats (site_sessions). Admin-only via RLS. */
@@ -37,7 +38,10 @@ function top(list: Session[], f: (s: Session) => string) {
 export function TrafficMetrics({ start, end }: { start: Date; end: Date }) {
   const loadRowsFn = useServerFn(getAdminTrafficSessions);
   const loadLiveFn = useServerFn(getAdminLiveSessions);
+  const loadPurchasesFn = useServerFn(getAdminPurchaseGeography);
   const [rows, setRows] = useState<Session[]>([]);
+  const [purchases, setPurchases] = useState<PurchaseGeography | null>(null);
+  const [purchaseError, setPurchaseError] = useState<string | null>(null);
   const [now, setNow] = useState(Date.now());
   const [error, setError] = useState<string | null>(null);
 
@@ -58,6 +62,28 @@ export function TrafficMetrics({ start, end }: { start: Date; end: Date }) {
     return () => { alive = false; clearInterval(id); };
   }, [start, end, loadRowsFn]);
 
+  useEffect(() => {
+    let alive = true;
+    let busy = false;
+    setPurchases(null);
+    setPurchaseError(null);
+    const load = async () => {
+      if (busy) return;
+      busy = true;
+      try {
+        const data = await loadPurchasesFn({ data: { start: start.toISOString(), end: end.toISOString() } });
+        if (alive) { setPurchases(data); setPurchaseError(null); }
+      } catch (e) {
+        if (alive) setPurchaseError(e instanceof Error ? e.message : "Erro ao carregar compras");
+      } finally {
+        busy = false;
+      }
+    };
+    load();
+    const id = setInterval(load, 10000);
+    return () => { alive = false; clearInterval(id); };
+  }, [start, end, loadPurchasesFn]);
+
   // "Online agora" = sinal recebido nos últimos 60s (independe do período escolhido).
   const [live, setLive] = useState<Session[]>([]);
   useEffect(() => {
@@ -77,11 +103,7 @@ export function TrafficMetrics({ start, end }: { start: Date; end: Date }) {
 
   const funnel = useMemo(() => STEPS.map((_, i) => rows.filter((r) => r.max_step >= i + 1).length), [rows]);
   const total = funnel[0] || 0;
-  const states = useMemo(() => {
-    const m = new Map<string, number>();
-    rows.forEach((r) => { const k = r.region || "Não identificado"; m.set(k, (m.get(k) ?? 0) + 1); });
-    return [...m.entries()].sort((a, b) => b[1] - a[1]);
-  }, [rows]);
+  const states = purchases?.states ?? [];
   const bounce = total ? Math.round((rows.filter((r) => r.pageviews <= 1 && r.max_step === 1).length / total) * 100) : 0;
   const mobile = total ? Math.round((rows.filter((r) => r.device === "mobile").length / total) * 100) : 0;
 
@@ -121,20 +143,31 @@ export function TrafficMetrics({ start, end }: { start: Date; end: Date }) {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="rounded-2xl border bg-card p-5 shadow-sm lg:col-span-2">
-          <h3 className="font-semibold">De onde estão acessando</h3>
-          <p className="mb-2 text-xs text-muted-foreground">Bolinhas maiores = mais visitas. Bolinhas pulsando = online agora.</p>
-          <BrazilVisitorMap rows={rows} live={live} />
+          <h3 className="font-semibold">De onde vêm as compras</h3>
+          <p className="mb-2 text-xs text-muted-foreground">Somente pagamentos confirmados. Bolinhas maiores = mais compras. Localização por município do endereço de entrega.</p>
+          {purchases ? <BrazilPurchaseMap cities={purchases.cities} /> : (
+            <p className="py-20 text-center text-sm text-muted-foreground">
+              {purchaseError ? "Não foi possível carregar o mapa de compras." : "Carregando compras…"}
+            </p>
+          )}
+          {purchases && purchases.unmapped > 0 && (
+            <p className="mt-2 text-xs text-muted-foreground">
+              {purchases.unmapped} {purchases.unmapped === 1 ? "compra sem cidade identificada não aparece" : "compras sem cidade identificada não aparecem"} no mapa.
+            </p>
+          )}
+          {purchaseError && <p role="alert" className="mt-2 text-sm text-destructive">Falha ao atualizar compras: {purchaseError}</p>}
         </div>
         <div className="rounded-2xl border bg-card p-5 shadow-sm">
-          <h3 className="font-semibold">Visitas por estado</h3>
-          <p className="mb-3 text-xs text-muted-foreground">No período escolhido.</p>
+          <h3 className="font-semibold">Compras por estado</h3>
+          <p className="mb-3 text-xs text-muted-foreground">Por data de confirmação do pagamento no período escolhido.</p>
           <div className="max-h-[380px] space-y-2 overflow-y-auto pr-1">
-            {states.length === 0 && <p className="text-sm text-muted-foreground">Sem dados ainda.</p>}
-            {states.map(([k, v]) => (
-              <div key={k}>
-                <div className="flex justify-between text-sm"><span className="truncate">{k}</span><b className="tabular-nums">{v}</b></div>
+            {!purchases && <p className="text-sm text-muted-foreground">{purchaseError ? "Dados indisponíveis." : "Carregando compras…"}</p>}
+            {purchases && states.length === 0 && <p className="text-sm text-muted-foreground">Nenhuma compra paga no período.</p>}
+            {states.map((state) => (
+              <div key={state.code}>
+                <div className="flex justify-between gap-2 text-sm"><span className="truncate">{state.name}{state.code !== "unknown" && ` (${state.code})`}</span><b className="tabular-nums">{state.count}</b></div>
                 <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted">
-                  <div className="h-full rounded-full bg-primary" style={{ width: `${(v / states[0][1]) * 100}%` }} />
+                  <div className="h-full rounded-full bg-primary" style={{ width: `${(state.count / states[0].count) * 100}%` }} />
                 </div>
               </div>
             ))}

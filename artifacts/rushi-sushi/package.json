@@ -11,6 +11,7 @@
     "start": "node .output/server/index.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test:production": "node scripts/check-production-http.mjs",
+    "test:geography": "node --experimental-strip-types --test scripts/purchase-geography.test.mjs",
     "lint": "eslint .",
     "format": "prettier --write ."
   },

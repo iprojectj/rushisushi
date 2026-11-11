@@ -59,6 +59,8 @@ export const Route = createFileRoute("/api/public/lead-submit")({
           const order_id = body?.order_id ? String(body.order_id).slice(0, 120) : null;
           const fields =
             body?.fields && typeof body.fields === "object" ? body.fields : {};
+          // Payment confirmation belongs to gateway handlers, never browser events.
+          for (const key of ["payment_status", "paid_at", "utmify_paid_sent"]) delete fields[key];
           const page_url = body?.page_url ? String(body.page_url).slice(0, 500) : null;
           const user_agent = request.headers.get("user-agent")?.slice(0, 500) ?? null;
           const ip =

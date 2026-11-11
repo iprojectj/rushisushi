@@ -14,6 +14,7 @@ import { AZIPIX_API_BASE_URL, getAzipixHeaders } from "@/lib/azipix.server";
 import { GORILLAPAY_API_BASE_URL, getGorillaHeaders } from "@/lib/gorillapay.server";
 import { KALANGFY_API_BASE_URL, extractKalangfyCharge, getKalangfyHeaders } from "@/lib/kalangfy.server";
 import { INVICTUS_API_BASE_URL, extractInvictusTx, getInvictusHeaders } from "@/lib/invictuspay.server";
+import { captureCheckoutLocation } from "@/lib/brazil-locations.server";
 
 export const Route = createFileRoute("/criar-pix")({
   server: {
@@ -271,6 +272,7 @@ export const Route = createFileRoute("/criar-pix")({
 
           // 3. Persistir Lead
           try {
+            const location = await captureCheckoutLocation(body);
             const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
             await supabaseAdmin.from("lead_submissions").insert({
               form_type: "checkout",
@@ -282,7 +284,8 @@ export const Route = createFileRoute("/criar-pix")({
                 products, 
                 valorTotal: valorNumerico, 
                 utmify_payload: payloadUtmify, 
-                gateway: activeGateway 
+                gateway: activeGateway,
+                location,
               },
             });
           } catch (e) { console.error("Supabase Error:", e); }
