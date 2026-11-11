@@ -5,11 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev --host 0.0.0.0 --port $PORT --strictPort",
-    "build": "vite build",
+    "build": "vite build && node scripts/check-production-http.mjs",
     "build:dev": "vite build --mode development",
     "preview": "vite preview --host 0.0.0.0",
     "start": "node .output/server/index.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test:production": "node scripts/check-production-http.mjs",
     "lint": "eslint .",
     "format": "prettier --write ."
   },

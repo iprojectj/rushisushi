@@ -4,7 +4,7 @@
  * NOTE: this only discourages casual copying; it is never an authorization mechanism.
  */
 import { readdir, readFile, rm, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import type { Plugin } from "vite";
 
 /** Blocks view-source/devtools/save shortcuts outside editable fields. */
@@ -55,7 +55,23 @@ export async function protectPublishedAssets(publicDir: string): Promise<void> {
   }
 }
 
-/** Vite plugin placeholder kept for config symmetry; serves nothing extra in dev. */
+/**
+ * Nitro copies public files before building its Vite environment. Transform them
+ * in that environment's buildStart, before Nitro records size/ETag metadata.
+ * Never mutate published files in the later `compiled` hook.
+ */
 export function publicProtectionPlugin(): Plugin {
-  return { name: "rushi-public-protection", apply: "build" };
+  let publicDir: string;
+  return {
+    name: "rushi-public-protection",
+    apply: "build",
+    enforce: "pre",
+    configResolved(config) {
+      publicDir = resolve(config.root, ".output/public");
+    },
+    async buildStart() {
+      if (this.environment.name !== "nitro") return;
+      await protectPublishedAssets(publicDir);
+    },
+  };
 }

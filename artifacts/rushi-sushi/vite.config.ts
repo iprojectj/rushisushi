@@ -5,17 +5,7 @@
 //     React/TanStack dedupe, error logger plugins, and sandbox detection (port/host/strictPort).
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
-import { publicProtectionPlugin, protectPublishedAssets } from "./tooling/public-protection";
-import type { NitroConfig } from "nitro/types";
-
-const protectedNitro: NitroConfig = {
-  preset: "node-server",
-  hooks: {
-    compiled: async (nitro) => {
-      await protectPublishedAssets(nitro.options.output.publicDir);
-    },
-  },
-};
+import { publicProtectionPlugin } from "./tooling/public-protection";
 
 export default defineConfig({
   vite: {
@@ -23,7 +13,7 @@ export default defineConfig({
     server: { allowedHosts: true },
     build: { sourcemap: false },
   },
-  nitro: protectedNitro,
+  nitro: { preset: "node-server" },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
