@@ -53,17 +53,14 @@ class LocalQuery {
   update(payload: Record<string, unknown>) { this.operation = "update"; this.payload = payload; return this; }
   delete() { this.operation = "delete"; return this; }
 
-  private jsonValue(column: string, value: unknown) {
-    return ["fields", "value"].includes(column) ? JSON.stringify(value ?? {}) : value;
-  }
-
   private async run(): Promise<Result> {
     try {
       const sql = getDb();
       const values: unknown[] = [];
       const bind = (value: unknown, column?: string) => {
-        values.push(column ? this.jsonValue(column, value) : value);
-        return `$${values.length}${column && ["fields", "value"].includes(column) ? "::jsonb" : ""}`;
+        const isJson = column && ["fields", "value"].includes(column);
+        values.push(isJson ? sql.json((value ?? null) as Parameters<typeof sql.json>[0]) : value);
+        return `$${values.length}${isJson ? "::jsonb" : ""}`;
       };
       const where = this.filters.map(({ column, operator, value }) => {
         const col = this.column(column);
@@ -74,7 +71,7 @@ class LocalQuery {
           return `${col} IN (${items.map((item) => bind(item)).join(", ")})`;
         }
         if (operator === "contains") {
-          values.push(JSON.stringify(value));
+          values.push(sql.json(value as Parameters<typeof sql.json>[0]));
           return `${col} @> $${values.length}::jsonb`;
         }
         const op = operator === "eq" ? "=" : operator === "gte" ? ">=" : "<=";

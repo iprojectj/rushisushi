@@ -1,1 +1,3 @@
 - [Rūshī payment priority](rushi-payments.md) — Kalangfy is the user's priority gateway; UTMify is available for attribution.
+- [Fresh backend recovery](backend-recovery.md) — the user approved a new database because only the GitHub export remained available.
+- [Postgres JSON parameters](postgres-json.md) — pass native values with sql.json; pre-stringifying can silently store JSONB strings.

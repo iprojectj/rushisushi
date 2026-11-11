@@ -36,7 +36,7 @@ export const setActiveGateway = createServerFn({ method: "POST" })
     
     const { error } = await supabaseAdmin
       .from("app_settings")
-      .upsert({ key: "active_gateway", value: JSON.stringify(gateway) });
+      .upsert({ key: "active_gateway", value: gateway });
 
     if (error) {
       console.error("Error setting active gateway:", error);
@@ -71,7 +71,7 @@ export const setUtmifyTrackPaid = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { error } = await supabaseAdmin
       .from("app_settings")
-      .upsert({ key: UTMIFY_TRACK_PAID_KEY, value: JSON.stringify(data.enabled) });
+      .upsert({ key: UTMIFY_TRACK_PAID_KEY, value: data.enabled });
     if (error) throw error;
     return { enabled: data.enabled };
   });

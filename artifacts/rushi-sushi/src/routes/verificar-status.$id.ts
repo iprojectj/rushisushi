@@ -14,20 +14,21 @@ export const Route = createFileRoute("/verificar-status/$id")({
           const orderId = params.id;
           
           // 1. Tentar descobrir o gateway a partir do banco de dados (lead_submissions)
-          let gateway = "paradise";
-          try {
+          let gateway: string;
+          {
             const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-            const { data } = await supabaseAdmin
+            const { data, error } = await supabaseAdmin
               .from("lead_submissions")
               .select("fields")
               .eq("order_id", orderId)
+              .eq("form_type", "checkout")
               .maybeSingle();
-            
-            if (data?.fields && (data.fields as any).gateway) {
-              gateway = (data.fields as any).gateway;
+            if (error) throw error;
+            if (!data) {
+              return Response.json({ status: "not_found" }, { status: 404 });
             }
-          } catch (e) {
-            console.error("[verificar-status] Erro ao buscar gateway no banco:", e);
+            gateway = data.fields?.gateway;
+            if (!gateway) throw new Error("Pedido sem gateway registrado.");
           }
 
           let statusFinal = "pending";
@@ -36,8 +37,11 @@ export const Route = createFileRoute("/verificar-status/$id")({
             const res = await fetch(`${KALANGFY_API_BASE_URL}/charges/${encodeURIComponent(orderId)}`, {
               headers: getKalangfyHeaders(),
             });
+            if (!res.ok) throw new Error(`Kalangfy: falha ao consultar status (${res.status}).`);
             const data: any = await res.json().catch(() => ({}));
-            statusFinal = mapKalangfyStatus(extractKalangfyCharge(data)?.status);
+            const charge = extractKalangfyCharge(data);
+            if (!charge?.status) throw new Error("Kalangfy: resposta sem status da cobrança.");
+            statusFinal = mapKalangfyStatus(charge.status);
           } else if (gateway === "invictus") {
             const res = await fetch(`${INVICTUS_API_BASE_URL}/transactions/${encodeURIComponent(orderId)}`, {
               headers: getInvictusHeaders(),

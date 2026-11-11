@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { toast } from "sonner";
 import { pageHead } from "@/lib/page-head";
 
 export const Route = createFileRoute("/auth")({
@@ -16,22 +15,29 @@ function AuthPage() {
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    const response = await fetch("/admin-login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username: "admin", password }),
-    });
-    const result = await response.json().catch(() => ({}));
-    setLoading(false);
-    if (!response.ok || !result.success) {
-      toast.error("Login inválido", { description: result.message || "Verifique usuário e senha." });
-      return;
+    setErrorMessage(null);
+    try {
+      const response = await fetch("/admin-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: "admin", password }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success) {
+        setErrorMessage(result.message || "Verifique usuário e senha.");
+        return;
+      }
+      navigate({ to: "/admin/leads" });
+    } catch {
+      setErrorMessage("Não foi possível entrar. Verifique sua conexão e tente novamente.");
+    } finally {
+      setLoading(false);
     }
-    navigate({ to: "/admin/leads" });
   }
 
   return (
@@ -63,6 +69,9 @@ function AuthPage() {
                 required
               />
             </div>
+            {errorMessage && (
+              <p role="alert" className="text-sm text-destructive">{errorMessage}</p>
+            )}
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Entrando..." : "Entrar"}
             </Button>
