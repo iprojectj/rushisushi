@@ -148,7 +148,7 @@ components:
           format: date-time
     RefundTracking:
       type: object
-      required: [protocol, status, createdAt, deadlineAt, updatedAt, message, customerName, email, whatsapp, orderNumber, reason, details]
+      required: [protocol, status, createdAt, deadlineAt, updatedAt, message, refundCompleted, customerName, email, whatsapp, orderNumber, reason, details]
       properties:
         protocol:
           type: string
@@ -165,6 +165,8 @@ components:
           format: date-time
         message:
           type: ["string", "null"]
+        refundCompleted:
+          type: boolean
         customerName:
           type: ["string", "null"]
         email:
@@ -179,7 +181,7 @@ components:
           type: ["string", "null"]
     RefundStatus:
       type: string
-      enum: [recebida, em_analise, contato_whatsapp, aprovada, estornada, negada]
+      enum: [recebida, em_analise, aprovada, estornada, negada]
     ApiError:
       type: object
       required: [error]

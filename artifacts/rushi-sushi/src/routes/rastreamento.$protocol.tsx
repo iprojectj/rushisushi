@@ -9,7 +9,6 @@ import { getRefundProgress } from "@/lib/refund-progress";
 const STATUS_LABEL: Record<string, string> = {
   recebida: "Solicitação recebida",
   em_analise: "Em análise pela equipe",
-  contato_whatsapp: "Contato pelo WhatsApp",
   aprovada: "Reembolso autorizado",
   estornada: "Reembolso efetivado",
   negada: "Análise concluída",
@@ -18,7 +17,6 @@ const STATUS_LABEL: Record<string, string> = {
 const TRACKING_STEPS = [
   { status: "recebida", label: "Solicitação recebida", description: "Seu pedido de reembolso foi recebido com sucesso." },
   { status: "em_analise", label: "Em análise pela equipe", description: "A equipe está conferindo os dados e o relato enviado." },
-  { status: "contato_whatsapp", label: "Contato pelo WhatsApp", description: "A equipe registrou o contato com você pelo WhatsApp." },
   { status: "aprovada", label: "Reembolso autorizado", description: "A equipe autorizou a solicitação e está realizando o procedimento manual." },
   { status: "estornada", label: "Reembolso efetivado", description: "A equipe confirmou que o valor foi devolvido." },
 ];
@@ -48,37 +46,56 @@ function RefundTrackingPage() {
   const [record, setRecord] = useState<RefundTracking | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [refreshWarning, setRefreshWarning] = useState("");
   const [copied, setCopied] = useState(false);
   const [now, setNow] = useState(() => Date.now());
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError("");
+  const load = useCallback(async (quiet = false) => {
+    if (!quiet) {
+      setLoading(true);
+      setError("");
+    }
     try {
       const result = await trackRequest.mutateAsync({ data: { protocol } });
       setRecord(result);
+      setError("");
+      setRefreshWarning("");
     } catch (requestError) {
-      setRecord(null);
-      setError(getApiError(requestError) ?? "Não encontramos este código de acompanhamento.");
+      if (quiet) {
+        setRefreshWarning("Não foi possível buscar a última atualização. A página tentará novamente.");
+      } else {
+        setRecord(null);
+        setError(getApiError(requestError) ?? "Não encontramos este código de acompanhamento.");
+      }
     } finally {
-      setLoading(false);
+      if (!quiet) setLoading(false);
     }
   }, [protocol, trackRequest.mutateAsync]);
 
   useEffect(() => { void load(); }, [load]);
   useEffect(() => {
-    const timer = window.setInterval(() => setNow(Date.now()), 60_000);
+    if (!record) return;
+    const timer = window.setInterval(() => {
+      setNow(Date.now());
+      void load(true);
+    }, 60_000);
     return () => window.clearInterval(timer);
-  }, []);
+  }, [load, record]);
 
-  const progress = record
+  const elapsedProgress = record
     ? getRefundProgress(record.createdAt, record.deadlineAt, now, record.status)
     : { percent: 5, elapsedDays: 0, remainingDays: 15 };
-  const completedStepIndex = record?.status === "negada"
+  const displayStatus = record?.refundCompleted && record.status !== "negada" && elapsedProgress.remainingDays === 0
+    ? "estornada"
+    : record?.status ?? "recebida";
+  const progress = record
+    ? getRefundProgress(record.createdAt, record.deadlineAt, now, displayStatus)
+    : elapsedProgress;
+  const completedStepIndex = displayStatus === "negada"
     ? 1
-    : TRACKING_STEPS.findIndex((step) => step.status === record?.status);
-  const isRefunded = record?.status === "estornada";
-  const isRejected = record?.status === "negada";
+    : TRACKING_STEPS.findIndex((step) => step.status === displayStatus);
+  const isRefunded = displayStatus === "estornada";
+  const isRejected = displayStatus === "negada";
 
   async function copyCode() {
     try {
@@ -130,8 +147,8 @@ function RefundTrackingPage() {
                   </button>
                 </div>
               </div>
-              <span className={`refund-tracking-status status-${record.status}`} data-testid="status-tracking-request">
-                <span /> {STATUS_LABEL[record.status] ?? record.status}
+              <span className={`refund-tracking-status status-${displayStatus}`} data-testid="status-tracking-request">
+                <span /> {STATUS_LABEL[displayStatus] ?? displayStatus}
               </span>
             </div>
 
@@ -156,7 +173,7 @@ function RefundTrackingPage() {
                 </strong>
               </div>
               <small className="refund-progress-deadline">Prazo de 15 dias: até {formatDate(record.deadlineAt)}</small>
-              <p>A barra começa em 5% e avança diariamente. O status “Reembolso efetivado” só aparece após a equipe confirmar a devolução real do valor.</p>
+              <p>A barra começa em 5% e avança diariamente. O status final só aparece no 15º dia se a equipe tiver confirmado a devolução real.</p>
             </section>
 
             <div className="refund-tracking-message" role="status" data-testid="text-tracking-message">
@@ -179,6 +196,7 @@ function RefundTrackingPage() {
                         <strong>{step.label}</strong>
                         <p>{step.description}</p>
                         {current && <small>Etapa atual</small>}
+                        {isRefunded && index === completedStepIndex && <small>Concluída</small>}
                       </div>
                     </li>
                   );
@@ -213,6 +231,7 @@ function RefundTrackingPage() {
                 <RefreshCw size={14} /> Atualizar andamento
               </button>
             </footer>
+            {refreshWarning && <p className="refund-tracking-refresh-warning" role="status">{refreshWarning}</p>}
           </article>
         ) : null}
 

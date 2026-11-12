@@ -13,4 +13,4 @@ The user's refund process is manual: staff contact the customer through WhatsApp
 
 **Why:** the user described this as the actual operating process.
 
-**How to apply:** show the 15-day progress as the expected timeline, but mark “Reembolso efetivado” only after staff confirms the money was returned.
+**How to apply:** show the 15-day progress as the expected timeline, but expose “Reembolso efetivado” only after staff confirms the money was returned and the 15-day deadline passes.

@@ -15,6 +15,7 @@ export interface RefundTracking {
   updatedAt: Date;
   /** @nullable */
   message: string | null;
+  refundCompleted: boolean;
   /** @nullable */
   customerName: string | null;
   /** @nullable */

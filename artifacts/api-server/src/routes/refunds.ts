@@ -7,13 +7,13 @@ import {
 } from "@workspace/api-zod";
 import { pool } from "@workspace/db";
 import { createUniqueRefundTrackingCode, lockRefundTrackingCodes } from "../lib/refund-tracking";
+import { getPublicRefundStatus, type RefundStatus } from "../lib/refund-status";
 
 const router = Router();
 const rateLimits = new Map<string, { count: number; resetAt: number }>();
 const REQUEST_WINDOW_MS = 10 * 60_000;
 const STATUS_WINDOW_MS = 10 * 60_000;
 
-type RefundStatus = "recebida" | "em_analise" | "contato_whatsapp" | "aprovada" | "estornada" | "negada";
 type RefundRow = {
   id: string;
   order_id: string | null;
@@ -80,7 +80,6 @@ function statusMessage(status: RefundStatus, message: unknown) {
   const defaults: Record<RefundStatus, string> = {
     recebida: "Seu pedido de reembolso foi recebido com sucesso. Ele está em andamento; acompanhe as atualizações por aqui.",
     em_analise: "Nossa equipe está analisando sua solicitação.",
-    contato_whatsapp: "Nossa equipe registrou o contato pelo WhatsApp e está seguindo com sua solicitação.",
     aprovada: "Sua solicitação foi autorizada. A equipe está realizando o reembolso manual.",
     estornada: "Reembolso efetivado. A equipe confirmou a devolução do valor.",
     negada: "A equipe concluiu a análise e não aprovou a solicitação.",
@@ -184,6 +183,8 @@ router.post("/refund-requests", async (request, response) => {
         publicOrderNumber,
         status: "recebida",
         statusMessage: null,
+        refundCompleted: false,
+        refundCompletedAt: null,
         createdAt: now,
         updatedAt: now,
       });
@@ -257,15 +258,19 @@ router.post("/refund-requests/track", async (request, response) => {
     }
 
     const fields = asRecord(row.fields);
-    const status = fields.status;
-    const validStatuses = new Set<RefundStatus>(["recebida", "em_analise", "contato_whatsapp", "aprovada", "estornada", "negada"]);
-    const safeStatus = validStatuses.has(status as RefundStatus) ? status as RefundStatus : "recebida";
     const updatedAt = typeof fields.updatedAt === "string" ? fields.updatedAt : row.created_at;
     const createdAt = row.created_at;
     const createdTime = new Date(createdAt).getTime();
-    const deadlineAt = new Date(
-      (Number.isFinite(createdTime) ? createdTime : Date.now()) + 15 * 24 * 60 * 60 * 1000,
-    );
+    const deadlineAt = new Date((Number.isFinite(createdTime) ? createdTime : Date.now()) + 15 * 24 * 60 * 60 * 1000);
+    const refundCompleted = fields.status !== "negada" &&
+      (fields.refundCompleted === true || fields.status === "estornada");
+    const deadlineReached = Date.now() >= deadlineAt.getTime();
+    const safeStatus = getPublicRefundStatus(fields.status, refundCompleted, deadlineAt.getTime(), Date.now());
+    const message = refundCompleted && !deadlineReached
+      ? "A equipe confirmou a devolução do valor. O status final será atualizado no acompanhamento ao fim do prazo de 15 dias."
+      : safeStatus === "estornada"
+        ? statusMessage("estornada", null)
+        : statusMessage(safeStatus, fields.statusMessage);
     response.set("Cache-Control", "private, no-store");
     response.set("Referrer-Policy", "no-referrer");
     response.json(TrackRefundRequestResponse.parse({
@@ -274,7 +279,8 @@ router.post("/refund-requests/track", async (request, response) => {
       createdAt,
       deadlineAt,
       updatedAt,
-      message: statusMessage(safeStatus, fields.statusMessage),
+      message,
+      refundCompleted,
       customerName: row.nome,
       email: row.email,
       whatsapp: row.whatsapp,

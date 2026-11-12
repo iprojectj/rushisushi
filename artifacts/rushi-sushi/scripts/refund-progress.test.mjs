@@ -20,6 +20,6 @@ test("reaches 100 percent at the 15-day deadline", () => {
   assert.equal(progress.remainingDays, 0);
 });
 
-test("shows completion immediately only after the team confirms the refund", () => {
+test("shows a full progress bar for a refund status confirmed by the team", () => {
   assert.equal(getRefundProgress(createdAt, deadlineAt, start + DAY_MS, "estornada").percent, 100);
 });

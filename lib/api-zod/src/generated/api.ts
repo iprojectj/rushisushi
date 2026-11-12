@@ -50,7 +50,7 @@ export const CreateRefundRequestBody = zod.object({
 
 export const CreateRefundRequestResponse = zod.object({
   "protocol": zod.string(),
-  "status": zod.enum(['recebida', 'em_analise', 'contato_whatsapp', 'aprovada', 'estornada', 'negada']),
+  "status": zod.enum(['recebida', 'em_analise', 'aprovada', 'estornada', 'negada']),
   "createdAt": zod.coerce.date()
 })
 
@@ -71,11 +71,12 @@ export const TrackRefundRequestBody = zod.object({
 
 export const TrackRefundRequestResponse = zod.object({
   "protocol": zod.string(),
-  "status": zod.enum(['recebida', 'em_analise', 'contato_whatsapp', 'aprovada', 'estornada', 'negada']),
+  "status": zod.enum(['recebida', 'em_analise', 'aprovada', 'estornada', 'negada']),
   "createdAt": zod.coerce.date(),
   "deadlineAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
   "message": zod.string().nullable(),
+  "refundCompleted": zod.boolean(),
   "customerName": zod.string().nullable(),
   "email": zod.string().nullable(),
   "whatsapp": zod.string().nullable(),
