@@ -230,6 +230,7 @@
 .refund-field input, .refund-field select, .refund-field textarea { background: #fffaf4; border: 1px solid #dfd1c3; border-radius: 5px; color: #342621; display: block; font-size: 12px; font-weight: 400; margin-top: 7px; outline: none; padding: 12px 13px; transition: border-color .18s, box-shadow .18s; width: 100%; }
 .refund-field input, .refund-field select { min-height: 44px; }
 .refund-field input::placeholder, .refund-field textarea::placeholder { color: #a39288; }
+.refund-field-hint { color: #806e65; display: block; font-size: 9px; font-weight: 500; margin-top: 6px; }
 .refund-field input:focus, .refund-field select:focus, .refund-field textarea:focus { border-color: #b9252b; box-shadow: 0 0 0 3px rgba(185,37,43,.1); }
 .refund-field-grid { display: grid; gap: 0 15px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .refund-textarea { min-height: 111px; resize: vertical; }

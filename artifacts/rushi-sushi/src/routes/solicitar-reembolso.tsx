@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useCreateRefundRequest, useTrackRefundRequest } from "@workspace/api-client-react";
 import type { RefundRequestInput } from "@workspace/api-client-react";
 import { ArrowRight, Check, ChevronRight, CircleHelp, Clock3, Copy, LockKeyhole, RotateCcw, Utensils } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import { resolvePublicOrderNumberForRefund } from "@/lib/public-order-number.functions";
 import { pageHead } from "@/lib/page-head";
 
 export const Route = createFileRoute("/solicitar-reembolso")({
@@ -29,6 +31,14 @@ const STATUS: Record<string, { label: string; note: string }> = {
 };
 const EMPTY = { name: "", email: "", whatsapp: "", orderId: "", reason: "" as Reason | "", details: "" };
 
+type OrderPrefill = {
+  name: string;
+  whatsapp: string;
+  orderId: string;
+  transactionId: string;
+  amount: string;
+};
+
 function readOrderPrefill() {
   try {
     const raw = localStorage.getItem("nobre_pix_data");
@@ -36,14 +46,21 @@ function readOrderPrefill() {
     const text = (...values: unknown[]) => values
       .find((v) => (typeof v === "string" || typeof v === "number") && String(v).trim() !== "")
       ?.toString().trim() ?? "";
+    const possiblePublicNumbers = [
+      text(data.publicOrderNumber),
+      text(data.public_order_number),
+      text(data.orderNumber),
+      text(data.orderId),
+    ];
+    const publicOrderNumber = possiblePublicNumbers.find((value) => /^#RS-[0-9]+$/i.test(value))?.toUpperCase() ?? "";
     const prefill = {
-      ...EMPTY,
+      orderId: publicOrderNumber,
+      transactionId: text(data.id, data.transactionId, data.transaction_id, data.order_id),
+      amount: text(data.amount, data.total, data.valor),
       name: text(data.name, data.nome, data.customerName) || localStorage.getItem("user_cache_nome")?.trim() || "",
       whatsapp: text(data.phone, data.whatsapp, data.telefone, data.customerPhone) || localStorage.getItem("user_cache_zap")?.trim() || "",
-      orderId: text(data.orderId, data.order_id, data.id, data.transactionId),
-      amount: text(data.amount, data.total, data.valor),
     };
-    return prefill.orderId || prefill.name || prefill.whatsapp ? prefill : null;
+    return prefill.orderId || prefill.transactionId || prefill.name || prefill.whatsapp ? prefill : null;
   } catch {
     return null;
   }
@@ -51,29 +68,63 @@ function readOrderPrefill() {
 
 function RefundRequestPage() {
   const [form, setForm] = useState(EMPTY);
-  const [order, setOrder] = useState<{ name: string; whatsapp: string; orderId: string; amount: string } | null>(null);
+  const [order, setOrder] = useState<OrderPrefill | null>(null);
   const [submitted, setSubmitted] = useState<{ protocol: string; status: string } | null>(null);
   const [copied, setCopied] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [orderNumberError, setOrderNumberError] = useState("");
+  const [orderNumberLoading, setOrderNumberLoading] = useState(false);
   const [tracked, setTracked] = useState<Tracked | null>(null);
   const [protocol, setProtocol] = useState("");
   const [trackError, setTrackError] = useState("");
   const requestKey = useRef<string | null>(null);
   const create = useCreateRefundRequest();
   const track = useTrackRefundRequest();
+  const resolveOrderNumber = useServerFn(resolvePublicOrderNumberForRefund);
 
-  const prefillOrder = useCallback(() => {
+  const prefillOrder = useCallback(async () => {
     const found = readOrderPrefill();
     setOrder(found);
     if (!found) return;
+    setOrderNumberError("");
     setForm((current) => ({
       ...current,
       name: current.name || found.name,
       whatsapp: current.whatsapp || found.whatsapp,
       orderId: current.orderId || found.orderId,
     }));
-  }, []);
-  useEffect(() => { prefillOrder(); }, [prefillOrder]);
+    if (found.orderId || !found.transactionId || !found.whatsapp) return;
+    setOrderNumberLoading(true);
+    try {
+      const publicOrderNumber = await resolveOrderNumber({
+        data: { transactionId: found.transactionId, whatsapp: found.whatsapp },
+      });
+      if (!publicOrderNumber) {
+        setOrderNumberError("Não localizamos o número deste pedido. Confira o WhatsApp usado no checkout.");
+        return;
+      }
+      setOrder((current) => current?.transactionId === found.transactionId
+        ? { ...current, orderId: publicOrderNumber }
+        : current);
+      setForm((current) => ({ ...current, orderId: current.orderId || publicOrderNumber }));
+      try {
+        const stored = localStorage.getItem("nobre_pix_data");
+        if (stored) {
+          const data = JSON.parse(stored) as Record<string, unknown>;
+          if (String(data.id ?? data.transactionId ?? "") === found.transactionId) {
+            localStorage.setItem("nobre_pix_data", JSON.stringify({ ...data, publicOrderNumber }));
+          }
+        }
+      } catch {
+        // The displayed value remains usable if browser storage is unavailable.
+      }
+    } catch {
+      setOrderNumberError("Não conseguimos recuperar o número do pedido. Tente recarregar esta página.");
+    } finally {
+      setOrderNumberLoading(false);
+    }
+  }, [resolveOrderNumber]);
+  useEffect(() => { void prefillOrder(); }, [prefillOrder]);
 
   async function submitRequest(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -190,6 +241,8 @@ function RefundRequestPage() {
                 </label>
                 <label className="refund-field">Número do pedido
                   <input className={inputClass} data-testid="input-refund-order" required maxLength={120} value={form.orderId} onChange={(e) => setForm({ ...form, orderId: e.target.value })} placeholder="Ex.: #RS-2841" />
+                  {orderNumberLoading && <span className="refund-field-hint" role="status" data-testid="loading-order-number">Localizando o número do pedido…</span>}
+                  {orderNumberError && <span className="refund-error" role="alert" data-testid="error-prefill-order-number">{orderNumberError}</span>}
                 </label>
               </div>
               <label className="refund-field">O que aconteceu?

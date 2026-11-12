@@ -20,6 +20,8 @@ export const Route = createFileRoute("/criar-pix")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        let transactionId = "";
+        let checkoutRecord: { id: string; publicOrderNumber: string } | null = null;
         try {
           const body = (await request.json()) as any;
           const { valorTotal, nome, whatsapp, products, trackingParameters = {} } = body;
@@ -51,12 +53,31 @@ export const Route = createFileRoute("/criar-pix")({
             console.error("[criar-pix] Erro ao buscar gateway ativo:", e);
           }
 
-          let transactionId: string = "";
           let pixCopiaECola: string = "";
           let qrCodeFinal: string = "";
 
           // Virtus foi removida do painel; se ainda estiver salva, cai na Paradise.
           if (activeGateway === "virtus" || activeGateway === "nexus") activeGateway = "paradise";
+
+          let checkoutLocation: unknown = null;
+          try {
+            checkoutLocation = await captureCheckoutLocation(body);
+          } catch (error) {
+            console.warn("[criar-pix] Não foi possível registrar a localização do checkout:", error);
+          }
+          const { createCheckoutWithPublicOrderNumber } = await import("@/lib/public-order-number.server");
+          checkoutRecord = await createCheckoutWithPublicOrderNumber({
+            nome: String(nome ?? "").slice(0, 200),
+            whatsapp: telefoneLimpo,
+            email: emailCliente,
+            fields: {
+              products,
+              valorTotal: valorNumerico,
+              gateway: activeGateway,
+              location: checkoutLocation,
+              payment_creation_status: "pending",
+            },
+          });
 
           const gerarPix = async (gw: string): Promise<void> => {
           if (gw === "kalangfy") {
@@ -268,29 +289,16 @@ export const Route = createFileRoute("/criar-pix")({
             },
           };
 
+          if (!checkoutRecord) throw new Error("Número do pedido não foi reservado.");
+          const { attachGatewayTransaction } = await import("@/lib/public-order-number.server");
+          await attachGatewayTransaction(checkoutRecord.id, String(transactionId), {
+            utmify_payload: payloadUtmify,
+            payment_creation_status: "created",
+          });
+
           pendingOrders[String(transactionId)] = payloadUtmify;
 
-          // 3. Persistir Lead
-          try {
-            const location = await captureCheckoutLocation(body);
-            const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-            await supabaseAdmin.from("lead_submissions").insert({
-              form_type: "checkout",
-              order_id: String(transactionId),
-              nome,
-              whatsapp: telefoneLimpo,
-              email: emailCliente,
-              fields: { 
-                products, 
-                valorTotal: valorNumerico, 
-                utmify_payload: payloadUtmify, 
-                gateway: activeGateway,
-                location,
-              },
-            });
-          } catch (e) { console.error("Supabase Error:", e); }
-
-          // 4. Notificar Utmify
+          // 3. Notificar Utmify
           await enviarPedidoParaUtmify(payloadUtmify);
 
           return new Response(JSON.stringify({
@@ -298,10 +306,19 @@ export const Route = createFileRoute("/criar-pix")({
             qrCodeData: qrCodeFinal,
             pixCopiaECola,
             transactionId,
+            publicOrderNumber: checkoutRecord.publicOrderNumber,
             gateway: activeGateway
           }), { headers: { "Content-Type": "application/json" } });
 
         } catch (error: any) {
+          if (checkoutRecord && !transactionId) {
+            try {
+              const { setCheckoutCreationFailure } = await import("@/lib/public-order-number.server");
+              await setCheckoutCreationFailure(checkoutRecord.id);
+            } catch (markError) {
+              console.error("[criar-pix] Não foi possível marcar a criação do PIX como falha:", markError);
+            }
+          }
           console.error("[criar-pix] fatal:", error);
           const errorMessage = error?.message || String(error);
           return new Response(JSON.stringify({ 

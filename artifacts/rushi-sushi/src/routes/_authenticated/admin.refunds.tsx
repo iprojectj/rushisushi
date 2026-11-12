@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_authenticated/admin/refunds")({
 });
 
 type RefundStatus = "recebida" | "em_analise" | "aprovada" | "estornada" | "negada";
-type RefundFields = { protocol?: string; reason?: string; details?: string; status?: RefundStatus; statusMessage?: string | null; updatedAt?: string };
+type RefundFields = { protocol?: string; publicOrderNumber?: string; reason?: string; details?: string; status?: RefundStatus; statusMessage?: string | null; updatedAt?: string };
 type RefundRow = {
   id: string;
   order_id: string;
@@ -89,7 +89,7 @@ function RefundQueuePage() {
       ? filter === "todas" || status === "recebida" || status === "em_analise"
       : status === filter;
     const needle = search.trim().toLocaleLowerCase("pt-BR");
-    const matchesSearch = !needle || [row.nome, row.email, row.whatsapp, row.order_id, fields.protocol].some((value) => value?.toLocaleLowerCase("pt-BR").includes(needle));
+    const matchesSearch = !needle || [row.nome, row.email, row.whatsapp, fields.publicOrderNumber, fields.protocol].some((value) => value?.toLocaleLowerCase("pt-BR").includes(needle));
     return matchesFilter && matchesSearch;
   }), [enriched, filter, search]);
 
@@ -166,7 +166,7 @@ function RefundQueuePage() {
                 <article className={`refund-admin-card ${isOpen ? "expanded" : ""}`} key={row.id} data-testid={`card-refund-${row.id}`}>
                   <button className="refund-admin-card-head" type="button" aria-expanded={isOpen} onClick={() => setExpanded(isOpen ? null : row.id)} data-testid={`button-expand-refund-${row.id}`}>
                     <span className={`refund-admin-badge badge-${status}`} data-testid={`status-refund-${row.id}`}><span />{STATUS_LABEL[status]}</span>
-                    <span className="refund-admin-customer"><strong data-testid={`text-refund-customer-${row.id}`}>{row.nome || "Cliente"}</strong><small>{REASON_LABEL[fields.reason ?? ""] ?? "Solicitação de reembolso"} <i>·</i> Pedido <span data-testid={`text-refund-order-${row.id}`}>{row.order_id || "—"}</span></small></span>
+                    <span className="refund-admin-customer"><strong data-testid={`text-refund-customer-${row.id}`}>{row.nome || "Cliente"}</strong><small>{REASON_LABEL[fields.reason ?? ""] ?? "Solicitação de reembolso"} <i>·</i> Pedido <span data-testid={`text-refund-order-${row.id}`}>{fields.publicOrderNumber || row.order_id || "—"}</span></small></span>
                     <span className="refund-admin-protocol"><small>PROTOCOLO</small><strong data-testid={`text-refund-protocol-${row.id}`}>{fields.protocol || "—"}</strong></span>
                     <span className="refund-admin-date">{formatAdminDate(row.created_at)}</span>
                     <ChevronDown size={17} className="refund-admin-chevron" />

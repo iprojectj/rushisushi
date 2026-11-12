@@ -114,8 +114,10 @@ components:
           maxLength: 20
         orderId:
           type: string
-          minLength: 1
+          description: "Código público do pedido, por exemplo #RS-2812."
+          minLength: 7
           maxLength: 120
+          pattern: '^#RS-[0-9]+$'
         reason:
           type: string
           enum: [nao_entregue, pedido_incorreto, item_faltando, pedido_cancelado, outro]

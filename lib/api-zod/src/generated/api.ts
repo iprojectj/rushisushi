@@ -28,8 +28,11 @@ export const createRefundRequestBodyEmailMax = 200;
 export const createRefundRequestBodyWhatsappMin = 10;
 export const createRefundRequestBodyWhatsappMax = 20;
 
+export const createRefundRequestBodyOrderIdMin = 7;
 export const createRefundRequestBodyOrderIdMax = 120;
 
+
+export const createRefundRequestBodyOrderIdRegExp = new RegExp('^#RS-[0-9]+$');
 export const createRefundRequestBodyDetailsMin = 5;
 export const createRefundRequestBodyDetailsMax = 1000;
 
@@ -40,7 +43,7 @@ export const CreateRefundRequestBody = zod.object({
   "name": zod.string().min(createRefundRequestBodyNameMin).max(createRefundRequestBodyNameMax),
   "email": zod.string().email().max(createRefundRequestBodyEmailMax),
   "whatsapp": zod.string().min(createRefundRequestBodyWhatsappMin).max(createRefundRequestBodyWhatsappMax),
-  "orderId": zod.string().min(1).max(createRefundRequestBodyOrderIdMax),
+  "orderId": zod.string().min(createRefundRequestBodyOrderIdMin).max(createRefundRequestBodyOrderIdMax).regex(createRefundRequestBodyOrderIdRegExp).describe('Código público do pedido, por exemplo #RS-2812.'),
   "reason": zod.enum(['nao_entregue', 'pedido_incorreto', 'item_faltando', 'pedido_cancelado', 'outro']),
   "details": zod.string().min(createRefundRequestBodyDetailsMin).max(createRefundRequestBodyDetailsMax)
 })

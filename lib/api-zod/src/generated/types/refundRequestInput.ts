@@ -22,8 +22,10 @@ export interface RefundRequestInput {
      */
   whatsapp: string;
   /**
-     * @minLength 1
+     * Código público do pedido, por exemplo #RS-2812.
+     * @minLength 7
      * @maxLength 120
+     * @pattern ^#RS-[0-9]+$
      */
   orderId: string;
   reason: RefundRequestInputReason;

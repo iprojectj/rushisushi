@@ -107,9 +107,15 @@ router.post("/refund-requests", async (request, response) => {
   const name = input.name.trim();
   const email = input.email.trim().toLowerCase();
   const whatsapp = input.whatsapp.replace(/\D/g, "");
-  const orderId = input.orderId.trim();
+  const publicOrderNumber = input.orderId.trim().toUpperCase();
   const details = input.details.trim();
-  if (whatsapp.length < 10 || whatsapp.length > 13 || !name || !details) {
+  if (
+    whatsapp.length < 10 ||
+    whatsapp.length > 13 ||
+    !name ||
+    !details ||
+    !/^#RS-[0-9]+$/.test(publicOrderNumber)
+  ) {
     errorResponse(response, 400, "Confira os dados informados e tente novamente.");
     return;
   }
@@ -120,14 +126,14 @@ router.post("/refund-requests", async (request, response) => {
       `SELECT id, order_id, nome, email, whatsapp, created_at, fields
        FROM lead_submissions
        WHERE form_type = 'checkout'
-         AND order_id = $1
+         AND fields->>'public_order_number' = $1
          AND whatsapp = $2
          AND (
            fields->>'payment_status' = 'paid' OR
            fields->>'utmify_paid_sent' = 'true'
          )
        LIMIT 1`,
-      [orderId, whatsapp],
+      [publicOrderNumber, whatsapp],
     );
     if (!paidOrder.rows[0]) {
       errorResponse(response, 400, "Não foi possível confirmar um pedido pago com esses dados.");
@@ -143,11 +149,16 @@ router.post("/refund-requests", async (request, response) => {
     );
     if (existing.rows[0]) {
       const row = existing.rows[0];
-      if (row.order_id !== orderId || row.whatsapp !== whatsapp || row.email !== email) {
+      const fields = asRecord(row.fields);
+      if (
+        row.order_id !== paidOrder.rows[0].order_id ||
+        row.whatsapp !== whatsapp ||
+        row.email !== email ||
+        fields.publicOrderNumber !== publicOrderNumber
+      ) {
         errorResponse(response, 409, "Não foi possível reutilizar esta solicitação. Atualize a página e tente novamente.");
         return;
       }
-      const fields = asRecord(row.fields);
       response.status(201).json(CreateRefundRequestResponse.parse({
         protocol: fields.protocol,
         status: fields.status || "recebida",
@@ -162,6 +173,7 @@ router.post("/refund-requests", async (request, response) => {
       protocol,
       reason: input.reason,
       details,
+      publicOrderNumber,
       status: "recebida",
       statusMessage: null,
       createdAt: now,
@@ -173,7 +185,7 @@ router.post("/refund-requests", async (request, response) => {
        VALUES ($1::uuid, 'refund_request', $2, $3, $4, $5, $6::jsonb)
        ON CONFLICT (id) DO NOTHING
        RETURNING id, order_id, nome, email, whatsapp, created_at, fields`,
-      [input.requestKey, orderId, name, email, whatsapp, fields],
+      [input.requestKey, paidOrder.rows[0].order_id, name, email, whatsapp, fields],
     );
     if (!inserted.rows[0]) {
       errorResponse(response, 409, "Não foi possível registrar a solicitação. Atualize a página e tente novamente.");
