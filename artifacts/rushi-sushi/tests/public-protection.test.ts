@@ -28,7 +28,7 @@ describe("public protection", () => {
     expect(dispatch("Tab")).toBe(false);
   });
 
-  for (const file of ["index", "pedido", "obrigado", "reembolso-solicitado", "mx/index", "mx/pedido", "mx/gracias", "mx/reembolso"]) {
+  for (const file of ["index", "pedido", "obrigado", "reembolso-solicitado"]) {
     it(`compacts ${file} while retaining parseable scripts`, async () => {
       const original = await readFile(`public/${file}.html`, "utf8");
       const guarded = addShortcutGuard(original);

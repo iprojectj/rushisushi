@@ -58,7 +58,7 @@ try {
   }
   assert.ok(ready, `Production server did not become ready: ${output}`);
   assert.match(await readFile(join(publicDir, "index.html"), "utf8"), /__rushiShortcuts/);
-  const paths = new Set(["/", "/mx/", "/auth"]);
+  const paths = new Set(["/", "/auth"]);
   for (const file of await htmlFiles(publicDir)) {
     paths.add(`/${relative(publicDir, file).split(sep).map(encodeURIComponent).join("/")}`);
   }

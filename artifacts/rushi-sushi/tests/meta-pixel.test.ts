@@ -5,8 +5,6 @@ const pages = [
   'public/index.html',
   'public/pedido.html',
   'public/obrigado.html',
-  'public/mx/index.html',
-  'public/mx/gracias.html',
   'public/v99-core-secure-app.js',
   'public/payment-blindado.js',
   'public/obrigado-blindado.js',

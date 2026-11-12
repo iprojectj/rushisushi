@@ -19,18 +19,12 @@ import { Route as GeocodificarRouteImport } from './routes/geocodificar'
 import { Route as ObrigadoRouteImport } from './routes/obrigado'
 import { Route as PedidoRouteImport } from './routes/pedido'
 import { Route as ReembolsoSolicitadoRouteImport } from './routes/reembolso-solicitado'
-import { Route as MxIndexRouteImport } from './routes/mx.index'
-import { Route as MxCrearPagoRouteImport } from './routes/mx.crear-pago'
-import { Route as MxGraciasRouteImport } from './routes/mx.gracias'
-import { Route as MxPedidoRouteImport } from './routes/mx.pedido'
-import { Route as MxReembolsoRouteImport } from './routes/mx.reembolso'
 import { Route as VerificarStatusIdRouteImport } from './routes/verificar-status.$id'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin.dashboard'
 import { Route as AuthenticatedAdminLeadsRouteImport } from './routes/_authenticated/admin.leads'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as ApiPublicAzipixWebhookRouteImport } from './routes/api/public/azipix-webhook'
-import { Route as ApiPublicCooudWebhookRouteImport } from './routes/api/public/cooud-webhook'
 import { Route as ApiPublicKalangfyWebhookRouteImport } from './routes/api/public/kalangfy-webhook'
 import { Route as ApiPublicLeadSubmitRouteImport } from './routes/api/public/lead-submit'
 import { Route as ApiPublicParadiseWebhookRouteImport } from './routes/api/public/paradise-webhook'
@@ -86,31 +80,6 @@ const ReembolsoSolicitadoRoute = ReembolsoSolicitadoRouteImport.update({
   path: '/reembolso-solicitado',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MxIndexRoute = MxIndexRouteImport.update({
-  id: '/mx/',
-  path: '/mx/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MxCrearPagoRoute = MxCrearPagoRouteImport.update({
-  id: '/mx/crear-pago',
-  path: '/mx/crear-pago',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MxGraciasRoute = MxGraciasRouteImport.update({
-  id: '/mx/gracias',
-  path: '/mx/gracias',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MxPedidoRoute = MxPedidoRouteImport.update({
-  id: '/mx/pedido',
-  path: '/mx/pedido',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MxReembolsoRoute = MxReembolsoRouteImport.update({
-  id: '/mx/reembolso',
-  path: '/mx/reembolso',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const VerificarStatusIdRoute = VerificarStatusIdRouteImport.update({
   id: '/verificar-status/$id',
   path: '/verificar-status/$id',
@@ -141,11 +110,6 @@ const AuthenticatedAdminSettingsRoute =
 const ApiPublicAzipixWebhookRoute = ApiPublicAzipixWebhookRouteImport.update({
   id: '/api/public/azipix-webhook',
   path: '/api/public/azipix-webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicCooudWebhookRoute = ApiPublicCooudWebhookRouteImport.update({
-  id: '/api/public/cooud-webhook',
-  path: '/api/public/cooud-webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicKalangfyWebhookRoute =
@@ -187,17 +151,11 @@ export interface FileRoutesByFullPath {
   '/obrigado': typeof ObrigadoRoute
   '/pedido': typeof PedidoRoute
   '/reembolso-solicitado': typeof ReembolsoSolicitadoRoute
-  '/mx/crear-pago': typeof MxCrearPagoRoute
-  '/mx/gracias': typeof MxGraciasRoute
-  '/mx/pedido': typeof MxPedidoRoute
-  '/mx/reembolso': typeof MxReembolsoRoute
   '/verificar-status/$id': typeof VerificarStatusIdRoute
-  '/mx/': typeof MxIndexRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/api/public/azipix-webhook': typeof ApiPublicAzipixWebhookRoute
-  '/api/public/cooud-webhook': typeof ApiPublicCooudWebhookRoute
   '/api/public/kalangfy-webhook': typeof ApiPublicKalangfyWebhookRoute
   '/api/public/lead-submit': typeof ApiPublicLeadSubmitRoute
   '/api/public/paradise-webhook': typeof ApiPublicParadiseWebhookRoute
@@ -215,17 +173,11 @@ export interface FileRoutesByTo {
   '/obrigado': typeof ObrigadoRoute
   '/pedido': typeof PedidoRoute
   '/reembolso-solicitado': typeof ReembolsoSolicitadoRoute
-  '/mx/crear-pago': typeof MxCrearPagoRoute
-  '/mx/gracias': typeof MxGraciasRoute
-  '/mx/pedido': typeof MxPedidoRoute
-  '/mx/reembolso': typeof MxReembolsoRoute
   '/verificar-status/$id': typeof VerificarStatusIdRoute
-  '/mx': typeof MxIndexRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/api/public/azipix-webhook': typeof ApiPublicAzipixWebhookRoute
-  '/api/public/cooud-webhook': typeof ApiPublicCooudWebhookRoute
   '/api/public/kalangfy-webhook': typeof ApiPublicKalangfyWebhookRoute
   '/api/public/lead-submit': typeof ApiPublicLeadSubmitRoute
   '/api/public/paradise-webhook': typeof ApiPublicParadiseWebhookRoute
@@ -245,17 +197,11 @@ export interface FileRoutesById {
   '/obrigado': typeof ObrigadoRoute
   '/pedido': typeof PedidoRoute
   '/reembolso-solicitado': typeof ReembolsoSolicitadoRoute
-  '/mx/crear-pago': typeof MxCrearPagoRoute
-  '/mx/gracias': typeof MxGraciasRoute
-  '/mx/pedido': typeof MxPedidoRoute
-  '/mx/reembolso': typeof MxReembolsoRoute
   '/verificar-status/$id': typeof VerificarStatusIdRoute
-  '/mx/': typeof MxIndexRoute
   '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/_authenticated/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/api/public/azipix-webhook': typeof ApiPublicAzipixWebhookRoute
-  '/api/public/cooud-webhook': typeof ApiPublicCooudWebhookRoute
   '/api/public/kalangfy-webhook': typeof ApiPublicKalangfyWebhookRoute
   '/api/public/lead-submit': typeof ApiPublicLeadSubmitRoute
   '/api/public/paradise-webhook': typeof ApiPublicParadiseWebhookRoute
@@ -275,17 +221,11 @@ export interface FileRouteTypes {
     | '/obrigado'
     | '/pedido'
     | '/reembolso-solicitado'
-    | '/mx/crear-pago'
-    | '/mx/gracias'
-    | '/mx/pedido'
-    | '/mx/reembolso'
     | '/verificar-status/$id'
-    | '/mx/'
     | '/admin/dashboard'
     | '/admin/leads'
     | '/admin/settings'
     | '/api/public/azipix-webhook'
-    | '/api/public/cooud-webhook'
     | '/api/public/kalangfy-webhook'
     | '/api/public/lead-submit'
     | '/api/public/paradise-webhook'
@@ -303,17 +243,11 @@ export interface FileRouteTypes {
     | '/obrigado'
     | '/pedido'
     | '/reembolso-solicitado'
-    | '/mx/crear-pago'
-    | '/mx/gracias'
-    | '/mx/pedido'
-    | '/mx/reembolso'
     | '/verificar-status/$id'
-    | '/mx'
     | '/admin/dashboard'
     | '/admin/leads'
     | '/admin/settings'
     | '/api/public/azipix-webhook'
-    | '/api/public/cooud-webhook'
     | '/api/public/kalangfy-webhook'
     | '/api/public/lead-submit'
     | '/api/public/paradise-webhook'
@@ -332,17 +266,11 @@ export interface FileRouteTypes {
     | '/obrigado'
     | '/pedido'
     | '/reembolso-solicitado'
-    | '/mx/crear-pago'
-    | '/mx/gracias'
-    | '/mx/pedido'
-    | '/mx/reembolso'
     | '/verificar-status/$id'
-    | '/mx/'
     | '/_authenticated/admin/dashboard'
     | '/_authenticated/admin/leads'
     | '/_authenticated/admin/settings'
     | '/api/public/azipix-webhook'
-    | '/api/public/cooud-webhook'
     | '/api/public/kalangfy-webhook'
     | '/api/public/lead-submit'
     | '/api/public/paradise-webhook'
@@ -362,14 +290,8 @@ export interface RootRouteChildren {
   ObrigadoRoute: typeof ObrigadoRoute
   PedidoRoute: typeof PedidoRoute
   ReembolsoSolicitadoRoute: typeof ReembolsoSolicitadoRoute
-  MxCrearPagoRoute: typeof MxCrearPagoRoute
-  MxGraciasRoute: typeof MxGraciasRoute
-  MxPedidoRoute: typeof MxPedidoRoute
-  MxReembolsoRoute: typeof MxReembolsoRoute
   VerificarStatusIdRoute: typeof VerificarStatusIdRoute
-  MxIndexRoute: typeof MxIndexRoute
   ApiPublicAzipixWebhookRoute: typeof ApiPublicAzipixWebhookRoute
-  ApiPublicCooudWebhookRoute: typeof ApiPublicCooudWebhookRoute
   ApiPublicKalangfyWebhookRoute: typeof ApiPublicKalangfyWebhookRoute
   ApiPublicLeadSubmitRoute: typeof ApiPublicLeadSubmitRoute
   ApiPublicParadiseWebhookRoute: typeof ApiPublicParadiseWebhookRoute
@@ -448,41 +370,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReembolsoSolicitadoRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/mx/': {
-      id: '/mx/'
-      path: '/mx'
-      fullPath: '/mx/'
-      preLoaderRoute: typeof MxIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/mx/crear-pago': {
-      id: '/mx/crear-pago'
-      path: '/mx/crear-pago'
-      fullPath: '/mx/crear-pago'
-      preLoaderRoute: typeof MxCrearPagoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/mx/gracias': {
-      id: '/mx/gracias'
-      path: '/mx/gracias'
-      fullPath: '/mx/gracias'
-      preLoaderRoute: typeof MxGraciasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/mx/pedido': {
-      id: '/mx/pedido'
-      path: '/mx/pedido'
-      fullPath: '/mx/pedido'
-      preLoaderRoute: typeof MxPedidoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/mx/reembolso': {
-      id: '/mx/reembolso'
-      path: '/mx/reembolso'
-      fullPath: '/mx/reembolso'
-      preLoaderRoute: typeof MxReembolsoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/verificar-status/$id': {
       id: '/verificar-status/$id'
       path: '/verificar-status/$id'
@@ -523,13 +410,6 @@ declare module '@tanstack/react-router' {
       path: '/api/public/azipix-webhook'
       fullPath: '/api/public/azipix-webhook'
       preLoaderRoute: typeof ApiPublicAzipixWebhookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/cooud-webhook': {
-      id: '/api/public/cooud-webhook'
-      path: '/api/public/cooud-webhook'
-      fullPath: '/api/public/cooud-webhook'
-      preLoaderRoute: typeof ApiPublicCooudWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/kalangfy-webhook': {
@@ -612,14 +492,8 @@ const rootRouteChildren: RootRouteChildren = {
   ObrigadoRoute: ObrigadoRoute,
   PedidoRoute: PedidoRoute,
   ReembolsoSolicitadoRoute: ReembolsoSolicitadoRoute,
-  MxCrearPagoRoute: MxCrearPagoRoute,
-  MxGraciasRoute: MxGraciasRoute,
-  MxPedidoRoute: MxPedidoRoute,
-  MxReembolsoRoute: MxReembolsoRoute,
   VerificarStatusIdRoute: VerificarStatusIdRoute,
-  MxIndexRoute: MxIndexRoute,
   ApiPublicAzipixWebhookRoute: ApiPublicAzipixWebhookRoute,
-  ApiPublicCooudWebhookRoute: ApiPublicCooudWebhookRoute,
   ApiPublicKalangfyWebhookRoute: ApiPublicKalangfyWebhookRoute,
   ApiPublicLeadSubmitRoute: ApiPublicLeadSubmitRoute,
   ApiPublicParadiseWebhookRoute: ApiPublicParadiseWebhookRoute,
