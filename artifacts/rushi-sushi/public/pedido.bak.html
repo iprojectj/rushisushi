@@ -13,10 +13,10 @@
     <title>Carregando...</title>
     
     <style>
-        /* Mantém a identidade visual do iFood/nobre enquanto carrega */
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #EA1D2C; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow: hidden; }
-        .logo { width: 80px; margin-bottom: 20px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
-        .spinner { width: 30px; height: 30px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 0.8s linear infinite; }
+        /* Exibe a logo Rūshī com contraste enquanto a página carrega */
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #171717; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow: hidden; }
+        .logo { width: 120px; margin-bottom: 20px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
+        .spinner { width: 30px; height: 30px; border: 3px solid rgba(255,255,255,0.2); border-radius: 50%; border-top-color: #EA1D2C; animation: spin 0.8s linear infinite; }
         .status { color: white; margin-top: 15px; font-size: 14px; font-weight: 500; opacity: 0.9; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
@@ -29,7 +29,7 @@
 <body>
 
     <!-- MÁSCARA VISUAL (Loader Profissional) -->
-    <img src="images/ifood-white.webp" class="logo" onerror="this.style.display='none'">
+    <img src="images/logo-rushi-transparente.png" alt="Rūshī Sushi" class="logo" onerror="this.style.display='none'">
     <div class="spinner"></div>
     <p class="status">Carregando...</p>
 

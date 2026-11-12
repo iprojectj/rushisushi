@@ -119,11 +119,11 @@
 </head>
 <body class="pb-24 bg-white" id="main-body">
 
-    <div id="app-loader" class="fixed inset-0 z-[100] bg-[#EA1D2C] flex flex-col items-center justify-center transition-opacity duration-500">
-        <div class="w-32 h-auto mb-10 animate-heartbeat flex items-center justify-center">
-            <img src="images/ifood-white.webp" class="w-full object-contain">
+    <div id="app-loader" class="fixed inset-0 z-[100] bg-[#171717] flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="w-36 h-36 mb-8 animate-heartbeat flex items-center justify-center">
+            <img src="images/logo-rushi-transparente.png" alt="Rūshī Sushi" class="w-full h-full object-contain">
         </div>
-        <div class="w-10 h-10 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
+        <div class="w-10 h-10 border-4 border-white/20 border-t-[#EA1D2C] rounded-full animate-spin"></div>
     </div>
 
     <header class="w-full relative bg-[#ffffff]">
@@ -660,7 +660,9 @@
 
 
                 <div id="sacola-tela-3" class="hidden h-full flex flex-col items-center justify-center p-8 text-center mt-20">
-                    <img src="images/ifood-red.png" class="w-32 h-auto mb-6 animate-pulse object-contain">
+                    <div class="w-32 h-32 mb-6 animate-pulse bg-[#171717] rounded-2xl p-2 shadow-md">
+                        <img src="images/logo-rushi-transparente.png" alt="Rūshī Sushi" class="w-full h-full object-contain">
+                    </div>
                     <h2 class="text-xl font-bold text-[#3e3e3e] mb-2">Validando pedido...</h2>
                     <p class="text-gray-500 text-sm">Conectando com o restaurante</p>
                     <div class="w-full bg-gray-200 h-1 rounded-full mt-8 overflow-hidden max-w-xs mx-auto"><div class="bg-[#EA1D2C] h-full w-1/3 animate-loading-bar"></div></div>
