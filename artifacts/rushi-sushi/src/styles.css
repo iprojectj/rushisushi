@@ -201,9 +201,9 @@
 .refund-separator { color: #c9b8a9; margin: 0 7px; }
 .refund-header-link, .refund-help-note a { align-items: center; color: var(--care-red); display: inline-flex; font-size: 12px; font-weight: 700; gap: 8px; text-decoration: none; }
 .refund-header-link:hover, .refund-help-note a:hover { color: var(--care-red-deep); text-decoration: underline; }
-.refund-hero { background: #eee4d7; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(260px, .85fr); min-height: 400px; overflow: hidden; padding: 60px clamp(24px, 10vw, 156px) 56px; position: relative; }
+.refund-hero { background: #eee4d7; display: flex; justify-content: center; min-height: 330px; overflow: hidden; padding: 58px clamp(24px, 10vw, 156px); position: relative; }
 .refund-hero::after { background: radial-gradient(ellipse at 82% 40%, rgba(185,37,43,.075), transparent 62%); content: ""; inset: 0; pointer-events: none; position: absolute; }
-.refund-hero-copy { align-self: center; max-width: 620px; position: relative; z-index: 1; }
+.refund-hero-copy { align-self: center; max-width: 760px; position: relative; z-index: 1; }
 .refund-eyebrow { align-items: center; color: var(--care-red); display: flex; font-size: 9px; font-weight: 800; gap: 12px; letter-spacing: .19em; margin: 0 0 16px; }
 .refund-eyebrow-rule { background: #c99d83; height: 1px; width: 38px; }
 .refund-hero h1 { font-family: "Instrument Serif", Georgia, serif; font-size: clamp(52px, 6vw, 79px); font-weight: 400; letter-spacing: -.035em; line-height: .91; margin: 0; }
@@ -217,17 +217,6 @@
 .refund-order-chip small, .refund-protocol-box small { color: #8c7167; display: block; font-size: 8px; font-weight: 800; letter-spacing: .13em; }
 .refund-order-chip strong { display: block; font-size: 12px; margin-top: 2px; }
 .refund-order-chip b { color: var(--care-red); font-size: 12px; margin-left: auto; }
-.refund-hero-art { align-items: center; display: flex; justify-content: center; min-height: 270px; position: relative; z-index: 1; }
-.refund-art-ring { border: 1px solid rgba(135,74,59,.23); border-radius: 50%; height: 264px; position: absolute; transform: rotate(-18deg) scaleX(1.2); width: 264px; }
-.refund-art-orbit { border: 1px solid rgba(185,37,43,.3); border-radius: 50%; height: 308px; position: absolute; transform: rotate(28deg) scaleX(.76); width: 308px; }
-.refund-art-plate { align-items: center; background: #fbf7ef; border: 1px solid #d8c8b6; border-radius: 50%; box-shadow: 8px 18px 36px rgba(78,46,34,.12), inset 0 0 0 10px #f2e9dc, inset 0 0 0 11px #ddcbbb; display: flex; height: 214px; justify-content: center; position: relative; transform: rotate(-10deg); width: 214px; }
-.refund-art-bowl { align-items: center; background: #382823; border: 7px solid #9e392d; border-radius: 50% 50% 46% 46%; box-shadow: inset 0 -8px 0 #241a18; display: flex; gap: 8px; height: 77px; justify-content: center; overflow: hidden; position: relative; transform: rotate(10deg); width: 122px; }
-.refund-art-bowl::before { background: #deac68; border-radius: 50%; content: ""; height: 42px; position: absolute; top: -18px; width: 112px; }
-.refund-art-bowl span { background: #e8d8b1; border-radius: 4px; height: 27px; position: relative; transform: rotate(28deg); width: 8px; }
-.refund-art-bowl span:nth-child(2) { background: #c74c3a; height: 32px; transform: rotate(-18deg); }
-.refund-art-bowl span:nth-child(3) { background: #b5ad76; transform: rotate(48deg); }
-.refund-art-caption { color: #9b6254; font-family: "DM Sans", sans-serif; font-size: 8px; font-weight: 800; letter-spacing: .2em; line-height: 1.65; position: absolute; right: 5%; top: 16%; transform: rotate(9deg); }
-.refund-art-seal { align-items: center; background: var(--care-red); border: 3px solid #f4e9da; border-radius: 50%; box-shadow: 0 6px 16px #6d382c38; color: #fff4e7; display: flex; font-family: "Instrument Serif", serif; font-size: 25px; height: 52px; justify-content: center; position: absolute; right: 13%; top: 66%; transform: rotate(12deg); width: 52px; }
 .refund-content { align-items: start; display: grid; gap: clamp(36px, 8vw, 112px); grid-template-columns: minmax(0, 1.25fr) minmax(260px, .75fr); margin: 0 auto; max-width: 1160px; padding: 70px 28px 88px; }
 .refund-form-column { min-width: 0; }
 .refund-section-heading { align-items: center; display: flex; gap: 14px; }
@@ -288,7 +277,6 @@
 .refund-footer { align-items: center; border-top: 1px solid #e6dacd; color: #8a7770; display: flex; font-size: 10px; justify-content: space-between; padding: 18px clamp(20px, 6vw, 96px); }
 .refund-footer img { background: #322522; border-radius: 3px; height: 28px; object-fit: cover; width: 28px; }
 .refund-footer i { color: #c09c85; font-style: normal; margin: 0 5px; }
-.refund-footer-mark { align-items: center; background: var(--care-red); border-radius: 50%; color: #fff3e6; display: inline-flex; font-family: "Instrument Serif", serif; height: 19px; justify-content: center; margin-left: 5px; width: 19px; }
 
 /* Admin queue: paper, ink, and Rūshī vermilion over the existing authenticated shell. */
 .refund-admin { --ra-ink: #332722; --ra-muted: #7a6a62; --ra-line: #e7ddd3; color: var(--ra-ink); font-family: "DM Sans", sans-serif; }
@@ -377,16 +365,9 @@
   .refund-header-note { display: none; }
   .refund-header-link { font-size: 10px; }
   .refund-brand { height: 48px; width: 48px; }
-  .refund-hero { grid-template-columns: 1fr; min-height: auto; padding: 45px 25px 30px; }
-  .refund-hero-art { min-height: 205px; }
-  .refund-art-plate { height: 165px; width: 165px; }
-  .refund-art-ring { height: 200px; width: 200px; }
-  .refund-art-orbit { height: 230px; width: 230px; }
-  .refund-art-caption { right: 9%; top: 14%; }
-  .refund-art-seal { right: 15%; top: 66%; }
+  .refund-hero { min-height: auto; padding: 45px 25px 42px; }
   .refund-content { grid-template-columns: 1fr; gap: 44px; padding: 43px 22px 55px; }
   .refund-footer { flex-wrap: wrap; gap: 10px 14px; padding: 15px 20px; }
-  .refund-footer > span:last-child { display: none; }
   .refund-admin-intro { align-items: flex-start; flex-direction: column; gap: 20px; padding: 21px; }
   .refund-admin-summary { align-self: stretch; justify-content: flex-start; }
   .refund-admin-summary-stamp { margin-left: auto; }

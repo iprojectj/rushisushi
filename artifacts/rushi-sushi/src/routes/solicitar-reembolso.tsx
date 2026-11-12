@@ -32,17 +32,18 @@ const EMPTY = { name: "", email: "", whatsapp: "", orderId: "", reason: "" as Re
 function readOrderPrefill() {
   try {
     const raw = localStorage.getItem("nobre_pix_data");
-    if (!raw) return null;
-    const data = JSON.parse(raw) as Record<string, unknown>;
-    const text = (...values: unknown[]) => values.find((v) => typeof v === "string" || typeof v === "number")?.toString() ?? "";
+    const data = raw ? JSON.parse(raw) as Record<string, unknown> : {};
+    const text = (...values: unknown[]) => values
+      .find((v) => (typeof v === "string" || typeof v === "number") && String(v).trim() !== "")
+      ?.toString().trim() ?? "";
     const prefill = {
       ...EMPTY,
-      name: text(data.name, data.nome, data.customerName),
-      whatsapp: text(data.phone, data.whatsapp, data.telefone, data.customerPhone),
+      name: text(data.name, data.nome, data.customerName) || localStorage.getItem("user_cache_nome")?.trim() || "",
+      whatsapp: text(data.phone, data.whatsapp, data.telefone, data.customerPhone) || localStorage.getItem("user_cache_zap")?.trim() || "",
       orderId: text(data.orderId, data.order_id, data.id, data.transactionId),
       amount: text(data.amount, data.total, data.valor),
     };
-    return prefill.orderId ? prefill : null;
+    return prefill.orderId || prefill.name || prefill.whatsapp ? prefill : null;
   } catch {
     return null;
   }
@@ -131,10 +132,10 @@ function RefundRequestPage() {
           <p className="refund-eyebrow"><span>SUPORTE AO PEDIDO</span><span className="refund-eyebrow-rule" /></p>
           <h1>Vamos cuidar<br />disso <em>juntos.</em></h1>
           <p className="refund-lede">Sentimos que algo não saiu como deveria. Conte pra gente o que aconteceu — uma pessoa da nossa equipe vai olhar seu caso com atenção.</p>
-          {order && (
+          {order?.orderId && (
             <div className="refund-order-chip" data-testid="text-prefilled-order">
               <span className="refund-order-mark"><Utensils size={17} /></span>
-              <span><small>PEDIDO IDENTIFICADO</small><strong>{order.orderId || "Encontramos seus dados"}</strong></span>
+              <span><small>PEDIDO IDENTIFICADO</small><strong>{order.orderId}</strong></span>
               {order.amount && <b>{formatAmount(order.amount)}</b>}
             </div>
           )}
@@ -142,13 +143,6 @@ function RefundRequestPage() {
             <span><LockKeyhole size={15} /> Seus dados protegidos</span>
             <span><Clock3 size={15} /> Análise feita por uma pessoa</span>
           </div>
-        </div>
-        <div className="refund-hero-art" aria-hidden="true">
-          <div className="refund-art-ring" />
-          <div className="refund-art-orbit" />
-          <div className="refund-art-plate"><div className="refund-art-bowl"><span /><span /><span /></div></div>
-          <div className="refund-art-caption">FEITO COM<br />CUIDADO, SEMPRE</div>
-          <div className="refund-art-seal">R</div>
         </div>
       </section>
 
@@ -245,7 +239,7 @@ function RefundRequestPage() {
           <p className="refund-help-note">Precisa de uma mão? <strong>Guarde seu protocolo — nossa equipe responde por aqui.</strong></p>
         </aside>
       </section>
-      <footer className="refund-footer"><img src="/images/logo-rushi-transparente.png" alt="" /><span>Rūshī Sushi <i>·</i> A gente se importa com cada pedido.</span><span>Feito com cuidado <span className="refund-footer-mark">R</span></span></footer>
+      <footer className="refund-footer"><img src="/images/logo-rushi-transparente.png" alt="" /><span>Rūshī Sushi <i>·</i> A gente se importa com cada pedido.</span></footer>
     </main>
   );
 }
