@@ -19,6 +19,7 @@ import { Route as GeocodificarRouteImport } from './routes/geocodificar'
 import { Route as ObrigadoRouteImport } from './routes/obrigado'
 import { Route as PedidoRouteImport } from './routes/pedido'
 import { Route as ReembolsoSolicitadoRouteImport } from './routes/reembolso-solicitado'
+import { Route as SolicitarReembolsoRouteImport } from './routes/solicitar-reembolso'
 import { Route as VerificarStatusIdRouteImport } from './routes/verificar-status.$id'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin.dashboard'
@@ -78,6 +79,11 @@ const PedidoRoute = PedidoRouteImport.update({
 const ReembolsoSolicitadoRoute = ReembolsoSolicitadoRouteImport.update({
   id: '/reembolso-solicitado',
   path: '/reembolso-solicitado',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SolicitarReembolsoRoute = SolicitarReembolsoRouteImport.update({
+  id: '/solicitar-reembolso',
+  path: '/solicitar-reembolso',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VerificarStatusIdRoute = VerificarStatusIdRouteImport.update({
@@ -151,6 +157,7 @@ export interface FileRoutesByFullPath {
   '/obrigado': typeof ObrigadoRoute
   '/pedido': typeof PedidoRoute
   '/reembolso-solicitado': typeof ReembolsoSolicitadoRoute
+  '/solicitar-reembolso': typeof SolicitarReembolsoRoute
   '/verificar-status/$id': typeof VerificarStatusIdRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
@@ -173,6 +180,7 @@ export interface FileRoutesByTo {
   '/obrigado': typeof ObrigadoRoute
   '/pedido': typeof PedidoRoute
   '/reembolso-solicitado': typeof ReembolsoSolicitadoRoute
+  '/solicitar-reembolso': typeof SolicitarReembolsoRoute
   '/verificar-status/$id': typeof VerificarStatusIdRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
@@ -197,6 +205,7 @@ export interface FileRoutesById {
   '/obrigado': typeof ObrigadoRoute
   '/pedido': typeof PedidoRoute
   '/reembolso-solicitado': typeof ReembolsoSolicitadoRoute
+  '/solicitar-reembolso': typeof SolicitarReembolsoRoute
   '/verificar-status/$id': typeof VerificarStatusIdRoute
   '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/_authenticated/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
@@ -221,6 +230,7 @@ export interface FileRouteTypes {
     | '/obrigado'
     | '/pedido'
     | '/reembolso-solicitado'
+    | '/solicitar-reembolso'
     | '/verificar-status/$id'
     | '/admin/dashboard'
     | '/admin/leads'
@@ -243,6 +253,7 @@ export interface FileRouteTypes {
     | '/obrigado'
     | '/pedido'
     | '/reembolso-solicitado'
+    | '/solicitar-reembolso'
     | '/verificar-status/$id'
     | '/admin/dashboard'
     | '/admin/leads'
@@ -266,6 +277,7 @@ export interface FileRouteTypes {
     | '/obrigado'
     | '/pedido'
     | '/reembolso-solicitado'
+    | '/solicitar-reembolso'
     | '/verificar-status/$id'
     | '/_authenticated/admin/dashboard'
     | '/_authenticated/admin/leads'
@@ -290,6 +302,7 @@ export interface RootRouteChildren {
   ObrigadoRoute: typeof ObrigadoRoute
   PedidoRoute: typeof PedidoRoute
   ReembolsoSolicitadoRoute: typeof ReembolsoSolicitadoRoute
+  SolicitarReembolsoRoute: typeof SolicitarReembolsoRoute
   VerificarStatusIdRoute: typeof VerificarStatusIdRoute
   ApiPublicAzipixWebhookRoute: typeof ApiPublicAzipixWebhookRoute
   ApiPublicKalangfyWebhookRoute: typeof ApiPublicKalangfyWebhookRoute
@@ -368,6 +381,13 @@ declare module '@tanstack/react-router' {
       path: '/reembolso-solicitado'
       fullPath: '/reembolso-solicitado'
       preLoaderRoute: typeof ReembolsoSolicitadoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/solicitar-reembolso': {
+      id: '/solicitar-reembolso'
+      path: '/solicitar-reembolso'
+      fullPath: '/solicitar-reembolso'
+      preLoaderRoute: typeof SolicitarReembolsoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/verificar-status/$id': {
@@ -492,6 +512,7 @@ const rootRouteChildren: RootRouteChildren = {
   ObrigadoRoute: ObrigadoRoute,
   PedidoRoute: PedidoRoute,
   ReembolsoSolicitadoRoute: ReembolsoSolicitadoRoute,
+  SolicitarReembolsoRoute: SolicitarReembolsoRoute,
   VerificarStatusIdRoute: VerificarStatusIdRoute,
   ApiPublicAzipixWebhookRoute: ApiPublicAzipixWebhookRoute,
   ApiPublicKalangfyWebhookRoute: ApiPublicKalangfyWebhookRoute,

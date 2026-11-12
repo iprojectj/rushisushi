@@ -400,103 +400,9 @@
                 if(addrEl2) addrEl2.innerText = (linha2 || '') + (cepLimpo ? '  •  CEP ' + cepLimpo.replace(/(\d{5})(\d{3})/, '$1-$2') : '');
             };
 
-            const fetchJson = async (url) => {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 6500);
-                try {
-                    const response = await fetch(url, { headers: { 'Accept': 'application/json' }, signal: controller.signal });
-                    clearTimeout(timeoutId);
-                    if (!response.ok) throw new Error('Falha na consulta de mapa');
-                    return await response.json();
-                } catch (error) {
-                    clearTimeout(timeoutId);
-                    throw error;
-                }
-            };
-
-            const hydrateAddressFromCep = async () => {
-                if (!cepLimpo || cepLimpo.length !== 8) return;
-                try {
-                    const viaCep = await fetchJson('https://viacep.com.br/ws/' + cepLimpo + '/json/');
-                    if (viaCep && !viaCep.erro) {
-                        endereco.rua = endereco.rua || viaCep.logradouro;
-                        endereco.bairro = endereco.bairro || viaCep.bairro;
-                        endereco.cidade = viaCep.localidade || endereco.cidade;
-                        endereco.estado = viaCep.uf || endereco.estado;
-                        return;
-                    }
-                } catch(e) {}
-
-                try {
-                    const brasilApi = await fetchJson('https://brasilapi.com.br/api/cep/v1/' + cepLimpo);
-                    if (brasilApi && brasilApi.cep) {
-                        endereco.rua = endereco.rua || brasilApi.street;
-                        endereco.bairro = endereco.bairro || brasilApi.neighborhood;
-                        endereco.cidade = brasilApi.city || endereco.cidade;
-                        endereco.estado = brasilApi.state || endereco.estado;
-                    }
-                } catch(e) {}
-            };
-
-            const getCoordinatesFromCep = async () => {
-                if (!cepLimpo || cepLimpo.length !== 8) return null;
-                const data = await fetchJson('https://brasilapi.com.br/api/cep/v2/' + cepLimpo);
-                const coords = data && data.location && data.location.coordinates;
-                const lat = parseFloat(coords && coords.latitude);
-                const lon = parseFloat(coords && coords.longitude);
-                return Number.isFinite(lat) && Number.isFinite(lon) ? { lat, lon } : null;
-            };
-
-            const getCoordinatesFromSearch = async () => {
-                const rua = clean(endereco.rua);
-                const numero = clean(endereco.numero);
-                const bairro = clean(endereco.bairro);
-                const cidade = clean(endereco.cidade) || 'São Paulo';
-                const estado = normalizeState(endereco.estado);
-                const queries = [
-                    [rua, numero, bairro, cidade, estado, 'Brasil'],
-                    [rua, bairro, cidade, estado, 'Brasil'],
-                    [bairro, cidade, estado, 'Brasil'],
-                    [cidade, estado, 'Brasil']
-                ].map(parts => parts.filter(Boolean).join(', ')).filter(Boolean);
-
-                const cepFmt = cepLimpo.length === 8 ? cepLimpo.replace(/(\d{5})(\d{3})/, '$1-$2') : '';
-                const structured = [];
-                if (rua) structured.push('street=' + encodeURIComponent((numero ? numero + ' ' : '') + rua) + '&city=' + encodeURIComponent(cidade) + '&state=' + encodeURIComponent(estado) + '&country=Brasil');
-                if (rua && cepFmt) structured.push('street=' + encodeURIComponent(rua) + '&postalcode=' + cepFmt + '&country=Brasil');
-                for (const qs of structured) {
-                    try {
-                        const r = await fetchJson('https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=br&' + qs);
-                        if (r && r.length) { const lat = parseFloat(r[0].lat), lon = parseFloat(r[0].lon); if (Number.isFinite(lat) && Number.isFinite(lon)) return { lat, lon }; }
-                    } catch(e) {}
-                }
-                for (const queryText of queries) {
-                    try {
-                        const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=br&addressdetails=1&q=' + encodeURIComponent(queryText);
-                        const results = await fetchJson(url);
-                        if (results && results.length > 0) {
-                            const lat = parseFloat(results[0].lat);
-                            const lon = parseFloat(results[0].lon);
-                            if (Number.isFinite(lat) && Number.isFinite(lon)) return { lat, lon };
-                        }
-                    } catch(e) {}
-                }
-                return null;
-            };
-
-            await hydrateAddressFromCep();
-            updateAddressText();
-
             try {
-                // Prioriza o endereço completo digitado (rua + número); CEP é só fallback aproximado
-                let coords = null;
-                // 1º: Google (precisão de número da casa)
-                try {
-                    const gr = await fetch('/geocodificar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ rua: clean(endereco.rua), numero: clean(endereco.numero), bairro: clean(endereco.bairro), cidade: clean(endereco.cidade), estado: clean(endereco.estado), cep: cepLimpo }) });
-                    if (gr.ok) { const gj = await gr.json(); if (gj && gj.result) coords = gj.result; }
-                } catch(e) {}
-                if (!coords) { try { coords = await getCoordinatesFromSearch(); } catch(e) {} }
-                if (!coords) { try { coords = await getCoordinatesFromCep(); } catch(e) {} }
+                const coords = await window.resolveDeliveryCoordinates(endereco);
+                updateAddressText();
                 if (!coords) throw new Error('Coordenadas não encontradas');
                 renderMap(coords.lat, coords.lon);
             } catch (err) {
@@ -720,5 +626,6 @@
             `;
         }
     </script>
+<script src="/js/delivery-geocoder.js"></script>
 <script defer src="/js/presence-tracker.js"></script></body>
 </html>
