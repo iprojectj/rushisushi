@@ -173,7 +173,6 @@ function RefundTrackingPage() {
                 </strong>
               </div>
               <small className="refund-progress-deadline">Prazo de 15 dias: até {formatDate(record.deadlineAt)}</small>
-              <p>A barra começa em 5% e avança diariamente. O status final só aparece no 15º dia se a equipe tiver confirmado a devolução real.</p>
             </section>
 
             <div className="refund-tracking-message" role="status" data-testid="text-tracking-message">
@@ -235,7 +234,6 @@ function RefundTrackingPage() {
           </article>
         ) : null}
 
-        <p className="refund-tracking-notice">Este acompanhamento é uma página de suporte da Rūshī Sushi. Nenhum pedido de estorno é enviado automaticamente ao Kalangfy.</p>
       </section>
 
       <footer className="refund-footer"><img src="/images/logo-rushi-transparente.png" alt="" /><span>Rūshī Sushi <i>·</i> A gente se importa com cada pedido.</span></footer>
