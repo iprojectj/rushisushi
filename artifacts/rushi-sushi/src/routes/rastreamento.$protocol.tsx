@@ -190,9 +190,9 @@ function RefundTrackingPage() {
                   const complete = !isRejected && index <= completedStepIndex;
                   const current = !isRefunded && !isRejected && index === completedStepIndex;
                   return (
-                    <li className={`refund-step${complete ? " is-complete" : ""}${current ? " is-current" : ""}`} key={step.status} aria-current={current ? "step" : undefined}>
-                      <span className="refund-step-marker">{complete ? <Check size={14} /> : index + 1}</span>
-                      <div className="refund-step-copy">
+                    <li className={`refund-tracking-step${complete ? " is-complete" : ""}${current ? " is-current" : ""}`} key={step.status} aria-current={current ? "step" : undefined}>
+                      <span className="refund-tracking-step-marker">{complete ? <Check size={14} /> : index + 1}</span>
+                      <div className="refund-tracking-step-copy">
                         <strong>{step.label}</strong>
                         <p>{step.description}</p>
                         {current && <small>Etapa atual</small>}
