@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { BarChart3, Users, LogOut, Menu, X, Sparkles, Settings } from "lucide-react";
+import { BarChart3, Users, LogOut, Menu, X, Sparkles, Settings, Banknote } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import "./admin-theme.css";
@@ -7,6 +7,7 @@ import "./admin-theme.css";
 const NAV = [
   { to: "/admin/dashboard", label: "Visão geral", icon: BarChart3 },
   { to: "/admin/leads", label: "Clientes", icon: Users },
+  { to: "/admin/refunds", label: "Reembolsos", icon: Banknote },
   { to: "/admin/settings", label: "Configurações", icon: Settings },
 ] as const;
 

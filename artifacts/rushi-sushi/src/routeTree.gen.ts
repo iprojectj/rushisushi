@@ -24,6 +24,7 @@ import { Route as VerificarStatusIdRouteImport } from './routes/verificar-status
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin.dashboard'
 import { Route as AuthenticatedAdminLeadsRouteImport } from './routes/_authenticated/admin.leads'
+import { Route as AuthenticatedAdminRefundsRouteImport } from './routes/_authenticated/admin.refunds'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as ApiPublicAzipixWebhookRouteImport } from './routes/api/public/azipix-webhook'
 import { Route as ApiPublicKalangfyWebhookRouteImport } from './routes/api/public/kalangfy-webhook'
@@ -107,6 +108,12 @@ const AuthenticatedAdminLeadsRoute = AuthenticatedAdminLeadsRouteImport.update({
   path: '/admin/leads',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminRefundsRoute =
+  AuthenticatedAdminRefundsRouteImport.update({
+    id: '/admin/refunds',
+    path: '/admin/refunds',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminSettingsRoute =
   AuthenticatedAdminSettingsRouteImport.update({
     id: '/admin/settings',
@@ -161,6 +168,7 @@ export interface FileRoutesByFullPath {
   '/verificar-status/$id': typeof VerificarStatusIdRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
+  '/admin/refunds': typeof AuthenticatedAdminRefundsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/api/public/azipix-webhook': typeof ApiPublicAzipixWebhookRoute
   '/api/public/kalangfy-webhook': typeof ApiPublicKalangfyWebhookRoute
@@ -184,6 +192,7 @@ export interface FileRoutesByTo {
   '/verificar-status/$id': typeof VerificarStatusIdRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
+  '/admin/refunds': typeof AuthenticatedAdminRefundsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/api/public/azipix-webhook': typeof ApiPublicAzipixWebhookRoute
   '/api/public/kalangfy-webhook': typeof ApiPublicKalangfyWebhookRoute
@@ -209,6 +218,7 @@ export interface FileRoutesById {
   '/verificar-status/$id': typeof VerificarStatusIdRoute
   '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/_authenticated/admin/leads': typeof AuthenticatedAdminLeadsRouteWithChildren
+  '/_authenticated/admin/refunds': typeof AuthenticatedAdminRefundsRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/api/public/azipix-webhook': typeof ApiPublicAzipixWebhookRoute
   '/api/public/kalangfy-webhook': typeof ApiPublicKalangfyWebhookRoute
@@ -234,6 +244,7 @@ export interface FileRouteTypes {
     | '/verificar-status/$id'
     | '/admin/dashboard'
     | '/admin/leads'
+    | '/admin/refunds'
     | '/admin/settings'
     | '/api/public/azipix-webhook'
     | '/api/public/kalangfy-webhook'
@@ -257,6 +268,7 @@ export interface FileRouteTypes {
     | '/verificar-status/$id'
     | '/admin/dashboard'
     | '/admin/leads'
+    | '/admin/refunds'
     | '/admin/settings'
     | '/api/public/azipix-webhook'
     | '/api/public/kalangfy-webhook'
@@ -281,6 +293,7 @@ export interface FileRouteTypes {
     | '/verificar-status/$id'
     | '/_authenticated/admin/dashboard'
     | '/_authenticated/admin/leads'
+    | '/_authenticated/admin/refunds'
     | '/_authenticated/admin/settings'
     | '/api/public/azipix-webhook'
     | '/api/public/kalangfy-webhook'
@@ -418,6 +431,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminLeadsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/refunds': {
+      id: '/_authenticated/admin/refunds'
+      path: '/admin/refunds'
+      fullPath: '/admin/refunds'
+      preLoaderRoute: typeof AuthenticatedAdminRefundsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/settings': {
       id: '/_authenticated/admin/settings'
       path: '/admin/settings'
@@ -487,6 +507,7 @@ const AuthenticatedAdminLeadsRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
   AuthenticatedAdminLeadsRoute: typeof AuthenticatedAdminLeadsRouteWithChildren
+  AuthenticatedAdminRefundsRoute: typeof AuthenticatedAdminRefundsRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
@@ -494,6 +515,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
   AuthenticatedAdminLeadsRoute: AuthenticatedAdminLeadsRouteWithChildren,
+  AuthenticatedAdminRefundsRoute: AuthenticatedAdminRefundsRoute,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }

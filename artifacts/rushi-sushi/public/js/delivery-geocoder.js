@@ -65,8 +65,10 @@
         const street = clean(address.rua);
         const number = clean(address.numero);
         const neighborhood = clean(address.bairro);
-        const city = clean(address.cidade) || 'São Paulo';
-        const state = normalizeState(address.estado);
+        const addressCity = clean(address.cidade);
+        const city = addressCity || 'São Paulo';
+        const rawState = clean(address.estado);
+        const state = normalizeState(rawState) || 'SP';
         const postCode = cep.length === 8 ? cep.replace(/(\d{5})(\d{3})/, '$1-$2') : '';
 
         // Match checkout order: precise Google geocoding first, then OSM
@@ -79,8 +81,8 @@
                     rua: street,
                     numero: number,
                     bairro: neighborhood,
-                    cidade: city,
-                    estado: clean(address.estado),
+                    cidade: addressCity,
+                    estado: rawState,
                     cep,
                 }),
             });

@@ -24,6 +24,66 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /refund-requests:
+    post:
+      operationId: createRefundRequest
+      tags: [refunds]
+      summary: Register a refund request for review
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefundRequestInput"
+      responses:
+        "201":
+          description: Refund request registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RefundRequestCreated"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /refund-requests/track:
+    post:
+      operationId: trackRefundRequest
+      tags: [refunds]
+      summary: Retrieve refund request status by protocol
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefundTrackInput"
+      responses:
+        "200":
+          description: Current request status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RefundTracking"
+        "404":
+          description: Request protocol not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +93,75 @@ components:
           type: string
       required:
         - status
+    RefundRequestInput:
+      type: object
+      required: [requestKey, name, email, whatsapp, orderId, reason, details]
+      properties:
+        requestKey:
+          type: string
+          format: uuid
+        name:
+          type: string
+          minLength: 2
+          maxLength: 120
+        email:
+          type: string
+          format: email
+          maxLength: 200
+        whatsapp:
+          type: string
+          minLength: 10
+          maxLength: 20
+        orderId:
+          type: string
+          minLength: 1
+          maxLength: 120
+        reason:
+          type: string
+          enum: [nao_entregue, pedido_incorreto, item_faltando, pedido_cancelado, outro]
+        details:
+          type: string
+          minLength: 5
+          maxLength: 1000
+    RefundTrackInput:
+      type: object
+      required: [protocol]
+      properties:
+        protocol:
+          type: string
+          minLength: 20
+          maxLength: 40
+    RefundRequestCreated:
+      type: object
+      required: [protocol, status, createdAt]
+      properties:
+        protocol:
+          type: string
+        status:
+          $ref: "#/components/schemas/RefundStatus"
+        createdAt:
+          type: string
+          format: date-time
+    RefundTracking:
+      type: object
+      required: [protocol, status, updatedAt, message]
+      properties:
+        protocol:
+          type: string
+        status:
+          $ref: "#/components/schemas/RefundStatus"
+        updatedAt:
+          type: string
+          format: date-time
+        message:
+          type: ["string", "null"]
+    RefundStatus:
+      type: string
+      enum: [recebida, em_analise, aprovada, estornada, negada]
+    ApiError:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
 
