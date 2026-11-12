@@ -8,8 +8,10 @@
 
 export interface RefundTrackInput {
   /**
-     * @minLength 20
+     * Código de acompanhamento de oito caracteres.
+     * @minLength 8
      * @maxLength 40
+     * @pattern ^(?:[A-Z0-9]{8}|RS-[A-F0-9]{32})$
      */
   protocol: string;
 }

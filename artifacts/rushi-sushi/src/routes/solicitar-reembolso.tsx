@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useCreateRefundRequest, useTrackRefundRequest } from "@workspace/api-client-react";
 import type { RefundRequestInput } from "@workspace/api-client-react";
-import { ArrowRight, Check, ChevronRight, CircleHelp, Clock3, Copy, LockKeyhole, RotateCcw, Utensils } from "lucide-react";
+import { ArrowRight, CircleHelp, Clock3, LockKeyhole, RotateCcw, Utensils } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { resolvePublicOrderNumberForRefund } from "@/lib/public-order-number.functions";
 import { pageHead } from "@/lib/page-head";
@@ -67,10 +67,9 @@ function readOrderPrefill() {
 }
 
 function RefundRequestPage() {
+  const navigate = useNavigate();
   const [form, setForm] = useState(EMPTY);
   const [order, setOrder] = useState<OrderPrefill | null>(null);
-  const [submitted, setSubmitted] = useState<{ protocol: string; status: string } | null>(null);
-  const [copied, setCopied] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [orderNumberError, setOrderNumberError] = useState("");
   const [orderNumberLoading, setOrderNumberLoading] = useState(false);
@@ -142,13 +141,12 @@ function RefundRequestPage() {
           details: form.details.trim(),
         },
       });
-      setSubmitted({ protocol: result.protocol, status: result.status });
-      setCopied(false);
       setSubmitError("");
-      setProtocol(result.protocol);
+      await navigate({
+        to: "/rastreamento/$protocol",
+        params: { protocol: result.protocol },
+      });
       requestKey.current = null;
-      setForm(EMPTY);
-      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error) {
       // Keep the same request key so a retry cannot create a duplicate protocol.
       setSubmitError(errorMessage(error) ?? "Não foi possível enviar agora. Seus dados continuam aqui; tente novamente em instantes.");
@@ -199,28 +197,7 @@ function RefundRequestPage() {
 
       <section className="refund-content">
         <div className="refund-form-column">
-          {submitted ? (
-            <div className="refund-success-panel" role="status" data-testid="status-request-success">
-              <div className="refund-success-icon"><Check size={23} /></div>
-              <p className="refund-eyebrow">PEDIDO REGISTRADO</p>
-              <h2>Recebemos seu pedido.</h2>
-              <p>Isso ainda não é uma aprovação de estorno. Nossa equipe vai revisar as informações e atualizar o andamento por aqui.</p>
-              <div className="refund-protocol-box">
-                <div><small>SEU PROTOCOLO</small><strong data-testid="text-request-protocol">{submitted.protocol}</strong></div>
-                <button type="button" onClick={async () => {
-                  try {
-                    await navigator.clipboard?.writeText(submitted.protocol);
-                    setCopied(true);
-                    window.setTimeout(() => setCopied(false), 1800);
-                  } catch {
-                    setCopied(false);
-                  }
-                }} aria-label="Copiar protocolo" data-testid="button-copy-protocol">{copied ? <Check size={16} /> : <Copy size={16} />} {copied ? "Copiado" : "Copiar"}</button>
-              </div>
-              <button className="refund-text-button" type="button" onClick={() => { setSubmitted(null); setTracked(null); }}>Enviar outra solicitação <ChevronRight size={15} /></button>
-            </div>
-          ) : (
-            <form className="refund-form" onSubmit={submitRequest}>
+          <form className="refund-form" onSubmit={submitRequest}>
               <div className="refund-section-heading">
                 <div className="refund-step">01</div>
                 <div><p className="refund-eyebrow">SOLICITAÇÃO</p><h2>Conte o que aconteceu</h2></div>
@@ -260,8 +237,7 @@ function RefundRequestPage() {
                 {create.isPending ? <><span className="refund-button-loader" /> Enviando sua solicitação…</> : <>Enviar para análise <ArrowRight size={17} /></>}
               </button>
               <p className="refund-submit-note">Sua solicitação será revisada manualmente. O envio não realiza um estorno automaticamente.</p>
-            </form>
-          )}
+          </form>
         </div>
 
         <aside className="refund-sidebar">
@@ -274,8 +250,8 @@ function RefundRequestPage() {
           <div id="consultar" className="refund-lookup">
             <div className="refund-lookup-title"><span><CircleHelp size={17} /></span><div><p className="refund-eyebrow">JÁ ABRIU UM PEDIDO?</p><h3>Acompanhe por protocolo</h3></div></div>
             <form onSubmit={lookup}>
-              <label className="refund-field">Protocolo
-                <input className={inputClass} data-testid="input-track-protocol" required maxLength={40} autoCapitalize="characters" value={protocol} onChange={(e) => setProtocol(e.target.value)} placeholder="Ex.: RS-9A10B2C3D4E5F60718293A4B5C6D7E8F" />
+              <label className="refund-field">Código de acompanhamento
+                <input className={inputClass} data-testid="input-track-protocol" required minLength={8} maxLength={40} autoCapitalize="characters" value={protocol} onChange={(e) => setProtocol(e.target.value.toUpperCase())} placeholder="Ex.: NV49IAAC" />
               </label>
               <button type="submit" className="refund-lookup-button" disabled={track.isPending} data-testid="button-track-refund">
                 {track.isPending ? "Consultando…" : <>Consultar andamento <ArrowRight size={15} /></>}

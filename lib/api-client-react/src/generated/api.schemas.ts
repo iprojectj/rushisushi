@@ -51,8 +51,10 @@ export interface RefundRequestInput {
 
 export interface RefundTrackInput {
   /**
-     * @minLength 20
+     * Código de acompanhamento de oito caracteres.
+     * @minLength 8
      * @maxLength 40
+     * @pattern ^(?:[A-Z0-9]{8}|RS-[A-F0-9]{32})$
      */
   protocol: string;
 }
@@ -77,9 +79,23 @@ export interface RefundRequestCreated {
 export interface RefundTracking {
   protocol: string;
   status: RefundStatus;
+  createdAt: string;
+  deadlineAt: string;
   updatedAt: string;
   /** @nullable */
   message: string | null;
+  /** @nullable */
+  customerName: string | null;
+  /** @nullable */
+  email: string | null;
+  /** @nullable */
+  whatsapp: string | null;
+  /** @nullable */
+  orderNumber: string | null;
+  /** @nullable */
+  reason: string | null;
+  /** @nullable */
+  details: string | null;
 }
 
 export interface ApiError {

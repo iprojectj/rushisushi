@@ -10,7 +10,21 @@ import type { RefundStatus } from './refundStatus';
 export interface RefundTracking {
   protocol: string;
   status: RefundStatus;
+  createdAt: Date;
+  deadlineAt: Date;
   updatedAt: Date;
   /** @nullable */
   message: string | null;
+  /** @nullable */
+  customerName: string | null;
+  /** @nullable */
+  email: string | null;
+  /** @nullable */
+  whatsapp: string | null;
+  /** @nullable */
+  orderNumber: string | null;
+  /** @nullable */
+  reason: string | null;
+  /** @nullable */
+  details: string | null;
 }

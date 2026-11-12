@@ -1,4 +1,3 @@
-import { randomBytes } from "node:crypto";
 import { Router, type Request, type Response } from "express";
 import {
   CreateRefundRequestBody,
@@ -7,6 +6,7 @@ import {
   TrackRefundRequestResponse,
 } from "@workspace/api-zod";
 import { pool } from "@workspace/db";
+import { createUniqueRefundTrackingCode, lockRefundTrackingCodes } from "../lib/refund-tracking";
 
 const router = Router();
 const rateLimits = new Map<string, { count: number; resetAt: number }>();
@@ -140,64 +140,79 @@ router.post("/refund-requests", async (request, response) => {
       return;
     }
 
-    const existing = await pool.query<RefundRow>(
-      `SELECT id, order_id, nome, email, whatsapp, created_at, fields
-       FROM lead_submissions
-       WHERE id = $1::uuid AND form_type = 'refund_request'
-       LIMIT 1`,
-      [input.requestKey],
-    );
-    if (existing.rows[0]) {
-      const row = existing.rows[0];
-      const fields = asRecord(row.fields);
-      if (
-        row.order_id !== paidOrder.rows[0].order_id ||
-        row.whatsapp !== whatsapp ||
-        row.email !== email ||
-        fields.publicOrderNumber !== publicOrderNumber
-      ) {
-        errorResponse(response, 409, "Não foi possível reutilizar esta solicitação. Atualize a página e tente novamente.");
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      await lockRefundTrackingCodes(client);
+      const existing = await client.query<RefundRow>(
+        `SELECT id, order_id, nome, email, whatsapp, created_at, fields
+         FROM lead_submissions
+         WHERE id = $1::uuid AND form_type = 'refund_request'
+         LIMIT 1
+         FOR UPDATE`,
+        [input.requestKey],
+      );
+      if (existing.rows[0]) {
+        const row = existing.rows[0];
+        const fields = asRecord(row.fields);
+        if (
+          row.order_id !== paidOrder.rows[0].order_id ||
+          row.whatsapp !== whatsapp ||
+          row.email !== email ||
+          fields.publicOrderNumber !== publicOrderNumber
+        ) {
+          await client.query("ROLLBACK");
+          errorResponse(response, 409, "Não foi possível reutilizar esta solicitação. Atualize a página e tente novamente.");
+          return;
+        }
+        await client.query("COMMIT");
+        response.status(201).json(CreateRefundRequestResponse.parse({
+          protocol: fields.protocol,
+          status: fields.status || "recebida",
+          createdAt: row.created_at,
+        }));
         return;
       }
+
+      const protocol = await createUniqueRefundTrackingCode(client);
+      const now = new Date().toISOString();
+      const fields = JSON.stringify({
+        protocol,
+        reason: input.reason,
+        details,
+        publicOrderNumber,
+        status: "recebida",
+        statusMessage: null,
+        createdAt: now,
+        updatedAt: now,
+      });
+      const inserted = await client.query<RefundRow>(
+        `INSERT INTO lead_submissions
+           (id, form_type, order_id, nome, email, whatsapp, fields)
+         VALUES ($1::uuid, 'refund_request', $2, $3, $4, $5, $6::jsonb)
+         ON CONFLICT (id) DO NOTHING
+         RETURNING id, order_id, nome, email, whatsapp, created_at, fields`,
+        [input.requestKey, paidOrder.rows[0].order_id, name, email, whatsapp, fields],
+      );
+      if (!inserted.rows[0]) {
+        await client.query("ROLLBACK");
+        errorResponse(response, 409, "Não foi possível registrar a solicitação. Atualize a página e tente novamente.");
+        return;
+      }
+
+      await client.query("COMMIT");
+      const savedFields = asRecord(inserted.rows[0].fields);
       response.status(201).json(CreateRefundRequestResponse.parse({
-        protocol: fields.protocol,
-        status: fields.status || "recebida",
-        createdAt: row.created_at,
+        protocol: savedFields.protocol,
+        status: savedFields.status,
+        createdAt: inserted.rows[0].created_at,
       }));
-      return;
+    } catch (error) {
+      await client.query("ROLLBACK").catch(() => undefined);
+      throw error;
+    } finally {
+      client.release();
     }
-
-    const now = new Date().toISOString();
-    const protocol = `RS-${randomBytes(16).toString("hex").toUpperCase()}`;
-    const fields = JSON.stringify({
-      protocol,
-      reason: input.reason,
-      details,
-      publicOrderNumber,
-      status: "recebida",
-      statusMessage: null,
-      createdAt: now,
-      updatedAt: now,
-    });
-    const inserted = await pool.query<RefundRow>(
-      `INSERT INTO lead_submissions
-         (id, form_type, order_id, nome, email, whatsapp, fields)
-       VALUES ($1::uuid, 'refund_request', $2, $3, $4, $5, $6::jsonb)
-       ON CONFLICT (id) DO NOTHING
-       RETURNING id, order_id, nome, email, whatsapp, created_at, fields`,
-      [input.requestKey, paidOrder.rows[0].order_id, name, email, whatsapp, fields],
-    );
-    if (!inserted.rows[0]) {
-      errorResponse(response, 409, "Não foi possível registrar a solicitação. Atualize a página e tente novamente.");
-      return;
-    }
-
-    const savedFields = asRecord(inserted.rows[0].fields);
-    response.status(201).json(CreateRefundRequestResponse.parse({
-      protocol: savedFields.protocol,
-      status: savedFields.status,
-      createdAt: inserted.rows[0].created_at,
-    }));
   } catch (error) {
     request.log.error({ error }, "Failed to register a refund request");
     errorResponse(response, 500, "Não foi possível registrar sua solicitação agora.");
@@ -220,7 +235,7 @@ router.post("/refund-requests/track", async (request, response) => {
     return;
   }
   const protocol = parsed.data.protocol.trim().toUpperCase();
-  if (!/^RS-[A-F0-9]{32}$/.test(protocol)) {
+  if (!/^(?:[A-Z0-9]{8}|RS-[A-F0-9]{32})$/.test(protocol)) {
     errorResponse(response, 404, "Não encontramos uma solicitação com esse protocolo.");
     return;
   }
@@ -245,11 +260,26 @@ router.post("/refund-requests/track", async (request, response) => {
     const validStatuses = new Set<RefundStatus>(["recebida", "em_analise", "aprovada", "estornada", "negada"]);
     const safeStatus = validStatuses.has(status as RefundStatus) ? status as RefundStatus : "recebida";
     const updatedAt = typeof fields.updatedAt === "string" ? fields.updatedAt : row.created_at;
+    const createdAt = row.created_at;
+    const createdTime = new Date(createdAt).getTime();
+    const deadlineAt = new Date(
+      (Number.isFinite(createdTime) ? createdTime : Date.now()) + 15 * 24 * 60 * 60 * 1000,
+    );
+    response.set("Cache-Control", "private, no-store");
+    response.set("Referrer-Policy", "no-referrer");
     response.json(TrackRefundRequestResponse.parse({
       protocol,
       status: safeStatus,
+      createdAt,
+      deadlineAt,
       updatedAt,
       message: statusMessage(safeStatus, fields.statusMessage),
+      customerName: row.nome,
+      email: row.email,
+      whatsapp: row.whatsapp,
+      orderNumber: typeof fields.publicOrderNumber === "string" ? fields.publicOrderNumber : null,
+      reason: typeof fields.reason === "string" ? fields.reason : null,
+      details: typeof fields.details === "string" ? fields.details : null,
     }));
   } catch (error) {
     request.log.error({ error }, "Failed to track a refund request");

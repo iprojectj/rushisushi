@@ -131,8 +131,10 @@ components:
       properties:
         protocol:
           type: string
-          minLength: 20
+          description: Código de acompanhamento de oito caracteres.
+          minLength: 8
           maxLength: 40
+          pattern: '^(?:[A-Z0-9]{8}|RS-[A-F0-9]{32})$'
     RefundRequestCreated:
       type: object
       required: [protocol, status, createdAt]
@@ -146,16 +148,34 @@ components:
           format: date-time
     RefundTracking:
       type: object
-      required: [protocol, status, updatedAt, message]
+      required: [protocol, status, createdAt, deadlineAt, updatedAt, message, customerName, email, whatsapp, orderNumber, reason, details]
       properties:
         protocol:
           type: string
         status:
           $ref: "#/components/schemas/RefundStatus"
+        createdAt:
+          type: string
+          format: date-time
+        deadlineAt:
+          type: string
+          format: date-time
         updatedAt:
           type: string
           format: date-time
         message:
+          type: ["string", "null"]
+        customerName:
+          type: ["string", "null"]
+        email:
+          type: ["string", "null"]
+        whatsapp:
+          type: ["string", "null"]
+        orderNumber:
+          type: ["string", "null"]
+        reason:
+          type: ["string", "null"]
+        details:
           type: ["string", "null"]
     RefundStatus:
       type: string

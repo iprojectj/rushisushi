@@ -58,18 +58,28 @@ export const CreateRefundRequestResponse = zod.object({
 /**
  * @summary Retrieve refund request status by protocol
  */
-export const trackRefundRequestBodyProtocolMin = 20;
+export const trackRefundRequestBodyProtocolMin = 8;
 export const trackRefundRequestBodyProtocolMax = 40;
 
 
+export const trackRefundRequestBodyProtocolRegExp = new RegExp('^(?:[A-Z0-9]{8}|RS-[A-F0-9]{32})$');
+
 
 export const TrackRefundRequestBody = zod.object({
-  "protocol": zod.string().min(trackRefundRequestBodyProtocolMin).max(trackRefundRequestBodyProtocolMax)
+  "protocol": zod.string().min(trackRefundRequestBodyProtocolMin).max(trackRefundRequestBodyProtocolMax).regex(trackRefundRequestBodyProtocolRegExp).describe('Código de acompanhamento de oito caracteres.')
 })
 
 export const TrackRefundRequestResponse = zod.object({
   "protocol": zod.string(),
   "status": zod.enum(['recebida', 'em_analise', 'aprovada', 'estornada', 'negada']),
+  "createdAt": zod.coerce.date(),
+  "deadlineAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
-  "message": zod.string().nullable()
+  "message": zod.string().nullable(),
+  "customerName": zod.string().nullable(),
+  "email": zod.string().nullable(),
+  "whatsapp": zod.string().nullable(),
+  "orderNumber": zod.string().nullable(),
+  "reason": zod.string().nullable(),
+  "details": zod.string().nullable()
 })
