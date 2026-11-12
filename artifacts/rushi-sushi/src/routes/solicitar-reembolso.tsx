@@ -167,7 +167,7 @@ function RefundRequestPage() {
 
   const inputClass = "refund-input";
   return (
-    <main className="refund-page min-h-[100dvh]">
+    <main className="refund-page refund-request-page min-h-[100dvh]">
       <header className="refund-header">
         <a href="/" className="refund-brand" data-testid="link-rushi-home" aria-label="Rūshī Sushi — página inicial">
           <img src="/images/logo-rushi-transparente.png" alt="Rūshī Sushi" />
