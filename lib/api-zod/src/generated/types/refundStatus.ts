@@ -12,6 +12,7 @@ export type RefundStatus = typeof RefundStatus[keyof typeof RefundStatus];
 export const RefundStatus = {
   recebida: 'recebida',
   em_analise: 'em_analise',
+  contato_whatsapp: 'contato_whatsapp',
   aprovada: 'aprovada',
   estornada: 'estornada',
   negada: 'negada',

@@ -262,7 +262,7 @@
 .refund-track-result-top strong { font-size: 11px; }
 .refund-track-result-top small { color: #8a7971; font-size: 9px; margin-left: auto; }
 .refund-status-dot { background: #b88040; border-radius: 50%; height: 7px; width: 7px; }
-.status-em_analise { background: #bd8437; }.status-aprovada, .status-estornada { background: #4c8765; }.status-negada { background: #b9252b; }
+.status-em_analise { background: #bd8437; }.status-contato_whatsapp { background: #487c91; }.status-aprovada, .status-estornada { background: #4c8765; }.status-negada { background: #b9252b; }
 .refund-track-result p { color: #68564e; font-size: 10px; line-height: 1.6; margin: 10px 0; }
 .refund-track-result > small { color: #97857b; font-size: 9px; }
 .refund-help-note { color: #7b6961; font-size: 10px; margin-top: 18px; text-align: center; }
@@ -295,6 +295,7 @@
 .refund-tracking-status { align-items: center; background: #f5eedf; border-radius: 30px; color: #89632c; display: inline-flex; font-size: 10px; font-weight: 700; gap: 7px; padding: 8px 11px; }
 .refund-tracking-status > span { background: currentColor; border-radius: 50%; height: 6px; width: 6px; }
 .refund-tracking-status.status-em_analise { background: #f7ebd8; color: #a36b24; }
+.refund-tracking-status.status-contato_whatsapp { background: #e5eff2; color: #487c91; }
 .refund-tracking-status.status-aprovada, .refund-tracking-status.status-estornada { background: #e8f0e9; color: #4c7757; }
 .refund-tracking-status.status-negada { background: #f8e8e6; color: #a43a34; }
 .refund-progress-card { background: #f4ede4; border: 1px solid #e9ddd1; border-radius: 6px; margin-top: 22px; padding: 18px; }
@@ -310,6 +311,20 @@
 .refund-progress-caption strong { color: #563b32; }
 .refund-progress-deadline { color: #8f7d72; display: block; font-size: 8px; margin-top: 8px; }
 .refund-progress-card > p { color: #88766c; font-size: 9px; line-height: 1.6; margin: 13px 0 0; }
+.refund-steps-card { background: #fffaf5; border: 1px solid #e4d6c8; border-radius: 6px; margin-top: 15px; padding: 18px; }
+.refund-steps-card .refund-tracking-section-title { margin-bottom: 20px; }
+.refund-step-list { list-style: none; margin: 0; padding: 0; }
+.refund-step { display: grid; gap: 12px; grid-template-columns: 28px minmax(0, 1fr); min-height: 70px; position: relative; }
+.refund-step:not(:last-child)::before { background: #e1d4c7; content: ""; left: 13px; position: absolute; top: 28px; bottom: 0; width: 2px; }
+.refund-step-marker { align-items: center; background: #eee5db; border: 2px solid #e1d4c7; border-radius: 50%; color: #806e65; display: flex; font-size: 9px; font-weight: 800; height: 28px; justify-content: center; position: relative; width: 28px; z-index: 1; }
+.refund-step.is-complete .refund-step-marker { background: #4c8765; border-color: #4c8765; color: #fff; }
+.refund-step.is-current .refund-step-marker { box-shadow: 0 0 0 4px #4c876522; }
+.refund-step-copy { padding: 2px 0 16px; }
+.refund-step-copy strong { color: #66544b; display: block; font-size: 11px; }
+.refund-step.is-complete .refund-step-copy strong { color: #3c2b26; }
+.refund-step-copy p { color: #8a7971; font-size: 9px; line-height: 1.55; margin: 4px 0 0; }
+.refund-step-copy small { color: #4c7757; display: inline-block; font-size: 8px; font-weight: 800; margin-top: 5px; text-transform: uppercase; }
+.refund-deadline-note { background: #f7ebd8; border-radius: 4px; color: #7d5d2b; font-size: 10px; line-height: 1.6; margin: 6px 0 0; padding: 11px 12px; }
 .refund-tracking-message { align-items: flex-start; background: #edf1e9; border: 1px solid #dce5d7; border-radius: 5px; color: #4d6f4d; display: flex; gap: 9px; margin-top: 15px; padding: 13px; }
 .refund-tracking-message svg { flex: 0 0 auto; }
 .refund-tracking-message p { color: #53684f; font-size: 10px; line-height: 1.6; margin: 0; }
@@ -363,7 +378,7 @@
 .refund-admin-card-head { align-items: center; background: transparent; border: 0; color: inherit; cursor: pointer; display: grid; gap: 16px; grid-template-columns: 118px minmax(150px,1fr) minmax(115px,.7fr) 110px 16px; min-height: 75px; padding: 13px 17px; text-align: left; width: 100%; }
 .refund-admin-badge { align-items: center; background: #f4eee3; border-radius: 30px; color: #866330; display: inline-flex; font-size: 9px; font-weight: 700; gap: 6px; justify-self: start; padding: 6px 9px; }
 .refund-admin-badge > span { background: currentColor; border-radius: 50%; height: 5px; width: 5px; }
-.badge-em_analise { background: #f7ebd8; color: #a36b24; }.badge-aprovada,.badge-estornada { background: #e8f0e9; color: #4c7757; }.badge-negada { background: #f8e8e6; color: #a43a34; }
+.badge-em_analise { background: #f7ebd8; color: #a36b24; }.badge-contato_whatsapp { background: #e5eff2; color: #487c91; }.badge-aprovada,.badge-estornada { background: #e8f0e9; color: #4c7757; }.badge-negada { background: #f8e8e6; color: #a43a34; }
 .refund-admin-customer, .refund-admin-protocol { display: flex; flex-direction: column; min-width: 0; }
 .refund-admin-customer strong { font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .refund-admin-customer small { color: #89786f; font-size: 9px; margin-top: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -452,5 +467,6 @@
   .refund-admin-summary { gap: 17px; }
   .refund-progress-card { padding: 14px; }
   .refund-progress-caption { align-items: flex-start; flex-direction: column; gap: 5px; }
+  .refund-steps-card { padding: 14px; }
   .refund-tracking-grid { grid-template-columns: 1fr; }
 }

@@ -179,7 +179,7 @@ components:
           type: ["string", "null"]
     RefundStatus:
       type: string
-      enum: [recebida, em_analise, aprovada, estornada, negada]
+      enum: [recebida, em_analise, contato_whatsapp, aprovada, estornada, negada]
     ApiError:
       type: object
       required: [error]

@@ -11,7 +11,7 @@ export const Route = createFileRoute("/_authenticated/admin/refunds")({
   component: RefundQueuePage,
 });
 
-type RefundStatus = "recebida" | "em_analise" | "aprovada" | "estornada" | "negada";
+type RefundStatus = "recebida" | "em_analise" | "contato_whatsapp" | "aprovada" | "estornada" | "negada";
 type RefundFields = { protocol?: string; publicOrderNumber?: string; reason?: string; details?: string; status?: RefundStatus; statusMessage?: string | null; updatedAt?: string };
 type RefundRow = {
   id: string;
@@ -25,12 +25,14 @@ type RefundRow = {
 const STATUS_OPTIONS: { value: RefundStatus; label: string }[] = [
   { value: "recebida", label: "Recebida" },
   { value: "em_analise", label: "Em análise" },
+  { value: "contato_whatsapp", label: "Contato pelo WhatsApp" },
   { value: "aprovada", label: "Aprovada" },
   { value: "estornada", label: "Estornada" },
   { value: "negada", label: "Negada" },
 ];
 const STATUS_LABEL: Record<RefundStatus, string> = {
-  recebida: "Recebida", em_analise: "Em análise", aprovada: "Aprovada", estornada: "Estornada", negada: "Negada",
+  recebida: "Recebida", em_analise: "Em análise", contato_whatsapp: "Contato pelo WhatsApp",
+  aprovada: "Aprovada", estornada: "Reembolso efetivado", negada: "Não aprovada",
 };
 const REASON_LABEL: Record<string, string> = {
   nao_entregue: "Pedido não entregue", pedido_incorreto: "Pedido incorreto", item_faltando: "Item faltando",
@@ -76,9 +78,10 @@ function RefundQueuePage() {
 
   const enriched = useMemo(() => rows.map((row) => ({ row, fields: safeFields(row.fields) })).map(({ row, fields }) => ({ row, fields, status: fields.status ?? "recebida" as RefundStatus })), [rows]);
   const counts = useMemo(() => ({
-    abertas: enriched.filter(({ status }) => status === "recebida" || status === "em_analise").length,
+    abertas: enriched.filter(({ status }) => !["estornada", "negada"].includes(status)).length,
     recebida: enriched.filter(({ status }) => status === "recebida").length,
     em_analise: enriched.filter(({ status }) => status === "em_analise").length,
+    contato_whatsapp: enriched.filter(({ status }) => status === "contato_whatsapp").length,
     aprovada: enriched.filter(({ status }) => status === "aprovada").length,
     estornada: enriched.filter(({ status }) => status === "estornada").length,
     negada: enriched.filter(({ status }) => status === "negada").length,
@@ -86,7 +89,7 @@ function RefundQueuePage() {
   }), [enriched]);
   const visible = useMemo(() => enriched.filter(({ row, fields, status }) => {
     const matchesFilter = filter === "todas" || filter === "abertas"
-      ? filter === "todas" || status === "recebida" || status === "em_analise"
+      ? filter === "todas" || !["estornada", "negada"].includes(status)
       : status === filter;
     const needle = search.trim().toLocaleLowerCase("pt-BR");
     const matchesSearch = !needle || [row.nome, row.email, row.whatsapp, fields.publicOrderNumber, fields.protocol].some((value) => value?.toLocaleLowerCase("pt-BR").includes(needle));
@@ -136,6 +139,7 @@ function RefundQueuePage() {
               ["todas", "Todas", rows.length],
               ["recebida", "Recebidas", counts.recebida],
               ["em_analise", "Em análise", counts.em_analise],
+              ["contato_whatsapp", "Contato WhatsApp", counts.contato_whatsapp],
               ["aprovada", "Aprovadas", counts.aprovada],
               ["estornada", "Estornadas", counts.estornada],
               ["negada", "Não aprovadas", counts.negada],
@@ -191,7 +195,7 @@ function RefundQueuePage() {
                           <textarea maxLength={500} value={draft.message} onChange={(event) => setDrafts((current) => ({ ...current, [row.id]: { ...draft, message: event.target.value } }))} placeholder="Escreva uma atualização clara e acolhedora." data-testid={`input-message-${row.id}`} />
                         </label>
                       </div>
-                      {draft.status === "estornada" && <div className="refund-admin-warning" role="note" data-testid={`warning-refund-gateway-${row.id}`}><AlertCircle size={16} /><p><strong>Confirme antes de registrar.</strong> Marque como “Estornada” somente depois de verificar o estorno diretamente no gateway. Esta atualização não movimenta valores.</p></div>}
+              {draft.status === "estornada" && <div className="refund-admin-warning" role="note" data-testid={`warning-refund-gateway-${row.id}`}><AlertCircle size={16} /><p><strong>Confirme antes de registrar.</strong> Marque como “Reembolso efetivado” somente depois de confirmar que o valor foi devolvido ao cliente. Esta atualização não movimenta valores.</p></div>}
                       {saveErrors[row.id] && <p className="refund-admin-save-error" role="alert" data-testid={`error-save-refund-${row.id}`}>{saveErrors[row.id]}</p>}
                       {savedId === row.id && <p className="refund-admin-save-success" role="status" data-testid={`success-save-refund-${row.id}`}><Check size={15} /> Registro atualizado. Nenhum pagamento foi processado por esta ação.</p>}
                       <div className="refund-admin-edit-actions"><span>O cliente verá o status e esta mensagem no acompanhamento.</span><button type="button" disabled={savingId === row.id} onClick={() => void save(row, draft.status, draft.message)} data-testid={`button-save-refund-${row.id}`}>{savingId === row.id ? <><LoaderCircle size={16} className="animate-spin" /> Salvando…</> : <>Salvar atualização <ArrowDownUp size={15} /></>}</button></div>
@@ -202,7 +206,7 @@ function RefundQueuePage() {
             })}
           </div>
         )}
-        <div className="refund-admin-footnote"><ShieldCheck size={15} /><p>Atualizações de status são registros de suporte. A plataforma não inicia estornos por esta tela. <strong>Estornado</strong> só deve ser usado após confirmação no gateway.</p></div>
+        <div className="refund-admin-footnote"><ShieldCheck size={15} /><p>Atualizações de status são registros de suporte. A plataforma não inicia estornos por esta tela. <strong>Reembolso efetivado</strong> só deve ser usado após a devolução real do valor.</p></div>
       </div>
     </AdminShell>
   );

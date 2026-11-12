@@ -25,8 +25,9 @@ const REASONS: { value: Reason; label: string }[] = [
 const STATUS: Record<string, { label: string; note: string }> = {
   recebida: { label: "Recebida", note: "Seu pedido de ajuda chegou até nossa equipe." },
   em_analise: { label: "Em análise", note: "Estamos conferindo os detalhes com atenção." },
+  contato_whatsapp: { label: "Contato pelo WhatsApp", note: "Nossa equipe registrou o contato e está seguindo com sua solicitação." },
   aprovada: { label: "Aprovada", note: "A solicitação foi aprovada. Nossa equipe compartilhará os próximos passos." },
-  estornada: { label: "Estorno confirmado", note: "O estorno foi confirmado pela equipe Rūshī." },
+  estornada: { label: "Reembolso efetivado", note: "A equipe confirmou que o valor foi devolvido." },
   negada: { label: "Não aprovada", note: "Nossa equipe concluiu a análise e deixou uma mensagem sobre a decisão." },
 };
 const EMPTY = { name: "", email: "", whatsapp: "", orderId: "", reason: "" as Reason | "", details: "" };

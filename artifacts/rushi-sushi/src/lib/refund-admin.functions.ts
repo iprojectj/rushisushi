@@ -5,7 +5,7 @@ import { requireAdmin } from "@/lib/admin-auth.functions";
 
 const updateSchema = z.object({
   id: z.string().uuid(),
-  status: z.enum(["recebida", "em_analise", "aprovada", "estornada", "negada"]),
+  status: z.enum(["recebida", "em_analise", "contato_whatsapp", "aprovada", "estornada", "negada"]),
   message: z.string().max(500).nullable(),
 });
 

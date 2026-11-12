@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test:production": "node scripts/check-production-http.mjs",
     "test:geography": "node --experimental-strip-types --test scripts/purchase-geography.test.mjs",
+    "test:refund": "node --experimental-strip-types --test scripts/refund-progress.test.mjs",
     "lint": "eslint .",
     "format": "prettier --write ."
   },

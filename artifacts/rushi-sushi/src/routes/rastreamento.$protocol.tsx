@@ -4,17 +4,24 @@ import type { RefundTracking } from "@workspace/api-client-react";
 import { ArrowLeft, Check, Clipboard, Clock3, RefreshCw, ShieldCheck } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { pageHead } from "@/lib/page-head";
-
-const DAY_MS = 24 * 60 * 60 * 1000;
-const WAITING_WINDOW_MS = 15 * DAY_MS;
+import { getRefundProgress } from "@/lib/refund-progress";
 
 const STATUS_LABEL: Record<string, string> = {
   recebida: "Solicitação recebida",
   em_analise: "Em análise pela equipe",
-  aprovada: "Análise aprovada",
-  estornada: "Registro de estorno concluído",
+  contato_whatsapp: "Contato pelo WhatsApp",
+  aprovada: "Reembolso autorizado",
+  estornada: "Reembolso efetivado",
   negada: "Análise concluída",
 };
+
+const TRACKING_STEPS = [
+  { status: "recebida", label: "Solicitação recebida", description: "Seu pedido de reembolso foi recebido com sucesso." },
+  { status: "em_analise", label: "Em análise pela equipe", description: "A equipe está conferindo os dados e o relato enviado." },
+  { status: "contato_whatsapp", label: "Contato pelo WhatsApp", description: "A equipe registrou o contato com você pelo WhatsApp." },
+  { status: "aprovada", label: "Reembolso autorizado", description: "A equipe autorizou a solicitação e está realizando o procedimento manual." },
+  { status: "estornada", label: "Reembolso efetivado", description: "A equipe confirmou que o valor foi devolvido." },
+];
 
 const REASON_LABEL: Record<string, string> = {
   nao_entregue: "Pedido não entregue",
@@ -64,14 +71,14 @@ function RefundTrackingPage() {
     return () => window.clearInterval(timer);
   }, []);
 
-  const createdAtMs = record ? new Date(record.createdAt).getTime() : Number.NaN;
-  const deadlineAtMs = record ? new Date(record.deadlineAt).getTime() : Number.NaN;
-  const elapsedMs = Number.isFinite(createdAtMs) ? Math.max(0, now - createdAtMs) : 0;
-  const percent = Math.min(100, Math.floor((elapsedMs / WAITING_WINDOW_MS) * 100));
-  const elapsedDays = Math.min(15, Math.floor(elapsedMs / DAY_MS));
-  const remainingDays = Number.isFinite(deadlineAtMs)
-    ? Math.max(0, Math.ceil((deadlineAtMs - now) / DAY_MS))
-    : Math.max(0, 15 - elapsedDays);
+  const progress = record
+    ? getRefundProgress(record.createdAt, record.deadlineAt, now, record.status)
+    : { percent: 5, elapsedDays: 0, remainingDays: 15 };
+  const completedStepIndex = record?.status === "negada"
+    ? 1
+    : TRACKING_STEPS.findIndex((step) => step.status === record?.status);
+  const isRefunded = record?.status === "estornada";
+  const isRejected = record?.status === "negada";
 
   async function copyCode() {
     try {
@@ -96,8 +103,8 @@ function RefundTrackingPage() {
       <section className="refund-tracking-wrap">
         <div className="refund-tracking-heading">
           <p className="refund-eyebrow"><span>ACOMPANHAMENTO DO PEDIDO</span><span className="refund-eyebrow-rule" /></p>
-          <h1>Estamos cuidando<br />disso <em>com atenção.</em></h1>
-          <p>Veja os dados enviados e acompanhe o período de análise da sua solicitação.</p>
+          <h1>Seu reembolso,<br /><em>em acompanhamento.</em></h1>
+          <p>Acompanhe o andamento da solicitação e as atualizações feitas pela equipe Rūshī.</p>
         </div>
 
         {loading ? (
@@ -128,30 +135,63 @@ function RefundTrackingPage() {
               </span>
             </div>
 
-            <section className="refund-progress-card" aria-label="Progresso do período de acompanhamento">
+            <section className="refund-progress-card" aria-label="Progresso do prazo de reembolso">
               <div className="refund-progress-title">
-                <div><Clock3 size={17} /><strong>Período de acompanhamento</strong></div>
-                <b data-testid="text-tracking-percent">{percent}%</b>
+                <div><Clock3 size={17} /><strong>Prazo de reembolso</strong></div>
+                <b data-testid="text-tracking-percent">{progress.percent}%</b>
               </div>
-              <div className="refund-progress-track" role="progressbar" aria-label="Tempo transcorrido do período de 15 dias" aria-valuemin={0} aria-valuemax={100} aria-valuenow={percent}>
-                <span style={{ width: `${percent}%` }} />
+              <div className="refund-progress-track" role="progressbar" aria-label="Progresso do prazo de até 15 dias" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress.percent}>
+                <span style={{ width: `${progress.percent}%` }} />
               </div>
               <div className="refund-progress-caption">
-                <span>{elapsedDays} de 15 dias transcorridos</span>
-                <strong>{remainingDays > 0 ? (remainingDays === 1 ? "Falta 1 dia" : `Faltam ${remainingDays} dias`) : "Período de 15 dias concluído"}</strong>
+                <span>{progress.elapsedDays} de 15 dias transcorridos</span>
+                <strong>
+                  {isRefunded
+                    ? "Reembolso efetivado"
+                    : isRejected
+                      ? "Solicitação encerrada"
+                      : progress.remainingDays > 0
+                        ? (progress.remainingDays === 1 ? "Falta 1 dia" : `Faltam ${progress.remainingDays} dias`)
+                        : "Prazo concluído — aguardando confirmação"}
+                </strong>
               </div>
-              <small className="refund-progress-deadline">Fim deste período: {formatDate(record.deadlineAt)}</small>
-              <p>A barra acompanha o tempo desde o envio. Ela não significa aprovação nem realiza um estorno automaticamente.</p>
+              <small className="refund-progress-deadline">Prazo de 15 dias: até {formatDate(record.deadlineAt)}</small>
+              <p>A barra começa em 5% e avança diariamente. O status “Reembolso efetivado” só aparece após a equipe confirmar a devolução real do valor.</p>
             </section>
 
             <div className="refund-tracking-message" role="status" data-testid="text-tracking-message">
               <ShieldCheck size={18} />
-              <p>{record.message || "Sua solicitação foi registrada para análise da equipe Rūshī."}</p>
+              <p>{record.message || "Seu pedido de reembolso foi recebido com sucesso. Ele está em andamento; acompanhe as atualizações por aqui."}</p>
             </div>
+
+            <section className="refund-steps-card" aria-label="Etapas da solicitação">
+              <div className="refund-tracking-section-title">
+                <span>02</span><div><p className="refund-eyebrow">ANDAMENTO</p><h3>Etapas do reembolso</h3></div>
+              </div>
+              <ol className="refund-step-list">
+                {TRACKING_STEPS.map((step, index) => {
+                  const complete = !isRejected && index <= completedStepIndex;
+                  const current = !isRefunded && !isRejected && index === completedStepIndex;
+                  return (
+                    <li className={`refund-step${complete ? " is-complete" : ""}${current ? " is-current" : ""}`} key={step.status} aria-current={current ? "step" : undefined}>
+                      <span className="refund-step-marker">{complete ? <Check size={14} /> : index + 1}</span>
+                      <div className="refund-step-copy">
+                        <strong>{step.label}</strong>
+                        <p>{step.description}</p>
+                        {current && <small>Etapa atual</small>}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ol>
+              {progress.remainingDays === 0 && !isRefunded && !isRejected && (
+                <p className="refund-deadline-note" role="status">O prazo de acompanhamento chegou ao fim. Se a equipe ainda não confirmou a devolução, entre em contato com o atendimento.</p>
+              )}
+            </section>
 
             <section className="refund-tracking-details">
               <div className="refund-tracking-section-title">
-                <span>01</span><div><p className="refund-eyebrow">DADOS ENVIADOS</p><h3>Confira sua solicitação</h3></div>
+                <span>03</span><div><p className="refund-eyebrow">DADOS ENVIADOS</p><h3>Confira sua solicitação</h3></div>
               </div>
               <dl className="refund-tracking-grid">
                 <div><dt>Nome</dt><dd data-testid="text-tracking-name">{record.customerName || "Não informado"}</dd></div>

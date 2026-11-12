@@ -13,7 +13,7 @@ const rateLimits = new Map<string, { count: number; resetAt: number }>();
 const REQUEST_WINDOW_MS = 10 * 60_000;
 const STATUS_WINDOW_MS = 10 * 60_000;
 
-type RefundStatus = "recebida" | "em_analise" | "aprovada" | "estornada" | "negada";
+type RefundStatus = "recebida" | "em_analise" | "contato_whatsapp" | "aprovada" | "estornada" | "negada";
 type RefundRow = {
   id: string;
   order_id: string | null;
@@ -78,10 +78,11 @@ function asRecord(value: unknown): Record<string, unknown> {
 function statusMessage(status: RefundStatus, message: unknown) {
   if (typeof message === "string" && message.trim()) return message.trim().slice(0, 500);
   const defaults: Record<RefundStatus, string> = {
-    recebida: "Recebemos sua solicitação. Ela ainda será analisada pela equipe.",
+    recebida: "Seu pedido de reembolso foi recebido com sucesso. Ele está em andamento; acompanhe as atualizações por aqui.",
     em_analise: "Nossa equipe está analisando sua solicitação.",
-    aprovada: "Sua solicitação foi aprovada. O estorno ainda depende de processamento no gateway.",
-    estornada: "O estorno foi marcado como concluído pela equipe.",
+    contato_whatsapp: "Nossa equipe registrou o contato pelo WhatsApp e está seguindo com sua solicitação.",
+    aprovada: "Sua solicitação foi autorizada. A equipe está realizando o reembolso manual.",
+    estornada: "Reembolso efetivado. A equipe confirmou a devolução do valor.",
     negada: "A equipe concluiu a análise e não aprovou a solicitação.",
   };
   return defaults[status];
@@ -257,7 +258,7 @@ router.post("/refund-requests/track", async (request, response) => {
 
     const fields = asRecord(row.fields);
     const status = fields.status;
-    const validStatuses = new Set<RefundStatus>(["recebida", "em_analise", "aprovada", "estornada", "negada"]);
+    const validStatuses = new Set<RefundStatus>(["recebida", "em_analise", "contato_whatsapp", "aprovada", "estornada", "negada"]);
     const safeStatus = validStatuses.has(status as RefundStatus) ? status as RefundStatus : "recebida";
     const updatedAt = typeof fields.updatedAt === "string" ? fields.updatedAt : row.created_at;
     const createdAt = row.created_at;
